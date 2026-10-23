@@ -3384,13 +3384,16 @@ function openImport() { openSheet('📥 Importa partita', `<p class="desc">Incol
 function doImport() { const v = ($('#impc').value || '').trim(); try { if (!v.startsWith('FEUDUM1:')) throw 0; const s = JSON.parse(decodeURIComponent(escape(atob(v.slice(8))))); if (!s || s.v !== 1) throw 0; SAVE_KEY = 'feudum_proto_v1'; CLOUD.mem = CLOUD.mem || {}; CLOUD.mem[SAVE_KEY] = JSON.stringify(s); try { localStorage.setItem(SAVE_KEY, JSON.stringify(s)); } catch (e) { } closeSheet(); beginGame(false); toast('📥 Partita caricata'); } catch (e) { toast('Codice non valido'); } }
 function showTitle() {
   MODE = 'title'; $('#title').classList.remove('hidden'); renderTset();
-  const has = !!load();
-  const creBtn = `<button class="btn" style="background:linear-gradient(180deg,#3f7a2e,#245216)" onclick="pickCreative()">🧱 Modalità Creativa<small>tutto sbloccato, risorse infinite, costruzione istantanea</small></button>`;
-  const maxBtn = `<button class="btn" style="background:linear-gradient(180deg,#1e3a8a,#13245a)" onclick="pickEra()">🏰 Città al massimo<small>scegli l'era, tutto sbloccato</small></button>`;
+  const tb = (cls, on, ic, lb, sub, dis) => `<button class="btn tb ${cls}" ${dis ? 'disabled' : `onclick="${on}"`}><i class="bi">${ic}</i><span class="bl">${lb}</span>${sub ? `<small>${sub}</small>` : ''}</button>`;
   const sv = load(); const when = sv && sv.last ? new Date(sv.last).toLocaleString('it-IT', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : '';
-  $('#tbtns').innerHTML = `<button class="btn big" onclick="${sv ? 'newCampaign()' : 'beginGame(true)'}">⚔ Inizia Campagna</button>`
-    + `<button class="btn big cont ${sv ? '' : 'dis'}" ${sv ? 'onclick="beginGame(false)"' : 'disabled'}>📜 Continua Campagna<small>${sv ? `Mastio ${sv.mastio} · ${ERA(sv.mastio).n} · salvata ${when}` : (CLOUD.ready ? 'nessun salvataggio sul tuo account' : 'nessun salvataggio su questo dispositivo')}</small></button>` + `<div class="savex">${sv ? '<button class="btn ghost" onclick="saveCode()">📋 Copia codice partita</button>' : ''}<button class="btn ghost" onclick="openImport()">📥 Importa partita</button></div>` + `<div class="cloudst">${!window.claude ? '💾 Salvataggio su questo dispositivo · usa 📋 Copia codice partita per spostarlo' : CLOUD.ready ? '☁ Salvataggio nel cloud del tuo account: attivo' : '⚠ Salvataggio solo su questo browser' + (CLOUD.why ? ' · motivo: ' + CLOUD.why : ' · controllo del cloud in corso…') + '<br><button class="btn ghost" style="margin-top:5px;font-size:12px;padding:6px 12px" onclick="cloudAsk()">☁ Attiva salvataggio cloud</button>'}</div>`
-    + maxBtn + creBtn + `<button class="btn ghost" onclick="openRealms(1)">🌍 Altri Regni<small>classifica e cronache dei signori della Marca</small></button>`;
+  const cs = !window.claude ? '💾 Salvataggio su questo dispositivo · usa 📋 Copia codice partita per spostarlo' : CLOUD.ready ? '☁ Salvataggio nel cloud del tuo account: attivo' : '⚠ Salvataggio solo su questo browser' + (CLOUD.why ? ' · motivo: ' + CLOUD.why : ' · controllo del cloud in corso…') + '<br><button class="btn ghost" style="margin-top:5px;font-size:12px;padding:6px 12px" onclick="cloudAsk()">☁ Attiva salvataggio cloud</button>';
+  $('#tbtns').innerHTML = tb('big k-new', sv ? 'newCampaign()' : 'beginGame(true)', '⚔', 'Inizia Campagna', 'una nuova Marca da conquistare')
+    + tb('big cont' + (sv ? '' : ' dis'), 'beginGame(false)', '📜', 'Continua Campagna', sv ? `Mastio ${sv.mastio} · ${ERA(sv.mastio).n} · salvata ${when}` : (CLOUD.ready ? 'nessun salvataggio sul tuo account' : 'nessun salvataggio su questo dispositivo'), !sv)
+    + `<div class="savex">${sv ? '<button class="btn ghost" onclick="saveCode()">📋 Copia codice partita</button>' : ''}<button class="btn ghost" onclick="openImport()">📥 Importa partita</button></div>`
+    + `<div class="cloudst">${cs}</div>`
+    + tb('k-max', 'pickEra()', '🏰', 'Città al massimo', "scegli l'era, tutto sbloccato")
+    + tb('k-cre', 'pickCreative()', '🧱', 'Modalità Creativa', 'tutto sbloccato, risorse infinite')
+    + tb('ghost k-rlm', 'openRealms(1)', '🌍', 'Altri Regni', 'classifica e cronache dei signori della Marca');
 }
 function pickCreative() {
   SAVE_KEY = 'feudum_creativo'; const has = !!load(); SAVE_KEY = 'feudum_proto_v1';

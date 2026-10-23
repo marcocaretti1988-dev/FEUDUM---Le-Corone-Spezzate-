@@ -435,6 +435,91 @@ html[data-theme=pietra] #askd .ab{background:linear-gradient(180deg,#30353a,#222
 #tuta{position:fixed;z-index:36;font-size:34px;pointer-events:none;filter:drop-shadow(0 3px 3px rgba(0,0,0,.6));animation:tbob .8s ease-in-out infinite alternate}@keyframes tbob{to{transform:translateY(10px)}}
 html[data-theme=pietra] #tutb{background:linear-gradient(180deg,#3a4046,#262a2e);color:#eef0f1;border-color:#8d959c}
 #tutb.top{bottom:auto;top:calc(var(--sat) + 150px)}
+
+/* ===== MENU PRINCIPALE: ogni layout ha la sua forma ===== */
+.tbox .rod,.tbox .dc{display:none;position:absolute;pointer-events:none}
+#tbtns .tb .bi{font-style:normal}#tbtns .tb .bl{display:inline}
+#tbtns .tb.k-max{background:linear-gradient(180deg,#1e3a8a,#13245a)}#tbtns .tb.k-cre{background:linear-gradient(180deg,#3f7a2e,#245216)}
+#tbtns .tb small{display:block}
+/* — Pergamena: rotolo con bastoni di legno, bottoni di legno arrotondati — */
+html[data-theme=pergamena] .tbox{border-radius:6px;margin:26px 0}
+html[data-theme=pergamena] .tbox .rod{display:block;left:-16px;right:-16px;height:22px;border-radius:11px;background:linear-gradient(180deg,#8a5a32,#5a3518 45%,#2e1a0b);box-shadow:0 4px 8px rgba(0,0,0,.5),inset 0 2px 0 rgba(255,255,255,.25)}
+html[data-theme=pergamena] .tbox .r1{top:-18px}html[data-theme=pergamena] .tbox .r2{bottom:-18px}
+html[data-theme=pergamena] .tbox .rod:before,html[data-theme=pergamena] .tbox .rod:after{content:"";position:absolute;top:-4px;width:18px;height:30px;border-radius:50%;background:radial-gradient(circle at 40% 35%,#c99a5a,#6b4220 60%,#2e1a0b)}
+html[data-theme=pergamena] .tbox .rod:before{left:-8px}html[data-theme=pergamena] .tbox .rod:after{right:-8px}
+html[data-theme=pergamena] .seal{top:auto;bottom:-30px;right:28px;z-index:2}
+html[data-theme=pergamena] #tbtns .tb{border-radius:999px;min-width:250px;border:2px solid #2a170a;box-shadow:inset 0 1px 0 rgba(255,255,255,.2),0 3px 0 #1a0e05}
+html[data-theme=pergamena] #tbtns .tb .bi{margin-right:4px}
+/* — Miniatura: indice di un codice miniato, capilettera d'oro — */
+html[data-theme=miniatura] .tbox{border-radius:2px;background:linear-gradient(180deg,#fbf6e6,#efe2bf);border:0;padding:30px 30px 22px;box-shadow:0 20px 60px rgba(0,0,0,.6),inset 0 0 0 3px #c99a2e,inset 0 0 0 7px #fbf6e6,inset 0 0 0 9px #1f3a8a,inset 0 0 0 11px #fbf6e6,inset 0 0 0 12px #b3261e}
+html[data-theme=miniatura] .tbox:before{inset:18px;border:1px dashed rgba(201,154,46,.7)}
+html[data-theme=miniatura] .tbox .dc{display:block;width:34px;height:34px;background:radial-gradient(circle at 50% 50%,#b3261e 0 5px,#f6dd8c 6px 8px,#1f3a8a 9px 13px,transparent 14px),conic-gradient(from 45deg,#c99a2e 0 25%,transparent 0 50%,#c99a2e 0 75%,transparent 0);border-radius:50%;box-shadow:0 0 0 2px #c99a2e}
+html[data-theme=miniatura] .tbox .d1{top:-8px;left:-8px}html[data-theme=miniatura] .tbox .d2{top:-8px;right:-8px}html[data-theme=miniatura] .tbox .d3{bottom:-8px;left:-8px}html[data-theme=miniatura] .tbox .d4{bottom:-8px;right:-8px}
+html[data-theme=miniatura] .seal{display:none}
+html[data-theme=miniatura] .tbox h1{font-size:52px}
+html[data-theme=miniatura] .tbox h1::first-letter{display:inline-block;background:linear-gradient(135deg,#f6dd8c,#c99a2e);color:#b3261e;padding:0 8px;margin-right:4px;border:2px solid #1f3a8a;box-shadow:inset 0 0 0 2px #fbf6e6}
+html[data-theme=miniatura] .tbox h2{border-top:1px solid #c99a2e;border-bottom:1px solid #c99a2e;padding:3px 0;margin:6px 30px 10px}
+html[data-theme=miniatura] #tbtns{align-items:stretch;gap:0;border-top:2px solid #1f3a8a;border-bottom:2px solid #1f3a8a;padding:4px 0}
+html[data-theme=miniatura] #tbtns .tb{display:grid;grid-template-columns:42px 1fr;grid-template-rows:auto auto;column-gap:10px;text-align:left;align-items:center;background:transparent;border:0;border-bottom:1px dotted #c99a2e;border-radius:0;box-shadow:none;color:#1f3a8a;padding:7px 4px;font-size:15px}
+html[data-theme=miniatura] #tbtns .tb:last-child{border-bottom:0}
+html[data-theme=miniatura] #tbtns .tb .bi{grid-row:1/3;width:40px;height:40px;display:flex;align-items:center;justify-content:center;font-size:20px;background:linear-gradient(135deg,#f6dd8c,#c99a2e 60%,#a37a1c);border:2px solid #1f3a8a;box-shadow:inset 0 0 0 2px #fbf6e6,0 2px 3px rgba(0,0,0,.3)}
+html[data-theme=miniatura] #tbtns .tb .bl{align-self:end}
+html[data-theme=miniatura] #tbtns .tb small{color:#b3261e;font-style:italic;font-size:12px;align-self:start}
+html[data-theme=miniatura] #tbtns .tb.big .bi{background:linear-gradient(135deg,#e3483d,#b3261e 60%,#7e160f);border-color:#c99a2e;color:#fff}
+html[data-theme=miniatura] #tbtns .tb.big .bl{color:#b3261e;font-size:18px}
+html[data-theme=miniatura] #tbtns .tb.k-max .bi{background:linear-gradient(135deg,#3d5bb8,#1f3a8a);border-color:#c99a2e}
+html[data-theme=miniatura] #tbtns .tb.k-cre .bi{background:linear-gradient(135deg,#4f9a3a,#2c6a1e);border-color:#c99a2e}
+html[data-theme=miniatura] #tbtns .tb:active{background:rgba(201,154,46,.18)}
+html[data-theme=miniatura] #tbtns .savex{padding:6px 0;border-bottom:1px dotted #c99a2e}html[data-theme=miniatura] #tbtns .cloudst{padding:4px 0 6px;border-bottom:1px dotted #c99a2e;margin:0;font-style:italic}
+html[data-theme=miniatura] #tbtns .savex .btn,html[data-theme=miniatura] .tset .btn{border-radius:999px;background:#fbf6e6;border:1px solid #c99a2e;color:#1f3a8a;box-shadow:0 0 0 2px #fbf6e6,0 0 0 3px #1f3a8a}
+html[data-theme=miniatura] .tset{margin-top:10px;gap:10px}
+/* — Pietra e Ferro: lastra di ardesia con fasce di ferro e rivetti, piastre sfaccettate — */
+html[data-theme=pietra] .tbox{border-radius:0;border:0;padding:34px 22px 26px;background:radial-gradient(circle at 20% 15%,rgba(255,255,255,.06),transparent 40%),radial-gradient(circle at 80% 70%,rgba(0,0,0,.25),transparent 45%),repeating-linear-gradient(0deg,transparent 0 46px,rgba(0,0,0,.35) 46px 48px),repeating-linear-gradient(90deg,transparent 0 92px,rgba(0,0,0,.25) 92px 94px),linear-gradient(180deg,#3d4349,#272b2f);box-shadow:0 0 0 3px #15181a,0 0 0 6px #5d656c,0 24px 60px rgba(0,0,0,.85),inset 0 0 40px rgba(0,0,0,.6);clip-path:none}
+html[data-theme=pietra] .tbox:before{display:none}
+html[data-theme=pietra] .tbox .rod{display:block;left:-8px;right:-8px;height:16px;background:linear-gradient(180deg,#6f777e,#3a3f44 50%,#1d2023);border:1px solid #0b0c0d;background-image:radial-gradient(circle at center,#c9d0d6 0 2.5px,#2a2e32 3px,transparent 4px),linear-gradient(180deg,#6f777e,#3a3f44 50%,#1d2023);background-size:40px 16px,100% 100%;background-repeat:repeat-x,no-repeat;background-position:center}
+html[data-theme=pietra] .tbox .r1{top:6px}html[data-theme=pietra] .tbox .r2{bottom:6px}
+html[data-theme=pietra] .tbox .dc{display:block;width:18px;height:18px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#e3e7ea,#7a838a 45%,#1b1e21);box-shadow:0 2px 2px #000;z-index:2}
+html[data-theme=pietra] .tbox .d1{top:30px;left:8px}html[data-theme=pietra] .tbox .d2{top:30px;right:8px}html[data-theme=pietra] .tbox .d3{bottom:30px;left:8px}html[data-theme=pietra] .tbox .d4{bottom:30px;right:8px}
+html[data-theme=pietra] .seal{width:56px;height:56px;top:-22px;left:50%;right:auto;margin-left:-28px;transform:none;border-radius:50%;background:transparent;border:7px solid #5d656c;box-shadow:0 0 0 2px #15181a,inset 0 0 0 2px #15181a,0 4px 8px #000;color:#ffb35a;font-size:18px}
+html[data-theme=pietra] .tbox h1{font-size:50px;letter-spacing:.12em;color:#d7dadc;text-shadow:0 -1px 0 #000,0 1px 0 rgba(255,255,255,.18)}
+html[data-theme=pietra] #tbtns{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+html[data-theme=pietra] #tbtns .tb{--cut:12px;clip-path:polygon(var(--cut) 0,calc(100% - var(--cut)) 0,100% var(--cut),100% calc(100% - var(--cut)),calc(100% - var(--cut)) 100%,var(--cut) 100%,0 calc(100% - var(--cut)),0 var(--cut));border:0;border-radius:0;padding:12px 10px 10px;display:flex;flex-direction:column;align-items:center;gap:3px;background:radial-gradient(circle at 10px 50%,#c9d0d6 0 2px,#1b1e21 2.5px,transparent 3.5px),radial-gradient(circle at calc(100% - 10px) 50%,#c9d0d6 0 2px,#1b1e21 2.5px,transparent 3.5px),linear-gradient(180deg,#646c74,#3b4146 55%,#2a2e32);box-shadow:inset 0 2px 0 rgba(255,255,255,.22),inset 0 -3px 0 rgba(0,0,0,.5);text-transform:uppercase;letter-spacing:.08em;color:#eef0f1}
+html[data-theme=pietra] #tbtns .tb .bi{font-size:24px;filter:grayscale(.3) drop-shadow(0 2px 0 #000)}
+html[data-theme=pietra] #tbtns .tb small{text-transform:none;letter-spacing:0;color:#b8c0c6}
+html[data-theme=pietra] #tbtns .tb.big{grid-column:1/3;flex-direction:row;justify-content:center;gap:10px;flex-wrap:wrap;background:radial-gradient(circle at 12px 50%,#ffe0b0 0 2px,#3a1a06 2.5px,transparent 3.5px),radial-gradient(circle at calc(100% - 12px) 50%,#ffe0b0 0 2px,#3a1a06 2.5px,transparent 3.5px),linear-gradient(180deg,#e07a2f,#9a4414 55%,#6a2c0a);color:#fff3e4;font-size:17px}
+html[data-theme=pietra] #tbtns .tb.big small{flex-basis:100%;color:#ffd9b0}
+html[data-theme=pietra] #tbtns .tb.cont{background:radial-gradient(circle at 12px 50%,#c9d0d6 0 2px,#1b1e21 2.5px,transparent 3.5px),radial-gradient(circle at calc(100% - 12px) 50%,#c9d0d6 0 2px,#1b1e21 2.5px,transparent 3.5px),linear-gradient(180deg,#5a6168,#30353a)}
+html[data-theme=pietra] #tbtns .tb.k-max .bl{color:#a9c4ef}html[data-theme=pietra] #tbtns .tb.k-cre .bl{color:#a9e08f}
+html[data-theme=pietra] #tbtns .tb.k-rlm{grid-column:1/3;flex-direction:row;justify-content:center;gap:8px;flex-wrap:wrap}html[data-theme=pietra] #tbtns .tb.k-rlm small{flex-basis:100%}
+html[data-theme=pietra] #tbtns .savex,html[data-theme=pietra] #tbtns .cloudst{grid-column:1/3}
+html[data-theme=pietra] #tbtns .savex .btn,html[data-theme=pietra] .tset .btn{border-radius:0;border:1px solid #0b0c0d;background:linear-gradient(180deg,#4a5157,#2c3135);box-shadow:inset 0 1px 0 rgba(255,255,255,.15),0 2px 0 #000;color:#eef0f1}
+html[data-theme=pietra] .tset .btn.ghost{background:linear-gradient(180deg,#4a5157,#2c3135)}
+html[data-theme=pietra] .tset{margin-top:10px}
+/* — Araldica: scudo con stendardi a coda di rondine e smalti pieni — */
+html[data-theme=araldica] .tbox h2{margin:8px -34px 12px;position:relative}
+html[data-theme=araldica] .tbox h2 span{display:inline-block;background:#b3201f;color:#f4f1ea;padding:6px 26px;border:3px solid #111;position:relative;z-index:1}
+html[data-theme=araldica] .tbox h2:before,html[data-theme=araldica] .tbox h2:after{content:"";position:absolute;top:10px;width:44px;height:30px;background:#7e1514;border:3px solid #111}
+html[data-theme=araldica] .tbox h2:before{left:20px;clip-path:polygon(0 0,100% 0,100% 100%,0 100%,28% 50%)}html[data-theme=araldica] .tbox h2:after{right:20px;clip-path:polygon(0 0,100% 0,72% 50%,100% 100%,0 100%)}
+html[data-theme=araldica] .tbox .dc{display:block;top:0;bottom:0;width:10px;background:repeating-linear-gradient(180deg,#e8b923 0 18px,#111 18px 22px)}
+html[data-theme=araldica] .tbox .d1{left:10px;bottom:40%}html[data-theme=araldica] .tbox .d2{right:10px;bottom:40%}
+html[data-theme=araldica] #tbtns{align-items:stretch;gap:9px;padding:0 6px}
+html[data-theme=araldica] #tbtns .tb{display:grid;grid-template-columns:38px 1fr;grid-template-rows:auto auto;column-gap:10px;text-align:left;align-items:center;border:0;border-radius:0;box-shadow:none;padding:8px 34px 8px 8px;clip-path:polygon(0 0,100% 0,calc(100% - 22px) 50%,100% 100%,0 100%);background:#1d4aa0;color:#f4f1ea;filter:drop-shadow(4px 4px 0 #111);text-transform:uppercase;letter-spacing:.06em;font-size:14px}
+html[data-theme=araldica] #tbtns .tb .bi{grid-row:1/3;width:36px;height:40px;display:flex;align-items:center;justify-content:center;font-size:18px;background:#f4f1ea;clip-path:polygon(0 0,100% 0,100% 60%,50% 100%,0 60%)}
+html[data-theme=araldica] #tbtns .tb .bl{align-self:end}html[data-theme=araldica] #tbtns .tb small{text-transform:none;letter-spacing:0;color:#ffe28a;align-self:start}
+html[data-theme=araldica] #tbtns .tb.big{background:#b3201f;font-size:16px}
+html[data-theme=araldica] #tbtns .tb.cont{background:#111}html[data-theme=araldica] #tbtns .tb.cont .bi{background:#e8b923}
+html[data-theme=araldica] #tbtns .tb.k-max{background:#1d4aa0}html[data-theme=araldica] #tbtns .tb.k-cre{background:#2f8a3a}
+html[data-theme=araldica] #tbtns .tb.k-rlm{background:#e8b923;color:#111}html[data-theme=araldica] #tbtns .tb.k-rlm small{color:#3a2a00}html[data-theme=araldica] #tbtns .tb.k-rlm .bi{background:#111}
+html[data-theme=araldica] #tbtns .tb:active{transform:translate(3px,3px);filter:drop-shadow(1px 1px 0 #111)}
+html[data-theme=araldica] .tset .btn{clip-path:polygon(0 0,100% 0,100% 62%,50% 100%,0 62%);border:0;box-shadow:none;padding:8px 14px 18px;background:#111;color:#f4f1ea;border-radius:0}
+html[data-theme=araldica] .tset .btn small{color:#e8b923!important}
+html[data-theme=araldica] .tset .btn:nth-child(2){background:#b3201f}html[data-theme=araldica] .tset .btn:nth-child(3){background:#1d4aa0}
+html[data-theme=araldica] #tbtns .savex .btn{border-radius:0}
+#title{overflow-y:auto;-webkit-overflow-scrolling:touch}#title .tbox{margin:auto;flex-shrink:0}
+html[data-theme=pergamena] .tbox{margin:30px auto}
+html[data-theme=pergamena] #tbtns .tb{flex-direction:row;flex-wrap:wrap;justify-content:center;column-gap:6px;padding:9px 16px}html[data-theme=pergamena] #tbtns .tb small{flex-basis:100%}
+html[data-theme=araldica] #tbtns .tb .bi{color:#111}html[data-theme=araldica] #tbtns .tb.k-rlm .bi{color:#e8b923}
+html[data-theme=araldica] .tbox .dc{display:none!important}
 </style>
 </head>
 <body>
@@ -463,9 +548,9 @@ html[data-theme=pietra] #tutb{background:linear-gradient(180deg,#3a4046,#262a2e)
 <button id="memob" class="hidden" onclick="sfx('click');openMemo()" title="Promemoria"><span>📜</span><b>0</b></button>
 <div id="rotbar" class="hidden"><button onclick="rotateView(-1)" title="Ruota (Q)">⟲</button><span id="rotlbl">N</span><button onclick="rotateView(1)" title="Ruota (E)">⟳</button></div>
 <div id="toast"></div>
-<div id="title" class="hidden"><div class="tbox"><div class="seal">F</div>
+<div id="title" class="hidden"><div class="tbox"><i class="rod r1"></i><i class="rod r2"></i><i class="dc d1"></i><i class="dc d2"></i><i class="dc d3"></i><i class="dc d4"></i><div class="seal">F</div>
   <div class="tk">MARCA ORIENTALE · A.D. 1254</div>
-  <h1>FEUDUM</h1><h2>Le Corone Spezzate</h2>
+  <h1>FEUDUM</h1><h2><span>Le Corone Spezzate</span></h2>
   <p>La stirpe sveva si è spenta. L'Impero è spezzato in cento feudi. Hai un Mastio di legno marcio, pochi contadini e una lettera dal sigillo infranto: <i>«Reclama ciò che è tuo.»</i></p>
   <div id="tbtns"></div><div id="tset" class="tset"></div>
   <div class="foot">PROTOTIPO SINGLE-PLAYER · 4 ERE · MASTIO 1–16</div>
@@ -3867,13 +3952,16 @@ function openImport() { openSheet('📥 Importa partita', `<p class="desc">Incol
 function doImport() { const v = ($('#impc').value || '').trim(); try { if (!v.startsWith('FEUDUM1:')) throw 0; const s = JSON.parse(decodeURIComponent(escape(atob(v.slice(8))))); if (!s || s.v !== 1) throw 0; SAVE_KEY = 'feudum_proto_v1'; CLOUD.mem = CLOUD.mem || {}; CLOUD.mem[SAVE_KEY] = JSON.stringify(s); try { localStorage.setItem(SAVE_KEY, JSON.stringify(s)); } catch (e) { } closeSheet(); beginGame(false); toast('📥 Partita caricata'); } catch (e) { toast('Codice non valido'); } }
 function showTitle() {
   MODE = 'title'; $('#title').classList.remove('hidden'); renderTset();
-  const has = !!load();
-  const creBtn = `<button class="btn" style="background:linear-gradient(180deg,#3f7a2e,#245216)" onclick="pickCreative()">🧱 Modalità Creativa<small>tutto sbloccato, risorse infinite, costruzione istantanea</small></button>`;
-  const maxBtn = `<button class="btn" style="background:linear-gradient(180deg,#1e3a8a,#13245a)" onclick="pickEra()">🏰 Città al massimo<small>scegli l'era, tutto sbloccato</small></button>`;
+  const tb = (cls, on, ic, lb, sub, dis) => `<button class="btn tb ${cls}" ${dis ? 'disabled' : `onclick="${on}"`}><i class="bi">${ic}</i><span class="bl">${lb}</span>${sub ? `<small>${sub}</small>` : ''}</button>`;
   const sv = load(); const when = sv && sv.last ? new Date(sv.last).toLocaleString('it-IT', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : '';
-  $('#tbtns').innerHTML = `<button class="btn big" onclick="${sv ? 'newCampaign()' : 'beginGame(true)'}">⚔ Inizia Campagna</button>`
-    + `<button class="btn big cont ${sv ? '' : 'dis'}" ${sv ? 'onclick="beginGame(false)"' : 'disabled'}>📜 Continua Campagna<small>${sv ? `Mastio ${sv.mastio} · ${ERA(sv.mastio).n} · salvata ${when}` : (CLOUD.ready ? 'nessun salvataggio sul tuo account' : 'nessun salvataggio su questo dispositivo')}</small></button>` + `<div class="savex">${sv ? '<button class="btn ghost" onclick="saveCode()">📋 Copia codice partita</button>' : ''}<button class="btn ghost" onclick="openImport()">📥 Importa partita</button></div>` + `<div class="cloudst">${!window.claude ? '💾 Salvataggio su questo dispositivo · usa 📋 Copia codice partita per spostarlo' : CLOUD.ready ? '☁ Salvataggio nel cloud del tuo account: attivo' : '⚠ Salvataggio solo su questo browser' + (CLOUD.why ? ' · motivo: ' + CLOUD.why : ' · controllo del cloud in corso…') + '<br><button class="btn ghost" style="margin-top:5px;font-size:12px;padding:6px 12px" onclick="cloudAsk()">☁ Attiva salvataggio cloud</button>'}</div>`
-    + maxBtn + creBtn + `<button class="btn ghost" onclick="openRealms(1)">🌍 Altri Regni<small>classifica e cronache dei signori della Marca</small></button>`;
+  const cs = !window.claude ? '💾 Salvataggio su questo dispositivo · usa 📋 Copia codice partita per spostarlo' : CLOUD.ready ? '☁ Salvataggio nel cloud del tuo account: attivo' : '⚠ Salvataggio solo su questo browser' + (CLOUD.why ? ' · motivo: ' + CLOUD.why : ' · controllo del cloud in corso…') + '<br><button class="btn ghost" style="margin-top:5px;font-size:12px;padding:6px 12px" onclick="cloudAsk()">☁ Attiva salvataggio cloud</button>';
+  $('#tbtns').innerHTML = tb('big k-new', sv ? 'newCampaign()' : 'beginGame(true)', '⚔', 'Inizia Campagna', 'una nuova Marca da conquistare')
+    + tb('big cont' + (sv ? '' : ' dis'), 'beginGame(false)', '📜', 'Continua Campagna', sv ? `Mastio ${sv.mastio} · ${ERA(sv.mastio).n} · salvata ${when}` : (CLOUD.ready ? 'nessun salvataggio sul tuo account' : 'nessun salvataggio su questo dispositivo'), !sv)
+    + `<div class="savex">${sv ? '<button class="btn ghost" onclick="saveCode()">📋 Copia codice partita</button>' : ''}<button class="btn ghost" onclick="openImport()">📥 Importa partita</button></div>`
+    + `<div class="cloudst">${cs}</div>`
+    + tb('k-max', 'pickEra()', '🏰', 'Città al massimo', "scegli l'era, tutto sbloccato")
+    + tb('k-cre', 'pickCreative()', '🧱', 'Modalità Creativa', 'tutto sbloccato, risorse infinite')
+    + tb('ghost k-rlm', 'openRealms(1)', '🌍', 'Altri Regni', 'classifica e cronache dei signori della Marca');
 }
 function pickCreative() {
   SAVE_KEY = 'feudum_creativo'; const has = !!load(); SAVE_KEY = 'feudum_proto_v1';
