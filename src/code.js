@@ -1588,8 +1588,9 @@ function render(sc, dt) {
     c.save(); c.setTransform(1, 0, 0, 1, 0, 0); c.fillStyle = 'rgba(10,18,40,0.5)'; c.fillRect(0, 0, cv.width, cv.height);
     c.globalCompositeOperation = 'lighter';
     c.setTransform(z, 0, 0, z, DPR * (VW / 2 - cam.x * cam.z), DPR * (VH / 2 - cam.y * cam.z));
-    for (const b of sc.B) if (!b.dead && (BDEF[b.t].shoot || b.t === 'falo' || b.t === 'caserma')) { const [wx, wy] = W(b.x + b.w / 2, b.y + b.h / 2); const fl = 0.85 + Math.sin(sc.time * 9 + b.id) * 0.08; const gr = c.createRadialGradient(wx, wy - 20, 4, wx, wy - 20, 140 * fl); gr.addColorStop(0, 'rgba(255,170,70,0.38)'); gr.addColorStop(1, 'rgba(255,120,40,0)'); c.fillStyle = gr; c.beginPath(); c.arc(wx, wy - 20, 140, 0, 7); c.fill(); }
-    for (const b of sc.B) if (b.dead && b.deadT < 8) { const [wx, wy] = W(b.x + b.w / 2, b.y + b.h / 2); const gr = c.createRadialGradient(wx, wy, 2, wx, wy, 80); gr.addColorStop(0, 'rgba(255,90,30,0.35)'); gr.addColorStop(1, 'rgba(255,60,20,0)'); c.fillStyle = gr; c.beginPath(); c.arc(wx, wy, 80, 0, 7); c.fill(); }
+    nightLights(c, sc, 1);
+    for (const b of sc.B) if (!b.dead && BDEF[b.t].shoot) { const [wx, wy] = W(b.x + b.w / 2, b.y + b.h / 2); const fl = 0.85 + Math.sin(sc.time * 9 + b.id) * 0.1; for (const sx of [-9, 9]) { const x = wx + sx, y = wy - 26; const gr = c.createRadialGradient(x, y, 1, x, y, 16 * fl); gr.addColorStop(0, 'rgba(255,180,80,0.5)'); gr.addColorStop(1, 'rgba(255,120,40,0)'); c.fillStyle = gr; c.fillRect(x - 16, y - 16, 32, 32); c.fillStyle = 'rgba(255,225,140,0.95)'; c.fillRect(x - 1.2, y - 2.5, 2.4, 3.5); } }
+    for (const b of sc.B) if (b.dead && b.deadT < 8) { const [wx, wy] = W(b.x + b.w / 2, b.y + b.h / 2); const gr = c.createRadialGradient(wx, wy, 2, wx, wy, 50); gr.addColorStop(0, 'rgba(255,90,30,0.35)'); gr.addColorStop(1, 'rgba(255,60,20,0)'); c.fillStyle = gr; c.beginPath(); c.arc(wx, wy, 50, 0, 7); c.fill(); }
     c.restore();
   }
   drawDayNight(c, sc, z);
@@ -2965,14 +2966,7 @@ function dayInfo() { const t0 = (S && S.seasonEpoch) || 0; const p = (((now() - 
   const night = p < 0.06 ? 1 - p / 0.06 : p < 0.62 ? 0 : p < 0.7 ? (p - 0.62) / 0.08 : p < 0.94 ? 1 : 1 - (p - 0.94) / 0.06;
   const ph = p < 0.08 ? ['🌅', 'Alba'] : p < 0.55 ? ['☀️', 'Giorno'] : p < 0.68 ? ['🌇', 'Tramonto'] : p < 0.94 ? ['🌙', 'Notte'] : ['🌅', 'Alba'];
   const hour = Math.floor((6 + p * 24) % 24); return { p, night: Math.max(0, Math.min(1, night)), ic: ph[0], n: ph[1], hour, dusk: p > 0.55 && p < 0.7 }; }
-const NOLIGHT = new Set(['poligono', 'stendardo', 'cripta', 'cancello', 'balista', 'bottino', 'tenda']);
-function drawDayNight(c, sc, z) {
-  if (sc.mode !== 'village' && sc.mode !== 'visit') return; const D = dayInfo(); const k = D.night;
-  c.save(); c.setTransform(1, 0, 0, 1, 0, 0);
-  if (D.dusk) { c.fillStyle = `rgba(255,120,40,${0.12 * Math.sin(Math.PI * (D.p - 0.55) / 0.15)})`; c.globalCompositeOperation = 'soft-light'; c.fillRect(0, 0, cv.width, cv.height); c.globalCompositeOperation = 'source-over'; }
-  if (k > 0.01) {
-    c.fillStyle = `rgba(12,20,45,${0.5 * k})`; c.fillRect(0, 0, cv.width, cv.height);
-    c.globalCompositeOperation = 'lighter'; c.setTransform(z, 0, 0, z, DPR * (VW / 2 - cam.x * cam.z), DPR * (VH / 2 - cam.y * cam.z));
+function nightLights(c, sc, k) {
     for (const b of sc.B) { if (b.dead) continue; const d = BDEF[b.t]; if (d.wall || (d.decor && b.t !== 'falo') || b.nat) continue; const [wx, wy] = W(b.x + b.w / 2, b.y + b.h / 2); const h0 = ((b.x * 73856093) ^ (b.y * 19349663) ^ (b.id * 83492791)) >>> 0;
       if (b.t === 'falo') { const fl = 0.8 + Math.sin(sc.time * 11 + b.id) * 0.12 + Math.sin(sc.time * 17) * 0.06; const gr = c.createRadialGradient(wx, wy - 8, 1, wx, wy - 8, 26 * fl); gr.addColorStop(0, `rgba(255,190,90,${0.55 * k})`); gr.addColorStop(1, 'rgba(255,120,40,0)'); c.fillStyle = gr; c.beginPath(); c.arc(wx, wy - 8, 26 * fl, 0, 7); c.fill(); continue; }
       if (NOLIGHT.has(b.t) || (b.t !== 'mastio' && h0 % 4 === 0)) continue; // qualche casa resta al buio
@@ -2982,6 +2976,16 @@ function drawDayNight(c, sc, z) {
         const gr = c.createRadialGradient(x, y, 0.5, x, y, 9); gr.addColorStop(0, `rgba(255,190,100,${0.35 * al})`); gr.addColorStop(1, 'rgba(255,150,60,0)'); c.fillStyle = gr; c.fillRect(x - 9, y - 9, 18, 18);
         c.fillStyle = `rgba(255,214,130,${0.95 * al})`; c.fillRect(x - 1.3, y - 2, 2.6, 3.6); c.fillStyle = `rgba(255,245,200,${0.8 * al})`; c.fillRect(x - 0.6, y - 1.4, 1.2, 1.6); }
     }
+}
+const NOLIGHT = new Set(['poligono', 'stendardo', 'cripta', 'cancello', 'balista', 'bottino', 'tenda']);
+function drawDayNight(c, sc, z) {
+  if (sc.mode !== 'village' && sc.mode !== 'visit') return; const D = dayInfo(); const k = D.night;
+  c.save(); c.setTransform(1, 0, 0, 1, 0, 0);
+  if (D.dusk) { c.fillStyle = `rgba(255,120,40,${0.12 * Math.sin(Math.PI * (D.p - 0.55) / 0.15)})`; c.globalCompositeOperation = 'soft-light'; c.fillRect(0, 0, cv.width, cv.height); c.globalCompositeOperation = 'source-over'; }
+  if (k > 0.01) {
+    c.fillStyle = `rgba(12,20,45,${0.5 * k})`; c.fillRect(0, 0, cv.width, cv.height);
+    c.globalCompositeOperation = 'lighter'; c.setTransform(z, 0, 0, z, DPR * (VW / 2 - cam.x * cam.z), DPR * (VH / 2 - cam.y * cam.z));
+    nightLights(c, sc, k);
     // lucciole d'estate e stelle
     if (seasonInfo().s.k === 'estate') for (let i = 0; i < 18; i++) { const px = ((i * 977 + sc.time * 6 * (i % 3 + 1)) % VW), py = ((i * 613 + Math.sin(sc.time + i) * 30) % VH); const al = (0.5 + 0.5 * Math.sin(sc.time * 3 + i * 2)) * k; c.setTransform(1, 0, 0, 1, 0, 0); c.fillStyle = `rgba(220,255,140,${al * 0.8})`; c.beginPath(); c.arc(px * DPR, py * DPR, 1.8 * DPR, 0, 7); c.fill(); }
   }
