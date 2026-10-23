@@ -1402,7 +1402,8 @@ const BDEF = {
   falo: { n: 'Falò', w: 1, h: 1, hp: 80, icon: '🔥', decor: true },
 };
 const BUILD_ORDER = ['municipio', 'casa', 'taverna', 'mercato', 'fattoria', 'capanna', 'granaio', 'fucina', 'infermeria', 'armeria', 'miniera', 'cava', 'tesoreria', 'caserma', 'poligono', 'scuderia', 'monastero', 'chiesa', 'accademia', 'torre', 'torrepietra', 'cancello', 'balista', 'muro', 'stendardo', 'funghi', 'cespuglio', 'masso', 'tronco'];
-const NATURE = ['funghi', 'cespuglio', 'cespuglio', 'masso', 'tronco'];
+const NATURE = ['funghi', 'cespuglio', 'cespuglio', 'masso', 'funghi', 'cespuglio', 'masso', 'tronco'];
+const TRONCHI_MAX = 8;
 // units
 const UDEF = {
   miliziano: { sn: 'Miliziano', n: 'Miliziano', hp: 55, dmg: 8, cd: 1.0, rng: 0.8, spd: 1.15, sp: 1, cost: { cibo: 40 }, lv: 1, at: 'caserma', role: 'Fanteria leggera di leva', t: 2 },
@@ -1546,7 +1547,7 @@ function sprDraw(c, key, x, y, sc, flip, alpha) {
 
 // ---------- building sprites ----------
 const BATL = new Image(); let BATL_OK = false; BATL.onload = () => BATL_OK = true;
-const BSCALE = { castello: 1.2, casa: 1.0, taverna: 1.1, falegnameria: 1.14, fucina: 1.06, armeria: 1.06, infermeria: 1.04, municipio: 1.0, mercato: 1.22, chiesa: 1.1, accademia: 1.12, cancello: 1.35, stalla: 1.15, fattoria: 1.35, miniera: 1.28, torre: 1.35, funghi: 0.95, cespuglio: 1.05, masso: 1.0, tronco: 1.0 };
+const BSCALE = { castello: 1.2, casa: 1.0, taverna: 1.1, falegnameria: 1.14, fucina: 1.06, armeria: 1.06, infermeria: 1.04, municipio: 1.0, mercato: 1.22, chiesa: 1.1, accademia: 1.12, cancello: 1.35, stalla: 1.15, fattoria: 1.35, miniera: 1.28, torre: 1.35, funghi: 0.6, cespuglio: 1.05, masso: 1.0, tronco: 1.0 };
 function bSprite(b) { if (b.t === 'mastio') return b.lvl >= 5 ? 'castello' : null; return BDEF[b.t].spr || null; }
 function bSpriteView(b) { const k = bSprite(b); const kv = k + '_' + rstep(); return BFR[kv] ? kv : k; } // facades: casa_1, casa_2, casa_3 when provided
 function bSpriteBase(b) { const k = bSprite(b); const f = BFR[k]; if (!f) return null;
@@ -2088,7 +2089,7 @@ function drawBuilding(c, sc, b) {
   const sk = b.t === 'mastio' && G3.models.castello && G3.models.castello.ready ? 'castello' : (G3.models[b.t] && G3.models[b.t].ready ? b.t : bSprite(b));
   if (sk && G3.models[sk] && G3.models[sk].ready) {
     if (!BDEF[b.t].decor) { const p = plotCache(b.w, b.h); c.drawImage(p.cv, wx - p.ox, wy - p.oy, p.w, p.h); } else { const [cx2, cy2] = W(b.x + b.w / 2, b.y + b.h / 2); c.fillStyle = 'rgba(0,0,0,0.2)'; c.beginPath(); c.ellipse(cx2, cy2, (b.w + b.h) * 13, (b.w + b.h) * 5.5, 0, 0, 7); c.fill(); } const ga = c.globalAlpha; if (b.ref && b.ref.end && b.ref.toLvl === 1) c.globalAlpha = 0.5; let k3 = sk, yaw = 0, fitm = 1;
-    if (b.t === 'tronco') yaw = -Math.PI / 4;
+    if (b.t === 'tronco') { const hh = (((b.x * 7 + b.y * 13) | 0) >>> 0) + (b.ref ? b.ref.id : 0); yaw = [-Math.PI / 4, 3 * Math.PI / 4, Math.PI / 4, -3 * Math.PI / 4][hh % 4] + ((hh >> 2) % 5 - 2) * 0.07; }
     if (b.t === 'balista') { need3d('balista_b'); need3d('balista_c'); fitm = 0.68; if (b.yawT != null) { let d = b.yawT - (b.yaw || 0); while (d > Math.PI) d -= 2 * Math.PI; while (d < -Math.PI) d += 2 * Math.PI; b.yaw = (b.yaw || 0) + d * 0.18; } yaw = b.yaw || 0;
       const tf = b.fired != null ? sc.time - b.fired : 99; if (tf < 0.35 && G3.models.balista_c && G3.models.balista_c.ready) k3 = 'balista_c'; else if (tf < 1.4 && G3.models.balista_b && G3.models.balista_b.ready) k3 = 'balista_b'; }
     let fit3 = fitm * b.w * 1.23 * (b.t === 'mastio' ? (b.lvl <= 8 ? 1.25 + 0.03 * b.lvl : 1.49 + 0.014 * (b.lvl - 8)) : b.t === 'caserma' ? 0.82 : b.t === 'falo' ? 0.8 : b.t === 'tronco' ? 0.55 : 1);
@@ -2643,6 +2644,7 @@ function spawnNature(n) {
   for (let tries = 0; tries < 400 && made < n; tries++) {
     const t = NATURE[(Math.random() * NATURE.length) | 0], x = 3 + ((Math.random() * (N - 7)) | 0), y = 3 + ((Math.random() * (N - 7)) | 0);
     if (Math.hypot(x - MCX, y - MCX) < 11 || !canPlace(t, x, y)) continue;
+    if (t === 'tronco' && S.buildings.filter(b => b.nat && b.t === 'tronco').length >= TRONCHI_MAX) continue;
     S.buildings.push({ id: S.nextId++, t, x, y, lvl: 1, stock: 0, end: 0, nat: true }); made++;
   }
   return made;
@@ -3759,6 +3761,7 @@ function beginGame(fresh, preset) {
   for (const r of S.buildings) { if (r.t === 'mastio' || r.nat) continue; if (!canPlace(r.t, r.x, r.y, r)) { const f = findFree(r.t, r.x, r.y, r); if (f) { r.x = f[0]; r.y = f[1]; } } }
   S.buildings = S.buildings.filter(r => !r.nat || canPlace(r.t, r.x, r.y, r));
   for (const r of S.buildings) { if (r.t === 'mastio') continue; const d = BDEF[r.t]; const wv = villageWater(); let wet = false; for (let yy = r.y; yy < r.y + d.h; yy++) for (let xx = r.x; xx < r.x + d.w; xx++) if (wv[yy * N + xx]) wet = true; if (wet) { const f = findFree(r.t, r.x, r.y, r); if (f) { r.x = f[0]; r.y = f[1]; } } }
+  { let k = 0; S.buildings = S.buildings.filter(b => !(b.nat && b.t === 'tronco') || ++k <= TRONCHI_MAX); }
   if (!S.fauna) S.fauna = []; faunaFill(true);
   if (S.nightIn == null) S.nightIn = S.raids ? 180 : DF().truce;
   if (!S.natInit) { S.natInit = 1; spawnNature(14); S.natIn = 240; }
