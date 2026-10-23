@@ -16,8 +16,8 @@ function DF() { return DIFFS[SET.diff] || DIFFS.normale; }
 const THEMES = {
   pergamena: { n: 'Pergamena', d: 'Legno, pergamena e cera rossa. Lo stile classico di FEUDUM.', fh: 'Cinzel', fb: 'Lora', sw: ['#f3e6c4', '#2f271f', '#8f1d1d', '#d9b25a'],
     ico: { O: '#3a2410', w: 1.5, H: 'rgba(255,255,255,.45)' }, cf: 'bold 12px Cinzel, serif', bub: ['rgba(253,246,227,0.95)', '#5c3a25'] },
-  miniatura: { n: 'Miniatura', d: 'Codice miniato: pergamena chiara, blu lapislazzuli e foglia d\'oro.', fh: 'Uncial Antiqua', fb: 'EB Garamond', sw: ['#f7efd9', '#1f3a8a', '#c99a2e', '#b3261e'],
-    ico: { O: '#16306e', w: 1.6, H: '#fff7d0', gold: 1 }, cf: '600 13px "Uncial Antiqua", serif', bub: ['rgba(247,239,217,0.97)', '#c99a2e'] },
+  miniatura: { n: 'Miniatura', d: 'Codice miniato: pergamena chiara, blu lapislazzuli e foglia d\'oro.', fh: 'Cormorant SC', fb: 'EB Garamond', sw: ['#f7efd9', '#1f3a8a', '#c99a2e', '#b3261e'],
+    ico: { O: '#16306e', w: 1.6, H: '#fff7d0', gold: 1 }, cf: '700 14px "Cormorant SC", serif', bub: ['rgba(247,239,217,0.97)', '#c99a2e'] },
   pietra: { n: 'Pietra e Ferro', d: 'Ardesia scura, ferro battuto e braci. Stile da fortezza.', fh: 'IM Fell English SC', fb: 'Alegreya Sans', sw: ['#2b2f33', '#8d959c', '#e07a2f', '#d7dadc'],
     ico: { O: '#15171a', w: 1.5, H: 'rgba(255,255,255,.55)', mono: 1 }, cf: '13px "IM Fell English SC", serif', bub: ['rgba(43,47,51,0.95)', '#8d959c'] },
   araldica: { n: 'Araldica', d: 'Smalti piatti come uno stemma: rosso, azzurro e oro su argento.', fh: 'Grenze Gotisch', fb: 'Alegreya', sw: ['#f4f1ea', '#1d4aa0', '#b3201f', '#e8b923'],

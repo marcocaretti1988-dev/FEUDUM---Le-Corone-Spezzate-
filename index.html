@@ -13,7 +13,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <title>FEUDUM — Le Corone Spezzate</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=Cinzel+Decorative:wght@700&family=Lora:ital,wght@0,400;0,600;1,400&family=Uncial+Antiqua&family=EB+Garamond:ital,wght@0,400;0,600;1,400&family=IM+Fell+English+SC&family=Alegreya+Sans:wght@400;500;700&family=Grenze+Gotisch:wght@600;700&family=Alegreya:wght@400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=Cinzel+Decorative:wght@700&family=Lora:ital,wght@0,400;0,600;1,400&family=Cormorant+SC:wght@500;600;700&family=EB+Garamond:ital,wght@0,400;0,600;1,400&family=IM+Fell+English+SC&family=Alegreya+Sans:wght@400;500;700&family=Grenze+Gotisch:wght@600;700&family=Alegreya:wght@400;600&display=swap" rel="stylesheet">
 <style>
 :root{--fh:Cinzel,serif;--fb:Lora,Georgia,serif;--fd:'Cinzel Decorative',Cinzel,serif;--ink:#1c120a;--parch:#f3e6c4;--parch2:#e7d3a6;--wood:#2f271f;--wood2:#1e1812;--crim:#8f1d1d;--blue:#1e3a8a;--gold:#d9b25a;--muted:#7a6a56;--sat:env(safe-area-inset-top,0px);--sab:env(safe-area-inset-bottom,0px)}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -520,6 +520,9 @@ html[data-theme=pergamena] .tbox{margin:30px auto}
 html[data-theme=pergamena] #tbtns .tb{flex-direction:row;flex-wrap:wrap;justify-content:center;column-gap:6px;padding:9px 16px}html[data-theme=pergamena] #tbtns .tb small{flex-basis:100%}
 html[data-theme=araldica] #tbtns .tb .bi{color:#111}html[data-theme=araldica] #tbtns .tb.k-rlm .bi{color:#e8b923}
 html[data-theme=araldica] .tbox .dc{display:none!important}
+html[data-theme=miniatura] .tbox h1{font-weight:700;letter-spacing:.06em}
+html[data-theme=miniatura] .btn,html[data-theme=miniatura] .sh-h,html[data-theme=miniatura] #tbtns .tb .bl{font-weight:700}
+html[data-theme=miniatura] #tbtns .tb .bl{font-size:17px;letter-spacing:.02em}
 </style>
 </head>
 <body>
@@ -584,8 +587,8 @@ function DF() { return DIFFS[SET.diff] || DIFFS.normale; }
 const THEMES = {
   pergamena: { n: 'Pergamena', d: 'Legno, pergamena e cera rossa. Lo stile classico di FEUDUM.', fh: 'Cinzel', fb: 'Lora', sw: ['#f3e6c4', '#2f271f', '#8f1d1d', '#d9b25a'],
     ico: { O: '#3a2410', w: 1.5, H: 'rgba(255,255,255,.45)' }, cf: 'bold 12px Cinzel, serif', bub: ['rgba(253,246,227,0.95)', '#5c3a25'] },
-  miniatura: { n: 'Miniatura', d: 'Codice miniato: pergamena chiara, blu lapislazzuli e foglia d\'oro.', fh: 'Uncial Antiqua', fb: 'EB Garamond', sw: ['#f7efd9', '#1f3a8a', '#c99a2e', '#b3261e'],
-    ico: { O: '#16306e', w: 1.6, H: '#fff7d0', gold: 1 }, cf: '600 13px "Uncial Antiqua", serif', bub: ['rgba(247,239,217,0.97)', '#c99a2e'] },
+  miniatura: { n: 'Miniatura', d: 'Codice miniato: pergamena chiara, blu lapislazzuli e foglia d\'oro.', fh: 'Cormorant SC', fb: 'EB Garamond', sw: ['#f7efd9', '#1f3a8a', '#c99a2e', '#b3261e'],
+    ico: { O: '#16306e', w: 1.6, H: '#fff7d0', gold: 1 }, cf: '700 14px "Cormorant SC", serif', bub: ['rgba(247,239,217,0.97)', '#c99a2e'] },
   pietra: { n: 'Pietra e Ferro', d: 'Ardesia scura, ferro battuto e braci. Stile da fortezza.', fh: 'IM Fell English SC', fb: 'Alegreya Sans', sw: ['#2b2f33', '#8d959c', '#e07a2f', '#d7dadc'],
     ico: { O: '#15171a', w: 1.5, H: 'rgba(255,255,255,.55)', mono: 1 }, cf: '13px "IM Fell English SC", serif', bub: ['rgba(43,47,51,0.95)', '#8d959c'] },
   araldica: { n: 'Araldica', d: 'Smalti piatti come uno stemma: rosso, azzurro e oro su argento.', fh: 'Grenze Gotisch', fb: 'Alegreya', sw: ['#f4f1ea', '#1d4aa0', '#b3201f', '#e8b923'],
