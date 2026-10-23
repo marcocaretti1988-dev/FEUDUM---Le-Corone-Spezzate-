@@ -534,6 +534,18 @@ html[data-theme=miniatura] #tbtns .tb .bl{font-size:17px;letter-spacing:.02em}
 #hud-bot .k-costruisci .i{background-image:url(ui/hb_costruisci.webp)}#hud-bot .k-costruisci:active .i{background-image:url(ui/hb_costruisci_p.webp)}
 #hud-bot .hb.img.dis .i,#hud-bot .hb.img:disabled .i{filter:grayscale(1) brightness(.8)}
 #hud-bot{gap:4px!important;padding-left:6px!important;padding-right:6px!important}
+/* ===== icone dipinte delle risorse ===== */
+.ico.ico-cibo{background-image:url(ui/rs_cibo.webp)!important;background-size:cover!important;border-radius:22%}#res .chip:active .ico-cibo{background-image:url(ui/rs_cibo_p.webp)!important}
+.ico.ico-legno{background-image:url(ui/rs_legno.webp)!important;background-size:cover!important;border-radius:22%}#res .chip:active .ico-legno{background-image:url(ui/rs_legno_p.webp)!important}
+.ico.ico-oro{background-image:url(ui/rs_oro.webp)!important;background-size:cover!important;border-radius:22%}#res .chip:active .ico-oro{background-image:url(ui/rs_oro_p.webp)!important}
+.ico.ico-pietra{background-image:url(ui/rs_pietra.webp)!important;background-size:cover!important;border-radius:22%}#res .chip:active .ico-pietra{background-image:url(ui/rs_pietra_p.webp)!important}
+.ico.ico-ferro{background-image:url(ui/rs_ferro.webp)!important;background-size:cover!important;border-radius:22%}#res .chip:active .ico-ferro{background-image:url(ui/rs_ferro_p.webp)!important}
+.ico.ico-pelli{background-image:url(ui/rs_pelli.webp)!important;background-size:cover!important;border-radius:22%}#res .chip:active .ico-pelli{background-image:url(ui/rs_pelli_p.webp)!important}
+.ico.ico-favore{background-image:url(ui/rs_favore.webp)!important;background-size:cover!important;border-radius:22%}#res .chip:active .ico-favore{background-image:url(ui/rs_favore_p.webp)!important}
+#res .chip .ic{height:34px!important}#res .chip .ic .ico{width:34px!important;height:34px!important;filter:drop-shadow(0 2px 2px rgba(0,0,0,.6))}
+#res .chip{padding-top:4px!important}
+.cc .ico,.costs .ico,.btn small .ico{width:1.4em;height:1.4em;vertical-align:-.38em}
+@media(min-width:700px){#res .chip .ic{height:auto!important}#res .chip .ic .ico{width:28px!important;height:28px!important}}
 </style>
 </head>
 <body>
@@ -541,7 +553,7 @@ html[data-theme=miniatura] #tbtns .tb .bl{font-size:17px;letter-spacing:.02em}
 <div id="hud" class="hidden">
   <div id="hud-top"><div id="res"></div><div id="era"></div><div id="quest"></div></div>
   <div id="hud-bot">
-    <button class="hb img k-costruisci" onclick="sfx('click');openBuild()"><span class="i"><i class="ico ico-build"></i></span>Costruisci</button>
+    <button class="hb img k-costruisci" onclick="sfx('click');openBuild()"><span class="i"></span>Costruisci</button>
     <button class="hb img k-esercito" onclick="sfx('click');openArmy()"><span class="i"></span>Esercito</button>
     <button class="hb img k-mastio" onclick="sfx('click');const m=mastioRef();SC.sel=SC.B.find(b=>b.ref===m);openBuildingInfo(m)"><span class="i"></span>Mastio</button>
     <button class="hb img k-attacca" onclick="sfx('click');openMap()"><span class="i"></span>Attacca</button>
