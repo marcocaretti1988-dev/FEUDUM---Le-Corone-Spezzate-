@@ -3524,6 +3524,7 @@ function dayInfo() { const t0 = (S && S.seasonEpoch) || 0; const p = (((now() - 
   const night = p < 0.06 ? 1 - p / 0.06 : p < 0.62 ? 0 : p < 0.7 ? (p - 0.62) / 0.08 : p < 0.94 ? 1 : 1 - (p - 0.94) / 0.06;
   const ph = p < 0.08 ? ['🌅', 'Alba'] : p < 0.55 ? ['☀️', 'Giorno'] : p < 0.68 ? ['🌇', 'Tramonto'] : p < 0.94 ? ['🌙', 'Notte'] : ['🌅', 'Alba'];
   const hour = Math.floor((6 + p * 24) % 24); return { p, night: Math.max(0, Math.min(1, night)), ic: ph[0], n: ph[1], hour, dusk: p > 0.55 && p < 0.7 }; }
+const NOLIGHT = new Set(['poligono', 'stendardo', 'cripta', 'cancello', 'balista', 'bottino', 'tenda']);
 function drawDayNight(c, sc, z) {
   if (sc.mode !== 'village' && sc.mode !== 'visit') return; const D = dayInfo(); const k = D.night;
   c.save(); c.setTransform(1, 0, 0, 1, 0, 0);
@@ -3531,7 +3532,15 @@ function drawDayNight(c, sc, z) {
   if (k > 0.01) {
     c.fillStyle = `rgba(12,20,45,${0.5 * k})`; c.fillRect(0, 0, cv.width, cv.height);
     c.globalCompositeOperation = 'lighter'; c.setTransform(z, 0, 0, z, DPR * (VW / 2 - cam.x * cam.z), DPR * (VH / 2 - cam.y * cam.z));
-    for (const b of sc.B) { if (b.dead) continue; const d = BDEF[b.t]; if (d.wall || (d.decor && b.t !== 'falo')) continue; const [wx, wy] = W(b.x + b.w / 2, b.y + b.h / 2); const big = b.t === 'mastio' ? 1.6 : b.t === 'falo' ? 1.3 : 0.8 + b.w * 0.15; const fl = 0.88 + Math.sin(sc.time * (b.t === 'falo' ? 11 : 3) + b.id) * 0.07; const R0 = 70 * big * fl; const gr = c.createRadialGradient(wx, wy - 14, 2, wx, wy - 14, R0); gr.addColorStop(0, `rgba(255,175,80,${0.42 * k})`); gr.addColorStop(0.5, `rgba(255,140,50,${0.14 * k})`); gr.addColorStop(1, 'rgba(255,120,40,0)'); c.fillStyle = gr; c.beginPath(); c.arc(wx, wy - 14, R0, 0, 7); c.fill(); }
+    for (const b of sc.B) { if (b.dead) continue; const d = BDEF[b.t]; if (d.wall || (d.decor && b.t !== 'falo') || b.nat) continue; const [wx, wy] = W(b.x + b.w / 2, b.y + b.h / 2); const h0 = ((b.x * 73856093) ^ (b.y * 19349663) ^ (b.id * 83492791)) >>> 0;
+      if (b.t === 'falo') { const fl = 0.8 + Math.sin(sc.time * 11 + b.id) * 0.12 + Math.sin(sc.time * 17) * 0.06; const gr = c.createRadialGradient(wx, wy - 8, 1, wx, wy - 8, 26 * fl); gr.addColorStop(0, `rgba(255,190,90,${0.55 * k})`); gr.addColorStop(1, 'rgba(255,120,40,0)'); c.fillStyle = gr; c.beginPath(); c.arc(wx, wy - 8, 26 * fl, 0, 7); c.fill(); continue; }
+      if (NOLIGHT.has(b.t) || (b.t !== 'mastio' && h0 % 4 === 0)) continue; // qualche casa resta al buio
+      const nW = b.t === 'mastio' ? 6 : Math.min(4, 1 + (h0 >> 3) % 2 + (b.w > 2 ? 1 : 0)); const sp = b.t === 'mastio' ? 9 + (S.mastio || 1) * 2.6 : 9 + b.w * 3;
+      for (let i = 0; i < nW; i++) { const hh = (h0 >> (i * 3)) & 63; const side = i % 2 ? 1 : -1; const ox = side * (5 + (hh % 5) * 0.2 * sp) ; const oy = -10 - (hh >> 2) % 4 * 4 - b.w * 3 + Math.abs(ox) * 0.35; const x = wx + ox, y = wy + oy;
+        const fl = 0.85 + Math.sin(sc.time * 2.3 + b.id * 3 + i * 1.7) * 0.1 + (Math.sin(sc.time * 9 + i * 5 + b.id) > 0.97 ? -0.3 : 0); const al = k * fl;
+        const gr = c.createRadialGradient(x, y, 0.5, x, y, 9); gr.addColorStop(0, `rgba(255,190,100,${0.35 * al})`); gr.addColorStop(1, 'rgba(255,150,60,0)'); c.fillStyle = gr; c.fillRect(x - 9, y - 9, 18, 18);
+        c.fillStyle = `rgba(255,214,130,${0.95 * al})`; c.fillRect(x - 1.3, y - 2, 2.6, 3.6); c.fillStyle = `rgba(255,245,200,${0.8 * al})`; c.fillRect(x - 0.6, y - 1.4, 1.2, 1.6); }
+    }
     // lucciole d'estate e stelle
     if (seasonInfo().s.k === 'estate') for (let i = 0; i < 18; i++) { const px = ((i * 977 + sc.time * 6 * (i % 3 + 1)) % VW), py = ((i * 613 + Math.sin(sc.time + i) * 30) % VH); const al = (0.5 + 0.5 * Math.sin(sc.time * 3 + i * 2)) * k; c.setTransform(1, 0, 0, 1, 0, 0); c.fillStyle = `rgba(220,255,140,${al * 0.8})`; c.beginPath(); c.arc(px * DPR, py * DPR, 1.8 * DPR, 0, 7); c.fill(); }
   }
