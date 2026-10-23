@@ -522,6 +522,18 @@ html[data-theme=miniatura] #tbtns .tb .bl{font-size:17px;letter-spacing:.02em}
 .prest{position:relative;display:flex;justify-content:space-between;align-items:center;gap:8px;padding:7px 10px 10px;margin:0 0 8px;border-radius:8px;background:rgba(201,162,39,.16);border:1px solid rgba(201,162,39,.5);font-size:12.5px}.prest span{font-size:11.5px;opacity:.85}.prest i{position:absolute;left:0;bottom:0;height:3px;background:linear-gradient(90deg,#c9a227,#f6dd8c);border-radius:0 0 0 8px}
 .arms h4{margin:10px 0 5px;font-family:var(--fh);font-size:13px}.aprev{text-align:center;margin:4px 0}.arow{display:flex;flex-wrap:wrap;gap:6px}
 .achip{border:2px solid rgba(0,0,0,.25);background:rgba(255,255,255,.5);border-radius:8px;padding:4px;min-width:34px;min-height:34px;display:inline-flex;flex-direction:column;align-items:center;justify-content:center;font-size:18px;color:var(--ink)}.achip i{width:22px;height:22px;border-radius:50%;border:1px solid rgba(0,0,0,.4)}.achip.on{border-color:var(--crim);box-shadow:0 0 0 2px rgba(179,38,30,.3)}.achip small{font-size:9.5px;font-family:var(--fb)}
+/* ===== pulsanti in basso con le icone dipinte ===== */
+#hud-bot .hb.img{background:none!important;border:0!important;box-shadow:none!important;padding:0 0 2px!important;border-radius:0!important;max-width:84px;flex:1 1 0;min-width:0;gap:2px;color:#f3e2b8!important;font-family:Cinzel,serif!important;font-weight:800;font-size:11.5px;letter-spacing:.04em;text-transform:uppercase;text-shadow:0 1px 0 #000,0 0 6px rgba(0,0,0,.9),0 0 2px #000}
+#hud-bot .hb.img .i{display:block;width:100%;max-width:66px;aspect-ratio:1;background-size:contain;background-repeat:no-repeat;background-position:center;filter:drop-shadow(0 3px 4px rgba(0,0,0,.6));position:relative}
+#hud-bot .hb.img:active{transform:translateY(2px)}
+#hud-bot .hb.img .i .ico{position:absolute;left:22%;top:20%;width:56%;height:56%;filter:drop-shadow(0 2px 2px rgba(0,0,0,.7))}
+#hud-bot .k-esercito .i{background-image:url(ui/hb_esercito.webp)}#hud-bot .k-esercito:active .i{background-image:url(ui/hb_esercito_p.webp)}
+#hud-bot .k-attacca .i{background-image:url(ui/hb_attacca.webp)}#hud-bot .k-attacca:active .i{background-image:url(ui/hb_attacca_p.webp)}
+#hud-bot .k-menu .i{background-image:url(ui/hb_menu.webp)}#hud-bot .k-menu:active .i{background-image:url(ui/hb_menu_p.webp)}
+#hud-bot .k-mastio .i{background-image:url(ui/hb_mastio.webp)}#hud-bot .k-mastio:active .i{background-image:url(ui/hb_mastio_p.webp)}
+#hud-bot .k-costruisci .i{background-image:url(ui/hb_costruisci.webp)}#hud-bot .k-costruisci:active .i{background-image:url(ui/hb_costruisci_p.webp)}
+#hud-bot .hb.img.dis .i,#hud-bot .hb.img:disabled .i{filter:grayscale(1) brightness(.8)}
+#hud-bot{gap:4px!important;padding-left:6px!important;padding-right:6px!important}
 </style>
 </head>
 <body>
@@ -529,11 +541,11 @@ html[data-theme=miniatura] #tbtns .tb .bl{font-size:17px;letter-spacing:.02em}
 <div id="hud" class="hidden">
   <div id="hud-top"><div id="res"></div><div id="era"></div><div id="quest"></div></div>
   <div id="hud-bot">
-    <button class="hb" onclick="sfx('click');openBuild()"><span class="i"><i class="ico ico-build"></i></span>Costruisci</button>
-    <button class="hb" onclick="sfx('click');openArmy()"><span class="i"><i class="ico ico-army"></i></span>Esercito</button>
-    <button class="hb" onclick="sfx('click');const m=mastioRef();SC.sel=SC.B.find(b=>b.ref===m);openBuildingInfo(m)"><span class="i"><i class="ico ico-castle"></i></span>Mastio</button>
-    <button class="hb atk" onclick="sfx('click');openMap()"><span class="i"><i class="ico ico-map"></i></span>Attacca</button>
-    <button class="hb sm" onclick="sfx('click');openMenu()" title="Menu"><span class="i"><i class="ico ico-gear"></i></span>Menu</button>
+    <button class="hb img k-costruisci" onclick="sfx('click');openBuild()"><span class="i"><i class="ico ico-build"></i></span>Costruisci</button>
+    <button class="hb img k-esercito" onclick="sfx('click');openArmy()"><span class="i"></span>Esercito</button>
+    <button class="hb img k-mastio" onclick="sfx('click');const m=mastioRef();SC.sel=SC.B.find(b=>b.ref===m);openBuildingInfo(m)"><span class="i"></span>Mastio</button>
+    <button class="hb img k-attacca" onclick="sfx('click');openMap()"><span class="i"></span>Attacca</button>
+    <button class="hb img k-menu" onclick="sfx('click');openMenu()" title="Menu"><span class="i"></span>Menu</button>
   </div>
 </div>
 <div id="placebar" class="hidden">
