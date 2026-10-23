@@ -1164,7 +1164,7 @@ function openAudio(back) {
   openSheet('🔊 Audio', `<div class="aud">${audioHTML(re)}<div class="acts"><button class="btn" onclick="${back ? back : 'closeSheet()'}">✓ Fatto</button></div></div>`, 'audio');
 }
 ['pointerdown', 'keydown', 'touchend'].forEach(ev => document.addEventListener(ev, musicStart, { passive: true }));
-document.addEventListener('visibilitychange', () => { if (!MUS.el) return; if (document.hidden) MUS.el.pause(); else musicStart(); });
+document.addEventListener('visibilitychange', () => { if (RAIDM.el) { if (document.hidden) RAIDM.el.pause(); else if (TENS.kind === 'raid' && !RAIDM.bad) RAIDM.el.play().catch(() => { }); } if (!MUS.el) return; if (document.hidden) MUS.el.pause(); else musicStart(); });
 
 // ---- musica di tensione durante assedi (attacchi tuoi) e razzie (attacchi subiti): generata con Web Audio ----
 const TENS = { kind: null, g: null, iv: 0, nextT: 0, step: 0, bus: null };
@@ -1176,11 +1176,23 @@ function tensionStart(kind) {
   if (!MUS.on || SET.mute) { TENS.kind = kind; return; }
   TENS.kind = kind; TENS.g = a.createGain(); TENS.g.gain.value = 0; TENS.g.connect(a.destination);
   const t0 = a.currentTime; TENS.g.gain.linearRampToValueAtTime(SET.mvol * 0.9, t0 + 1.5);
+  if (kind === 'raid' && raidTrack(a)) return; // razzia: colonna sonora "Ombre delle Terre Feudali
   TENS.bus = a.createDynamicsCompressor(); TENS.bus.threshold.value = -18; TENS.bus.ratio.value = 4; TENS.bus.connect(TENS.g);
   TENS.nextT = t0 + 0.15; TENS.step = 0;
   TENS.iv = setInterval(tensionSched, 40);
 }
+// colonna sonora vera per le razzie (quando ti attaccano); se non si carica, resta la musica generata
+const RAIDM = { el: null, src: null, bad: false };
+function raidTrack(a) {
+  if (RAIDM.bad) return false;
+  try {
+    if (!RAIDM.el) { RAIDM.el = new Audio('music/raid.mp3'); RAIDM.el.loop = true; RAIDM.el.preload = 'auto'; RAIDM.el.addEventListener('error', () => { RAIDM.bad = true; if (TENS.kind === 'raid' && !TENS.iv) { TENS.nextT = AC.currentTime + 0.1; TENS.step = 0; TENS.iv = setInterval(tensionSched, 40); } }); RAIDM.src = a.createMediaElementSource(RAIDM.el); }
+    try { RAIDM.src.disconnect(); } catch (e) { } RAIDM.src.connect(TENS.g);
+    RAIDM.el.currentTime = 0; const p = RAIDM.el.play(); if (p && p.catch) p.catch(() => { }); return true;
+  } catch (e) { RAIDM.bad = true; return false; }
+}
 function tensionStop(now) {
+  if (RAIDM.el && !RAIDM.el.paused) { const el = RAIDM.el; setTimeout(() => { if (TENS.kind !== 'raid') el.pause(); }, now ? 400 : 2600); }
   if (TENS.iv) clearInterval(TENS.iv); TENS.iv = 0; const g = TENS.g, a = AC; TENS.g = null; const wasOn = !!TENS.kind; TENS.kind = null;
   if (g && a) { const t = a.currentTime; g.gain.cancelScheduledValues(t); g.gain.setValueAtTime(g.gain.value, t); g.gain.linearRampToValueAtTime(0, t + (now ? 0.2 : 2.2)); setTimeout(() => { try { g.disconnect(); } catch (e) { } }, now ? 400 : 2600); }
   if (wasOn && !now) { MUS.duck = false; setTimeout(() => { if (TENS.kind) return; musicStart(); if (MUS.g && AC) { const t = AC.currentTime; MUS.g.gain.cancelScheduledValues(t); MUS.g.gain.setValueAtTime(0, t); MUS.g.gain.linearRampToValueAtTime(SET.mute ? 0 : SET.mvol, t + 2.5); } else musicApply(); }, 1600); }
