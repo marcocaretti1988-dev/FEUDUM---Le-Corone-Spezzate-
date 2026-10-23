@@ -2737,7 +2737,7 @@ function openBuildingInfo(r) {
 }
 function unitRow(k) {
   const d = UDEF[k]; const ok = unlockedUnit(k);
-  const lockTxt = S.mastio < d.lv ? `Mastio ${d.lv}` : !hasB(d.at) ? `serve ${BDEF[d.at].n}` : `serve ${BDEF[d.need].n}`;
+  const lockTxt = ok ? '' : S.mastio < d.lv ? `Mastio ${d.lv}` : !hasB(d.at) ? `serve ${(BDEF[d.at] || {}).n || d.at}` : d.need ? `serve ${(BDEF[d.need] || {}).n || d.need}` : '';
   const thumb = FR[k + '.idleF'];
   return `<div class="urow ${ok ? '' : 'dis'}"><div class="uimg" style="${thumbStyle(k)}"></div>
    <div class="uinfo"><b>${d.n}</b> <span class="cnt">×${S.army[k] || 0}</span><div class="role">${d.role}</div>
