@@ -1358,7 +1358,7 @@ function openAudio(back) {
   openSheet('🔊 Audio', `<div class="aud">${audioHTML(re)}<div class="acts"><button class="btn" onclick="${back ? back : 'closeSheet()'}">✓ Fatto</button></div></div>`, 'audio');
 }
 ['pointerdown', 'keydown', 'touchend'].forEach(ev => document.addEventListener(ev, musicStart, { passive: true }));
-document.addEventListener('visibilitychange', () => { if (RAIDM.el) { if (document.hidden) RAIDM.el.pause(); else if (TENS.kind === 'raid' && !RAIDM.bad) RAIDM.el.play().catch(() => { }); } if (!MUS.el) return; if (document.hidden) MUS.el.pause(); else musicStart(); });
+document.addEventListener('visibilitychange', () => { if (RAIDM.el) { if (document.hidden) RAIDM.el.pause(); else if (TENS.kind && !RAIDM.bad) RAIDM.el.play().catch(() => { }); } if (!MUS.el) return; if (document.hidden) MUS.el.pause(); else musicStart(); });
 
 // ---- musica di tensione durante assedi (attacchi tuoi) e razzie (attacchi subiti): generata con Web Audio ----
 const TENS = { kind: null, g: null, iv: 0, nextT: 0, step: 0, bus: null };
@@ -1370,7 +1370,7 @@ function tensionStart(kind) {
   if (!MUS.on || SET.mute) { TENS.kind = kind; return; }
   TENS.kind = kind; TENS.g = a.createGain(); TENS.g.gain.value = 0; TENS.g.connect(a.destination);
   const t0 = a.currentTime; TENS.g.gain.linearRampToValueAtTime(SET.mvol * 0.9, t0 + 1.5);
-  if (kind === 'raid' && raidTrack(a)) return; // razzia: colonna sonora "Ombre delle Terre Feudali
+  if (raidTrack(a)) return; // razzie e assedi: colonna sonora "Ombre delle Terre Feudali
   TENS.bus = a.createDynamicsCompressor(); TENS.bus.threshold.value = -18; TENS.bus.ratio.value = 4; TENS.bus.connect(TENS.g);
   TENS.nextT = t0 + 0.15; TENS.step = 0;
   TENS.iv = setInterval(tensionSched, 40);
@@ -1380,13 +1380,13 @@ const RAIDM = { el: null, src: null, bad: false };
 function raidTrack(a) {
   if (RAIDM.bad) return false;
   try {
-    if (!RAIDM.el) { RAIDM.el = new Audio('music/raid.mp3'); RAIDM.el.loop = true; RAIDM.el.preload = 'auto'; RAIDM.el.addEventListener('error', () => { RAIDM.bad = true; if (TENS.kind === 'raid' && !TENS.iv) { TENS.nextT = AC.currentTime + 0.1; TENS.step = 0; TENS.iv = setInterval(tensionSched, 40); } }); RAIDM.src = a.createMediaElementSource(RAIDM.el); }
+    if (!RAIDM.el) { RAIDM.el = new Audio('music/raid.mp3'); RAIDM.el.loop = true; RAIDM.el.preload = 'auto'; RAIDM.el.addEventListener('error', () => { RAIDM.bad = true; if (TENS.kind && !TENS.iv) { TENS.nextT = AC.currentTime + 0.1; TENS.step = 0; TENS.iv = setInterval(tensionSched, 40); } }); RAIDM.src = a.createMediaElementSource(RAIDM.el); }
     try { RAIDM.src.disconnect(); } catch (e) { } RAIDM.src.connect(TENS.g);
     RAIDM.el.currentTime = 0; const p = RAIDM.el.play(); if (p && p.catch) p.catch(() => { }); return true;
   } catch (e) { RAIDM.bad = true; return false; }
 }
 function tensionStop(now) {
-  if (RAIDM.el && !RAIDM.el.paused) { const el = RAIDM.el; setTimeout(() => { if (TENS.kind !== 'raid') el.pause(); }, now ? 400 : 2600); }
+  if (RAIDM.el && !RAIDM.el.paused) { const el = RAIDM.el; setTimeout(() => { if (!TENS.kind) el.pause(); }, now ? 400 : 2600); }
   if (TENS.iv) clearInterval(TENS.iv); TENS.iv = 0; const g = TENS.g, a = AC; TENS.g = null; const wasOn = !!TENS.kind; TENS.kind = null;
   if (g && a) { const t = a.currentTime; g.gain.cancelScheduledValues(t); g.gain.setValueAtTime(g.gain.value, t); g.gain.linearRampToValueAtTime(0, t + (now ? 0.2 : 2.2)); setTimeout(() => { try { g.disconnect(); } catch (e) { } }, now ? 400 : 2600); }
   if (wasOn && !now) { MUS.duck = false; setTimeout(() => { if (TENS.kind) return; musicStart(); if (MUS.g && AC) { const t = AC.currentTime; MUS.g.gain.cancelScheduledValues(t); MUS.g.gain.setValueAtTime(0, t); MUS.g.gain.linearRampToValueAtTime(SET.mute ? 0 : SET.mvol, t + 2.5); } else musicApply(); }, 1600); }
@@ -3722,10 +3722,27 @@ function updateBattleHUD(force) {
     if (!h.u) cls = sel && sel.hero === h.k ? 'on' : ''; else if (h.u.dead) { cls = 'dis'; lab = 'Caduto'; } else if (h.u.ultUsed) { cls = 'dis'; lab = 'Usata'; } else { cls = 'ult'; lab = d.ult; }
     html += `<button class="ucard hero ${cls}" onclick="heroCard('${h.k}')"><div class="uimg" style="${thumbStyle(h.k)}"></div><span class="n">♔</span><span class="nm">${lab}</span></button>`;
   }
-  $('#bcards').innerHTML = html || '<div class="empty">Nessuna truppa: difesa automatica</div>';
+  const left = MODE === 'attack' ? UNIT_ORDER.reduce((s, k) => s + (BT.avail[k] || 0), 0) : 0;
+  $('#bcards').innerHTML = (left > 1 ? `<button class="ucard all" onclick="deployAll()"><div class="uimg">⚔</div><span class="n">×${left}</span><span class="nm">Schiera tutti</span></button>` : '') + (html || '<div class="empty">Nessuna truppa: difesa automatica</div>');
 }
-function selDeploy(k) { if (!BT || !(BT.avail[k] > 0)) return; SC.deploySel = { k }; sfx('click'); updateBattleHUD(true); }
-function heroCard(k) { const h = BT.heroes.find(h => h.k === k); if (!h) return; if (!h.u) { SC.deploySel = { hero: k }; sfx('click'); } else if (heroUlt(SC, h.u)) { } updateBattleHUD(true); }
+function selDeploy(k) { if (!BT || BT.ended || !(BT.avail[k] > 0)) return; SC.deploySel = { k }; autoDeploy(); }
+// punto di raccolta: casella libera appena fuori dalla zona nemica, la più vicina al centro dello schermo
+function rallyPoint() {
+  const [cx, cy] = screenToTile(VW / 2, VH * 0.62); let best = null, bd = 1e9;
+  const free = (x, y) => inMap(x, y) && x > 1 && y > 1 && x < N - 2 && y < N - 2 && !(MODE === 'attack' && SC.zone[y * N + x]) && !isWater(SC, x, y) && !bAt(SC, x, y);
+  for (let y = 2; y < N - 2; y++) for (let x = 2; x < N - 2; x++) { if (!free(x, y)) continue; let near = false; if (MODE === 'attack') { for (let dy = -2; dy <= 2 && !near; dy++) for (let dx = -2; dx <= 2; dx++) if (inMap(x + dx, y + dy) && SC.zone[(y + dy) * N + x + dx]) { near = true; break; } } else near = true; if (!near) continue; const d = Math.hypot(x + 0.5 - cx, y + 0.5 - cy); if (d < bd) { bd = d; best = [x, y]; } }
+  return best;
+}
+function autoDeploy(all) {
+  if (!BT || BT.ended || !SC.deploySel) return; if (!SC.rally || (SC.rallyT || 0) < SC.time - 6) SC.rally = rallyPoint(); SC.rallyT = SC.time; const r = SC.rally; if (!r) { toast('Nessun punto libero per schierare: tocca la mappa fuori dalla zona rossa'); return; }
+  let tries = 0, done = 0; const want = all ? 999 : 1;
+  while (done < want && SC.deploySel && tries < 400) { tries++; SC.dn = (SC.dn || 0) + 1; const a = SC.dn * 2.4, rr = 0.3 + Math.sqrt(SC.dn) * 0.45; const x = r[0] + 0.5 + Math.cos(a) * rr, y = r[1] + 0.5 + Math.sin(a) * rr;
+    const [wx, wy] = W(x, y); const sx = (wx - cam.x) * cam.z + VW / 2, sy = (wy - cam.y) * cam.z + VH / 2; const ok = deployAtQuiet(sx, sy); if (ok) done++; if (SC.dn > 300) SC.dn = 0; }
+  if (all && done) { toast(`⚔ Schierati ${done} uomini`); sfx('horn'); }
+}
+function deployAtQuiet(sx, sy) { const T = SC.T.length; const r = deployAt(sx, sy); if (!r) SC.T.length = T; return r; }
+function deployAll() { if (!BT || BT.ended || MODE !== 'attack') return; for (const k of UNIT_ORDER) { if (!(BT.avail[k] > 0)) continue; SC.deploySel = { k }; autoDeploy(true); } updateBattleHUD(true); }
+function heroCard(k) { const h = BT.heroes.find(h => h.k === k); if (!h) return; if (!h.u) { SC.deploySel = { hero: k }; autoDeploy(); } else if (heroUlt(SC, h.u)) { } updateBattleHUD(true); }
 
 // ---------- title ----------
 // conferma dentro al gioco (i popup del browser sono bloccati nella pagina pubblicata)
