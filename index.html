@@ -409,6 +409,7 @@ html[data-theme=pietra] .rrow{background:rgba(255,255,255,.05)}
 .memo .mi.p0{border-color:#b3201f;background:rgba(255,190,170,.35)}.memo .mi.p1{border-color:#b45309;background:rgba(255,214,120,.3)}
 .memo .mic{font-size:22px;width:28px;text-align:center}.memo .mt{flex:1;min-width:0;display:flex;flex-direction:column}.memo .mt b{font-size:13px}.memo .mt small{font-size:11px;opacity:.8}.memo .mt small .ico{width:14px;height:14px;vertical-align:-3px}
 .memo .btn{padding:6px 10px;font-size:12px;white-space:nowrap}
+#quest .qn{flex-basis:100%;font-size:11px;font-weight:700;color:var(--crim);cursor:pointer}#quest .qn .ico,.cneed .ico{width:13px;height:13px;vertical-align:-2px}.cneed{color:#b3201f;font-size:10.5px;font-weight:700;margin-top:2px}.memo.need .mt small{margin-top:3px;line-height:1.35}.memo.need .mi{align-items:flex-start}.nacts{display:flex;flex-direction:column;gap:5px}
 .memo0{text-align:center;padding:14px 0}.memo0 div{font-size:44px}
 html[data-theme=miniatura] #memob{border-color:#c99a2e}html[data-theme=pietra] #memob{background:radial-gradient(circle at 35% 30%,#59616a,#353b40);border-color:#8d959c}html[data-theme=araldica] #memob{border-radius:4px;border:2px solid #111;background:#f4f1ea;box-shadow:3px 3px 0 #e8b923}
 html[data-theme=pietra] .memo .mi{background:rgba(255,255,255,.05)}
@@ -1609,18 +1610,18 @@ function isWater(sc, x, y) { return !!(sc && sc.water && x >= 0 && y >= 0 && x <
 // ---------- audio ----------
 // ---- audio: musica (Web Audio, così il volume funziona anche su iPhone) + effetti, con muto generale ----
 if (SET.mvol == null) SET.mvol = 0.45; if (SET.fvol == null) SET.fvol = 0.8; if (SET.mute == null) SET.mute = false;
-const MUS = { el: null, src: null, g: null, get on() { return SET.music !== false; } };
+const MUS = { el: null, src: null, g: null, duck: false, get on() { return SET.music !== false; } };
 let FXG = null;
 function fxOut(a) { if (!FXG) { FXG = a.createGain(); FXG.connect(a.destination); } FXG.gain.value = SET.mute ? 0 : SET.fvol; return FXG; }
-function musicApply() { if (MUS.g) MUS.g.gain.value = SET.mute ? 0 : SET.mvol; else if (MUS.el) MUS.el.volume = SET.mute ? 0 : SET.mvol; if (FXG) FXG.gain.value = SET.mute ? 0 : SET.fvol; }
+function musicApply() { const mv = SET.mute || MUS.duck ? 0 : SET.mvol; if (MUS.g) MUS.g.gain.value = mv; else if (MUS.el) MUS.el.volume = mv; if (FXG) FXG.gain.value = SET.mute ? 0 : SET.fvol; if (TENS.g) TENS.g.gain.value = SET.mute || !MUS.on ? 0 : SET.mvol * 0.9; }
 function musicStart() {
-  if (!MUS.on || SET.mute || document.hidden) return;
+  if (!MUS.on || SET.mute || document.hidden || MUS.duck) return;
   if (!MUS.el) { MUS.el = new Audio('feudum.mp3'); MUS.el.loop = true; MUS.el.preload = 'auto'; const a = ac(); if (a) { try { MUS.src = a.createMediaElementSource(MUS.el); MUS.g = a.createGain(); MUS.src.connect(MUS.g).connect(a.destination); } catch (e) { MUS.g = null; } } musicApply(); }
   else ac();
   if (MUS.el.paused) { const p = MUS.el.play(); if (p && p.catch) p.catch(() => { }); }
 }
 function musicStop() { if (MUS.el && !MUS.el.paused) MUS.el.pause(); }
-function audioRefresh() { saveSet(); musicApply(); if (MUS.on && !SET.mute) musicStart(); else musicStop(); updateSndBtn(); }
+function audioRefresh() { saveSet(); musicApply(); if (MUS.on && !SET.mute) musicStart(); else musicStop(); if (TENS.kind && (!MUS.on || SET.mute)) tensionStop(true); updateSndBtn(); }
 function musicToggle() { SET.music = !MUS.on; audioRefresh(); }
 function toggleMute() { SET.mute = !SET.mute; audioRefresh(); if (!SET.mute) sfx('click'); }
 function updateSndBtn() { const b = $('#sndmute'); if (b) { b.textContent = SET.mute ? '🔇' : '🔊'; b.title = SET.mute ? 'Audio spento' : 'Audio attivo'; b.classList.toggle('off', !!SET.mute); } }
@@ -1631,6 +1632,55 @@ function openAudio(back) {
 }
 ['pointerdown', 'keydown', 'touchend'].forEach(ev => document.addEventListener(ev, musicStart, { passive: true }));
 document.addEventListener('visibilitychange', () => { if (!MUS.el) return; if (document.hidden) MUS.el.pause(); else musicStart(); });
+
+// ---- musica di tensione durante assedi (attacchi tuoi) e razzie (attacchi subiti): generata con Web Audio ----
+const TENS = { kind: null, g: null, iv: 0, nextT: 0, step: 0, bus: null };
+const TENS_CH = [[38, [0, 3, 7]], [34, [0, 4, 7]], [31, [0, 3, 7]], [33, [0, 4, 7]]]; // Re- Sib Sol- La (midi radice + accordo)
+const mtof = m => 440 * Math.pow(2, (m - 69) / 12);
+function tensionStart(kind) {
+  const a = ac(); if (!a) return; tensionStop(true);
+  MUS.duck = true; if (MUS.g && MUS.el) { const t = a.currentTime; MUS.g.gain.cancelScheduledValues(t); MUS.g.gain.setValueAtTime(MUS.g.gain.value, t); MUS.g.gain.linearRampToValueAtTime(0, t + 1.2); setTimeout(() => { if (MUS.duck) musicStop(); }, 1300); } else musicStop();
+  if (!MUS.on || SET.mute) { TENS.kind = kind; return; }
+  TENS.kind = kind; TENS.g = a.createGain(); TENS.g.gain.value = 0; TENS.g.connect(a.destination);
+  const t0 = a.currentTime; TENS.g.gain.linearRampToValueAtTime(SET.mvol * 0.9, t0 + 1.5);
+  TENS.bus = a.createDynamicsCompressor(); TENS.bus.threshold.value = -18; TENS.bus.ratio.value = 4; TENS.bus.connect(TENS.g);
+  TENS.nextT = t0 + 0.15; TENS.step = 0;
+  TENS.iv = setInterval(tensionSched, 40);
+}
+function tensionStop(now) {
+  if (TENS.iv) clearInterval(TENS.iv); TENS.iv = 0; const g = TENS.g, a = AC; TENS.g = null; const wasOn = !!TENS.kind; TENS.kind = null;
+  if (g && a) { const t = a.currentTime; g.gain.cancelScheduledValues(t); g.gain.setValueAtTime(g.gain.value, t); g.gain.linearRampToValueAtTime(0, t + (now ? 0.2 : 2.2)); setTimeout(() => { try { g.disconnect(); } catch (e) { } }, now ? 400 : 2600); }
+  if (wasOn && !now) { MUS.duck = false; setTimeout(() => { if (TENS.kind) return; musicStart(); if (MUS.g && AC) { const t = AC.currentTime; MUS.g.gain.cancelScheduledValues(t); MUS.g.gain.setValueAtTime(0, t); MUS.g.gain.linearRampToValueAtTime(SET.mute ? 0 : SET.mvol, t + 2.5); } else musicApply(); }, 1600); }
+  else if (!now) { MUS.duck = false; musicApply(); }
+}
+function tensionSched() {
+  const a = AC; if (!a || !TENS.g) return; if (document.hidden) { TENS.nextT = a.currentTime + 0.1; return; }
+  const raid = TENS.kind === 'raid'; const late = BT && !BT.ended && BT.timer < 40;
+  const bpm = (raid ? 92 : 108) + (late ? 14 : 0), s16 = 60 / bpm / 4;
+  if (TENS.nextT < a.currentTime - 0.5) TENS.nextT = a.currentTime + 0.05;
+  while (TENS.nextT < a.currentTime + 0.25) { tensionStep(a, TENS.nextT, TENS.step, s16, raid, late); TENS.nextT += s16; TENS.step++; }
+}
+function tensionStep(a, t, st, s16, raid, late) {
+  const O = TENS.bus; const sb = st % 16, bar = Math.floor(st / 16), ch = TENS_CH[bar % 4], root = ch[0];
+  const env = (node, v, at, dec) => { const g = a.createGain(); g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(v, t + at); g.gain.exponentialRampToValueAtTime(0.0001, t + at + dec); node.connect(g).connect(O); return g; };
+  const osc = (type, f, v, at, dec, f2, lp) => { const o = a.createOscillator(); o.type = type; o.frequency.setValueAtTime(f, t); if (f2) o.frequency.exponentialRampToValueAtTime(f2, t + at + dec); let n = o; if (lp) { const fl = a.createBiquadFilter(); fl.type = 'lowpass'; fl.frequency.value = lp; o.connect(fl); n = fl; } env(n, v, at, dec); o.start(t); o.stop(t + at + dec + 0.05); };
+  const nz = (dur, f, q, v, type) => { const b = a.createBuffer(1, Math.ceil(a.sampleRate * dur), a.sampleRate), d = b.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1; const s = a.createBufferSource(); s.buffer = b; const fl = a.createBiquadFilter(); fl.type = type || 'bandpass'; fl.frequency.value = f; fl.Q.value = q; s.connect(fl); env(fl, v, 0.004, dur); s.start(t); s.stop(t + dur + 0.05); };
+  // tamburi di guerra (timpano grave)
+  const kick = raid ? [0, 6, 8, 14] : [0, 3, 6, 8, 11, 14];
+  if (kick.includes(sb)) { osc('sine', 95, sb === 0 ? 0.55 : 0.38, 0.005, 0.42, 42); nz(0.12, 180, 0.8, 0.18, 'lowpass'); }
+  // tamburo a cornice / rullante
+  if (sb === 4 || sb === 12) nz(0.18, raid ? 600 : 900, 0.9, raid ? 0.13 : 0.18);
+  if ((late || !raid) && sb % 2 === 1) nz(0.04, 5200, 1.5, late ? 0.05 : 0.025, 'highpass');
+  if (late && (sb === 15 || sb === 13)) nz(0.1, 900, 0.9, 0.12);
+  // bordone sull'accordo (ogni battuta)
+  if (sb === 0) { const dur = s16 * 16; for (const iv of [0, 7]) { osc('sawtooth', mtof(root + iv), 0.05, dur * 0.3, dur * 0.75, null, raid ? 320 : 420); } osc('sine', mtof(root - 12), 0.12, dur * 0.25, dur * 0.8); }
+  // ostinato d'archi pizzicato (crome)
+  if (sb % 2 === 0) { const pat = raid ? [0, 12, 3, 12, 7, 12, 3, 1] : [0, 7, 12, 7, 3, 7, 12, 1]; const n = root + 24 + pat[(sb / 2) | 0] - (pat[(sb / 2) | 0] === 1 ? 0 : 0); osc('sawtooth', mtof(n), raid ? 0.045 : 0.06, 0.006, s16 * 1.6, null, 1700); }
+  // ottoni ogni 4 battute
+  if (bar % 4 === 3 && sb === 8) { const dur = s16 * 8; for (const iv of ch[1]) osc('sawtooth', mtof(root + 12 + iv), 0.045, dur * 0.45, dur * 0.7, null, 1100); }
+  // razzia: campana a morto lontana
+  if (raid && sb === 0 && bar % 2 === 0) { [1, 2.01, 2.76, 4.07].forEach((m, i) => osc('sine', mtof(root + 12) * m, 0.07 / (i + 1), 0.005, 2.6 - i * 0.4)); }
+}
 let AC = null;
 function ac() { if (!AC) { try { AC = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { } } if (AC && AC.state === 'suspended') AC.resume(); return AC; }
 function sfx(kind) {
@@ -2372,7 +2422,7 @@ function startAttack(i) {
   const tg = S.targets[i]; if (!tg) return;
   const total = Object.values(S.army).reduce((a, b) => a + b, 0); const heroes = heroList();
   if (!total && !heroes.length) { toast('Non hai truppe! Addestra prima un esercito.'); return; }
-  closeSheet(); sfx('horn');
+  closeSheet(); sfx('horn'); tensionStart('attack');
   closeFolk(); SC = genEnemy(tg); MODE = 'attack'; buildZone(SC); SC.arms = armsMult();
   BT = { tg, idx: i, avail: { ...S.army }, used: {}, heroes: heroes.map(k => ({ k, u: null })), timer: 210, started: false, lootGot: {}, mastioDown: false, ended: false };
   SC.onBDead = b => { for (const k in b.loot) { BT.lootGot[k] = (BT.lootGot[k] || 0) + b.loot[k]; } if (b.t === 'mastio') BT.mastioDown = true; buildZone(SC); const [x, y] = [b.x + b.w / 2, b.y + b.h / 2]; const s = Object.entries(b.loot).filter(e => e[1] > 0).map(e => `+${e[1]}${RICON[e[0]]}`).join(' '); if (s) floatText(SC, x, y, s, '#ffe9a6', 1.6); };
@@ -2384,7 +2434,7 @@ function startAttack(i) {
 function heroList() { return Object.keys(HDEF).filter(k => S.mastio >= HDEF[k].lv); }
 function firstAvail() { for (const k of UNIT_ORDER) if (BT.avail[k] > 0) return { k }; const h = BT.heroes.find(h => !h.u); return h ? { hero: h.k } : null; }
 function startRaid() {
-  closeSheet(); closeFolk(); MODE = 'raid'; sfx('bell'); S.raids++;
+  closeSheet(); closeFolk(); MODE = 'raid'; sfx('bell'); S.raids++; tensionStart('raid');
   const sc = newScene('raid'); villageSetup(sc);
   for (const r of S.buildings) { const b = mkBuilding(r.t, r.x, r.y, r.lvl, 'D', null); b.raidRef = r; if (r.end) b.inactive = true; sc.B.push(b); }
   sceneIndex(sc); try { computePaths(sc); } catch (e) { }
@@ -2452,7 +2502,7 @@ function battleTick(dt) {
   updateBattleHUD();
 }
 function endBattle() {
-  BT.ended = true; SC.deploySel = null;
+  BT.ended = true; SC.deploySel = null; tensionStop();
   const dead = {}; for (const u of SC.U) if (u.dead && !u.hero && !u.ally && (u.side === (MODE === 'raid' ? 'D' : 'A'))) dead[u.k] = (dead[u.k] || 0) + 1;
   const cp = curePct(); const cured = {}; let curedN = 0; for (const k in dead) { cured[k] = Math.floor(dead[k] * cp + (Math.random() < (dead[k] * cp) % 1 ? 1 : 0)); curedN += cured[k]; dead[k] -= cured[k]; if (!dead[k]) delete dead[k]; }
   { const side = MODE === 'raid' ? 'D' : 'A'; const left = Object.assign({}, dead); let ups = 0;
@@ -2484,7 +2534,7 @@ function endBattle() {
   save();
   setTimeout(() => { openSheet('Esito', `<div class="result">${html}<button class="btn big" onclick="backToVillage()">Torna al feudo</button></div>`, 'result'); }, 900);
 }
-function backToVillage() { closeSheet(); BT = null; MODE = 'village'; SC = buildVillage(); $('#bhud').classList.add('hidden'); $('#hud').classList.remove('hidden'); centerCam(MCX, MCX); cam.z = VW < 600 ? 0.9 : Math.max(0.6, Math.min(1.15, VW / 1000)); updateHUD(); save(); }
+function backToVillage() { if (TENS.kind) tensionStop(); else if (MUS.duck) { MUS.duck = false; musicStart(); musicApply(); } closeSheet(); BT = null; MODE = 'village'; SC = buildVillage(); $('#bhud').classList.add('hidden'); $('#hud').classList.remove('hidden'); centerCam(MCX, MCX); cam.z = VW < 600 ? 0.9 : Math.max(0.6, Math.min(1.15, VW / 1000)); updateHUD(); save(); }
 function retreat() { if (BT && !BT.ended) { if (MODE === 'raid') { BT.timer = 0; } else endBattle(); } }
 
 // ---------- camera & input ----------
@@ -2574,7 +2624,7 @@ function confirmPlace() {
   if (placing.move) { placing.move.x = placing.x; placing.move.y = placing.y; cancelPlace(); SC = buildVillage(); save(); return; }
   if (countB(placing.t) >= maxB(placing.t)) { toast('Limite raggiunto: alza il livello del Mastio'); cancelPlace(); return; }
   if (d.req && !S.creative && !hasB(d.req)) { toast(`Serve prima: ${BDEF[d.req].n}`); cancelPlace(); return; }
-  if (!canPay(d.cost)) { toast('Risorse insufficienti'); return; }
+  if (!canPay(d.cost)) { const nm = d.n; cancelPlace(); needSheet(d.cost, 'costruire ' + nm); return; }
   if (d.t && !d.wall && !d.decor && builders() >= maxBuilders()) { toast(`Tutti i mastri d'opera sono occupati (max ${maxBuilders()})`); return; }
   pay(d.cost);
   const r = { id: S.nextId++, t: placing.t, x: placing.x, y: placing.y, lvl: 1, stock: 0, end: d.t && !S.creative ? now() + buildSecs(d) * 1000 * seasonBuildMul() : 0, dur: buildSecs(d) * 1000 * seasonBuildMul(), toLvl: 1 };
@@ -2995,7 +3045,7 @@ function canUp(r) {
 }
 function doUpgrade(id) {
   const r = S.buildings.find(b => b.id === id); if (!r) return; const why = canUp(r); if (why) { toast(why); return; }
-  const c = upCost(r); if (!canPay(c)) { toast('Risorse insufficienti'); return; }
+  const c = upCost(r); if (!canPay(c)) { needSheet(c, r.t === 'mastio' ? `alzare il Mastio al livello ${r.lvl + 1}` : `migliorare ${BDEF[r.t].n}`); return; }
   const t = upTime(r); if (t && !BDEF[r.t].wall && builders() >= maxBuilders()) { toast(`Tutti i mastri d'opera sono occupati (max ${maxBuilders()})`); return; }
   pay(c); if (resOf(r)) collect(r);
   if (t && !S.creative) { r.end = now() + t * 1000; r.dur = t * 1000; r.toLvl = r.lvl + 1; } else { r.lvl++; }
@@ -3059,10 +3109,10 @@ function openBuild() {
   const lockMsg = t => { const d = BDEF[t]; const lv = d.max.findIndex(v => v > 0) + 1; return `Mastio ${lv}`; };
   const html = `<div class="grid">${BUILD_ORDER.map(t => {
     const d = BDEF[t], n = countB(t), m = maxB(t), needReq = d.req && !S.creative && !hasB(d.req), locked = m === 0 || needReq, full = n >= m; const th = d.spr && bThumb(d.spr);
-    return `<button class="card ${locked || full ? 'dis' : ''}" ${locked || full ? '' : `onclick="startPlacement('${t}')"`}>
+    return `<button class="card ${locked || full ? 'dis' : ''}" ${locked || full ? '' : !canPay(d.cost) ? `onclick="needSheet(BDEF['${t}'].cost,'costruire ${d.n.replace(/'/g, '’')}')"` : `onclick="startPlacement('${t}')"`}>
       <div class="ci">${th ? `<img src="${th}" style="width:46px;height:46px;object-fit:contain">` : d.icon}</div><div class="cn">${d.n}</div>
       <div class="cs">${m === 0 ? '🔒 ' + lockMsg(t) : needReq ? '🔒 Serve ' + BDEF[d.req].n : `${n}/${m}`}</div>
-      <div class="cc">${costStr(d.cost)}${d.t && !S.creative ? ` <span class="tm">⏱ ${fmtT(buildSecs(d) * 1000 * seasonBuildMul())}</span>` : ''}</div><div class="cd">${d.desc}</div></button>`;
+      <div class="cc">${costStr(d.cost)}${!locked && !full && !canPay(d.cost) ? `<div class="cneed">${needLabel(d.cost)}</div>` : ''}${d.t && !S.creative ? ` <span class="tm">⏱ ${fmtT(buildSecs(d) * 1000 * seasonBuildMul())}</span>` : ''}</div><div class="cd">${d.desc}</div></button>`;
   }).join('')}</div>`;
   openSheet(ICO('build') + ' Costruisci', html, 'build');
 }
@@ -3289,6 +3339,8 @@ function memoItems() {
   if (!S || S.creative || MODE !== 'village') return []; const it = []; const add = (pri, ic, t, sub, act, lbl) => it.push({ pri, ic, t, sub, act, lbl });
   // missione pronta
   const q = QUESTS[S.mq]; if (q && q.c()) add(0, '📜', 'Missione compiuta: riscuoti!', q.t, 'claimQuest();openMemo()', 'Riscuoti');
+  // missione bloccata dai materiali
+  { const qc = questCost(); if (qc && Object.keys(lacking(qc.cost)).length) add(1, '🧱', `Per ${qc.what} manca qualcosa`, needLabel(qc.cost), `questNeed()`, 'Dove trovarlo'); }
   // razzia in arrivo
   if (S.raids != null && S.nightIn > 0 && S.nightIn <= 180) add(0, '🔥', `Predoni tra ${fmtT(S.nightIn * 1000)}`, 'Controlla mura, torri ed esercito', "closeSheet();openArmy()", 'Esercito');
   // raccolto
@@ -3326,6 +3378,45 @@ function openMemo() {
 }
 let MEMO_T = 0;
 function memoTick(dt) { MEMO_T -= dt; if (MEMO_T > 0) return; MEMO_T = 1; const el = $('#memob'); if (!el) return; if (!S || S.creative || MODE !== 'village') { el.classList.add('hidden'); return; } el.classList.remove('hidden'); const it = memoItems(); const urgent = it.filter(x => x.pri <= 1).length; const b = el.querySelector('b'); b.textContent = it.length; b.style.display = it.length ? '' : 'none'; el.classList.toggle('urg', urgent > 0); if ($('#sheet').dataset.p === 'memo' && (el.dataset.n !== String(it.length))) openMemo(); el.dataset.n = it.length; }
+
+// ================= RISORSE MANCANTI: la pergamena dice dove produrle =================
+const RSRC = { cibo: ['fattoria', 'taverna'], legno: ['capanna'], oro: ['casa', 'municipio', 'mercato', 'mastio'], pietra: ['cava', 'miniera'], ferro: ['fucina', 'miniera'], pelli: [], favore: ['monastero'] };
+const RXTRA = { cibo: 'Caccia cervi e cinghiali nei boschi', legno: 'Rimuovi tronchi caduti e cespugli dalla mappa', oro: 'Vinci assedi o vendi merci al Mercato', pietra: 'Rimuovi i massi muschiosi dalla mappa', ferro: 'Compra ferro al Mercato', pelli: 'Caccia animali o abbatti lupi e orsi durante le razzie', favore: 'Completa missioni e vinci assedi con molte stelle' };
+function lacking(cost) { const o = {}; if (!cost || (S && S.creative)) return o; for (const r in cost) { const m = cost[r] - Math.floor(S.res[r] || 0); if (m > 0) o[r] = m; } return o; }
+function needLabel(cost) { const l = lacking(cost); const k = Object.keys(l); if (!k.length) return ''; const r = k[0]; const own = S.buildings.filter(b => RSRC[r].includes(b.t) && !b.nat && !(b.end && b.toLvl === 1)); const w = own.length ? BDEF[own[0].t].n : (RSRC[r].find(t => t !== 'mastio' && maxB(t) > 0) ? BDEF[RSRC[r].find(t => t !== 'mastio' && maxB(t) > 0)].n : ''); return `Manca ${k.map(x => ICO(x) + ' ' + fmt(l[x])).join(' ')}${w ? ' → ' + w : ''}`; }
+function needItems(cost) {
+  const l = lacking(cost); const out = []; const c = caps();
+  for (const r in l) {
+    const miss = l[r]; const lines = []; const acts = [];
+    if (cost[r] > c[r]) lines.push(`⚠️ Il magazzino ne tiene solo ${fmt(c[r])}: ${r === 'oro' ? 'costruisci o migliora la Tesoreria' : 'costruisci o migliora un Granaio'}`);
+    const own = S.buildings.filter(b => RSRC[r].includes(b.t) && !b.nat && !(b.end && b.toLvl === 1));
+    if (own.length) {
+      const stock = own.reduce((a, b) => a + Math.floor(b.stock || 0), 0); const rate = own.reduce((a, b) => a + rateOf(b), 0);
+      const names = [...new Set(own.map(b => BDEF[b.t].n))].join(', ');
+      if (stock > 0) lines.push(`🧺 ${stock >= miss ? 'Basta raccogliere' : 'Raccogli'} ${ICO(r)} ${fmt(stock)} già pronti da: <b>${names}</b>`);
+      else lines.push(`Lo producono le tue botteghe: <b>${names}</b>`);
+      if (rate > 0 && stock < miss) lines.push(`⏳ Con la produzione attuale (${rate < 1 ? rate.toFixed(1) : Math.round(rate)}/min) ti servono circa ${fmtT((miss - stock) / rate * 60000)}`);
+      const best = own.filter(b => !b.end).sort((a, b) => (b.stock || 0) - (a.stock || 0))[0] || own[0];
+      acts.push([stock > 0 ? 'Raccogli' : 'Vai', `closeSheet();needGo(${best.id})`]);
+      const up = own.find(b => b.t !== 'mastio' && !canUp(b)); if (up) lines.push(`⬆ Migliora ${BDEF[up.t].n} per produrne di più`);
+    }
+    const canNew = RSRC[r].filter(t => t !== 'mastio' && maxB(t) > 0 && countB(t) < maxB(t) && !(BDEF[t].req && !hasB(BDEF[t].req)));
+    if (canNew.length) { lines.push(`🔨 ${own.length ? 'Oppure costruisci' : 'Costruisci'}: <b>${canNew.map(t => BDEF[t].n).join(' o ')}</b>`); acts.push(['Costruisci', `closeSheet();openBuild()`]); }
+    else if (!own.length && RSRC[r].length) { const lk = RSRC[r].filter(t => t !== 'mastio').map(t => { const d = BDEF[t]; if (d.req && !hasB(d.req)) return `${d.n} (serve ${BDEF[d.req].n})`; const lv = d.max.findIndex(v => v > 0) + 1; return lv > S.mastio ? `${d.n} (Mastio ${lv})` : null; }).filter(Boolean); if (lk.length) lines.push(`🔒 Si sblocca: ${lk.join(', ')}`); }
+    if (RXTRA[r]) lines.push(`💡 ${RXTRA[r]}`);
+    if (hasB('mercato') && ['oro', 'ferro'].includes(r)) acts.push(['Mercato', `closeSheet();openMarket()`]);
+    out.push({ r, miss, lines, acts });
+  }
+  return out;
+}
+function needGo(id) { const r = S.buildings.find(b => b.id === id); if (!r) return; if (!r.end && resOf(r) && (r.stock || 0) >= 1) { collect(r); save(); updateHUD(); } const b = SC && SC.B.find(b => b.ref === r); if (b) { const [x, y] = W(b.x + b.w / 2, b.y + b.h / 2); cam.x = x; cam.y = y + 60; SC.sel = b; } openBuildingInfo(r); }
+function needSheet(cost, what) {
+  const it = needItems(cost); if (!it.length) return false;
+  openSheet('📜 Ti mancano i materiali', `<p class="desc"><i>«Mio signore, per ${what} non basta ciò che abbiamo nei magazzini. Ecco dove trovare il resto.»</i></p><div class="memo need">${it.map(x => `<div class="mi p1"><span class="mic">${ICO(x.r)}</span><div class="mt"><b>Mancano ${fmt(x.miss)} ${RNAME[x.r]}</b>${x.lines.map(l => `<small>${l}</small>`).join('')}</div>${x.acts.length ? `<div class="nacts">${x.acts.map(a => `<button class="btn" onclick="${a[1]}">${a[0]}</button>`).join('')}</div>` : ''}</div>`).join('')}</div><div class="acts"><button class="btn ghost" onclick="closeSheet()">Ho capito</button></div>`, 'need');
+  return true;
+}
+function questCost() { const q = QUESTS[S.mq]; if (!q || q.c()) return null; if (q.m) { const m = S.buildings.find(b => b.t === 'mastio'); return m && !m.end && !canUp(m) ? { cost: upCost(m), what: `alzare il Mastio al livello ${m.lvl + 1}` } : null; } if (q.b) { const d = BDEF[q.b]; return maxB(q.b) > countB(q.b) ? { cost: d.cost, what: `costruire ${d.n}` } : null; } return null; }
+function questNeed() { const qc = questCost(); if (qc) needSheet(qc.cost, qc.what); }
 // ================= ALTRI REGNI: signori "di altri giocatori" (simulati per ora) =================
 const RLM_SEED = 1254;
 let _rlmT0 = 0; function RLM_T0() { if (_rlmT0) return _rlmT0; try { let v = +localStorage.getItem('feudum_rlm'); if (!v) { v = now() - 2 * 86400000; localStorage.setItem('feudum_rlm', v); } return _rlmT0 = v; } catch (e) { return _rlmT0 = now() - 2 * 86400000; } }
@@ -3534,40 +3625,40 @@ const CHAPTERS = [
 ];
 const vetMax = () => { let m = 1; for (const k in (S.vets || {})) for (const r of S.vets[k]) m = Math.max(m, r.lvl); return m; };
 const QUESTS = [
-  { ch: 0, t: 'Costruisci la Taverna', c: () => built('taverna') >= 1, r: { oro: 80, legno: 60 } },
-  { ch: 0, t: 'Costruisci una terza Casa', c: () => built('casa') >= 3, r: { legno: 120 } },
+  { ch: 0, t: 'Costruisci la Taverna', b: 'taverna', c: () => built('taverna') >= 1, r: { oro: 80, legno: 60 } },
+  { ch: 0, t: 'Costruisci una terza Casa', b: 'casa', c: () => built('casa') >= 3, r: { legno: 120 } },
   { ch: 0, t: 'Riscuoti 5 volte dalle botteghe', c: () => (S.collects || 0) >= 5, r: { cibo: 120 } },
   { ch: 0, t: 'Raduna un esercito di 14 uomini', c: () => Object.keys(S.army).reduce((a, k) => a + S.army[k] * UDEF[k].sp, 0) >= 14, r: { cibo: 150 } },
   { ch: 0, t: 'Vinci il tuo primo assedio', c: () => S.wins >= 1, r: { oro: 150, favore: 2 } },
-  { ch: 1, t: 'Porta il Mastio al livello 2', c: () => S.mastio >= 2, r: { legno: 200, cibo: 100 } },
-  { ch: 1, t: 'Costruisci il Fabbro', c: () => built('fucina') >= 1, r: { ferro: 60 } },
-  { ch: 1, t: "Costruisci l'Infermeria", c: () => built('infermeria') >= 1, r: { oro: 120 } },
+  { ch: 1, t: 'Porta il Mastio al livello 2', m: 1, c: () => S.mastio >= 2, r: { legno: 200, cibo: 100 } },
+  { ch: 1, t: 'Costruisci il Fabbro', b: 'fucina', c: () => built('fucina') >= 1, r: { ferro: 60 } },
+  { ch: 1, t: "Costruisci l'Infermeria", b: 'infermeria', c: () => built('infermeria') >= 1, r: { oro: 120 } },
   { ch: 1, t: 'Respingi una razzia notturna', c: () => S.raidsWon >= 1, r: { favore: 3, oro: 100 } },
-  { ch: 1, t: 'Porta il Mastio al livello 3', c: () => S.mastio >= 3, r: { pietra: 150 } },
+  { ch: 1, t: 'Porta il Mastio al livello 3', m: 1, c: () => S.mastio >= 3, r: { pietra: 150 } },
   { ch: 2, t: 'Manda un dono a un feudo vicino', c: () => (S.gifts || 0) >= 1, r: { oro: 80 }, how: 'Mappa → Diplomazia' },
-  { ch: 2, t: 'Costruisci il Mercato', c: () => built('mercato') >= 1, r: { legno: 150 } },
+  { ch: 2, t: 'Costruisci il Mercato', b: 'mercato', c: () => built('mercato') >= 1, r: { legno: 150 } },
   { ch: 2, t: 'Commercia 3 volte al Mercato', c: () => (S.trades || 0) >= 3, r: { oro: 100 }, how: 'Mappa → Mercato' },
   { ch: 2, t: 'Stringi un patto commerciale', c: () => countSt('patto', 'alleato') >= 1, r: { oro: 150, favore: 2 } },
   { ch: 2, t: 'Affronta 3 eventi della Marca', c: () => (S.events || 0) >= 3, r: { cibo: 150 } },
-  { ch: 3, t: "Costruisci l'Armeria", c: () => built('armeria') >= 1, r: { ferro: 120 } },
+  { ch: 3, t: "Costruisci l'Armeria", b: 'armeria', c: () => built('armeria') >= 1, r: { ferro: 120 } },
   { ch: 3, t: 'Caccia 3 animali selvatici', c: () => (S.hunted || 0) >= 3, r: { cibo: 150, pelli: 3 } },
   { ch: 3, t: 'Sopravvivi a un inverno', c: () => (S.winters || 0) >= 1, r: { cibo: 200, legno: 150 } },
-  { ch: 3, t: 'Porta il Mastio al livello 4', c: () => S.mastio >= 4, r: { oro: 300, ferro: 100 } },
+  { ch: 3, t: 'Porta il Mastio al livello 4', m: 1, c: () => S.mastio >= 4, r: { oro: 300, ferro: 100 } },
   { ch: 3, t: 'Ottieni 3 stelle in un assedio', c: () => !!S.best3, r: { favore: 5 } },
-  { ch: 4, t: 'Il Mastio diventa Castello (liv. 5)', c: () => S.mastio >= 5, r: { oro: 500, favore: 5 } },
+  { ch: 4, t: 'Il Mastio diventa Castello (liv. 5)', m: 1, c: () => S.mastio >= 5, r: { oro: 500, favore: 5 } },
   { ch: 4, t: 'Giura alleanza con un feudo', c: () => countSt('alleato') >= 1, r: { oro: 250 } },
   { ch: 4, t: 'Ricevi 5 carovane', c: () => (S.caravans || 0) >= 5, r: { pietra: 200 } },
   { ch: 4, t: 'Porta un veterano al livello 5', c: () => vetMax() >= 5, r: { ferro: 150 } },
   { ch: 4, t: 'Vinci 10 assedi', c: () => S.wins >= 10, r: { favore: 10 } },
   { ch: 5, t: 'Rendi vassallo un feudo', c: () => countSt('vassallo') >= 1, r: { oro: 400 }, how: 'Esigi tributo o conquistalo in guerra' },
-  { ch: 5, t: 'Castello al livello 8', c: () => S.mastio >= 8, r: { favore: 15 } },
+  { ch: 5, t: 'Castello al livello 8', m: 1, c: () => S.mastio >= 8, r: { favore: 15 } },
   { ch: 5, t: 'Due feudi alleati o vassalli', c: () => countSt('alleato', 'vassallo') >= 2, r: { oro: 500 } },
-  { ch: 6, t: 'Mastio al livello 10', c: () => S.mastio >= 10, r: { pietra: 400, oro: 400 } },
+  { ch: 6, t: 'Mastio al livello 10', m: 1, c: () => S.mastio >= 10, r: { pietra: 400, oro: 400 } },
   { ch: 6, t: 'Tre feudi alleati o vassalli', c: () => countSt('alleato', 'vassallo') >= 3, r: { favore: 15 } },
-  { ch: 6, t: 'Mastio al livello 12', c: () => S.mastio >= 12, r: { oro: 800 } },
-  { ch: 7, t: 'Mastio al livello 14', c: () => S.mastio >= 14, r: { oro: 1000, ferro: 400 } },
+  { ch: 6, t: 'Mastio al livello 12', m: 1, c: () => S.mastio >= 12, r: { oro: 800 } },
+  { ch: 7, t: 'Mastio al livello 14', m: 1, c: () => S.mastio >= 14, r: { oro: 1000, ferro: 400 } },
   { ch: 7, t: 'Tutti i feudi alleati o vassalli', c: () => countSt('alleato', 'vassallo') >= 5, r: { favore: 25 } },
-  { ch: 7, t: 'Mastio al livello 16: sei Imperatore', c: () => S.mastio >= 16, r: { favore: 50 } },
+  { ch: 7, t: 'Mastio al livello 16: sei Imperatore', m: 1, c: () => S.mastio >= 16, r: { favore: 50 } },
 ];
 function questMigrate() { if (S.qv === 2) return; S.qv = 2; let i = 0; while (i < QUESTS.length && QUESTS[i].c()) i++; S.mq = Math.min(S.mq || 0, i); if ((S.mq || 0) > 0) S.chSeen = QUESTS[Math.min(S.mq, QUESTS.length - 1)].ch; }
 let CH_IDLE = 0;
@@ -3584,7 +3675,8 @@ function questHTML() {
   const q = QUESTS[S.mq]; if (!q) return '<span class="qt">📜 La Marca è tua. Tutte le missioni compiute.</span>';
   const done = q.c(); const rw = Object.keys(q.r).map(k => ICO(k) + q.r[k]).join(' ');
   const chq = QUESTS.filter(x => x.ch === q.ch), ci = chq.indexOf(q) + 1;
-  return `<span class="ql" onclick="openChapter(${q.ch})">📜 Cap. ${CHAPTERS[q.ch].n} · ${ci}/${chq.length}</span> <span class="qt">${q.t}</span> <span class="qr">${rw}</span>${done ? '<button class="qb" onclick="claimQuest()">Riscuoti</button>' : ''}`;
+  const qc = !done && questCost(); const nl = qc ? needLabel(qc.cost) : '';
+  return `<span class="ql" onclick="openChapter(${q.ch})">📜 Cap. ${CHAPTERS[q.ch].n} · ${ci}/${chq.length}</span> <span class="qt">${q.t}</span> <span class="qr">${rw}</span>${done ? '<button class="qb" onclick="claimQuest()">Riscuoti</button>' : ''}${nl ? `<span class="qn" onclick="questNeed()">${nl} ›</span>` : ''}`;
 }
 function claimQuest() { const q = QUESTS[S.mq]; if (!q || !q.c()) return; for (const k in q.r) addRes(k, q.r[k]); const chDone = !QUESTS[S.mq + 1] || QUESTS[S.mq + 1].ch !== q.ch; S.mq++; if (chDone) { const C = CHAPTERS[q.ch]; for (const k in C.r) addRes(k, C.r[k]); setTimeout(() => toast(`🏆 Capitolo ${C.n} «${C.t}» completato! ${Object.keys(C.r).map(k => ICO(k) + ' +' + C.r[k]).join(' ')}`), 1800); } sfx('coin'); toast(`📜 Missione compiuta! ${Object.keys(q.r).map(k => ICO(k) + ' +' + q.r[k]).join(' ')}`); save(); updateHUD(); }
 
