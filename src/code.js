@@ -2417,9 +2417,15 @@ function wxTick() {
 // --- rendering ---
 const WX = { I: 0, k: 'sereno', drops: [], flakes: [], leaves: [], streaks: [], clouds: [], flash: 0, nextBolt: 4, snowA: 0, last: 0 };
 let SNOWCV = null;
-function snowCanvas() { if (SNOWCV) return SNOWCV; const M = 4, Sz = NMAP * M; const cv2 = document.createElement('canvas'); cv2.width = cv2.height = Sz; const x = cv2.getContext('2d'); const id = x.createImageData(Sz, Sz); const nz = makeNoise(77), nz2 = makeNoise(78); const WV = villageWater();
-  for (let py = 0; py < Sz; py++) for (let px = 0; px < Sz; px++) { const u = px / M, v = py / M; const n = nz(u / 6, v / 6, 3) * 0.7 + nz2(u / 1.5, v / 1.5, 2) * 0.3; const a = Math.min(1, Math.max(0, (n - 0.3) / 0.25)); const o = (py * Sz + px) * 4; const sh = 236 + n * 19; const wet = WV && WV[(v | 0) * NMAP + (u | 0)]; id.data[o] = sh - 6; id.data[o + 1] = sh - 2; id.data[o + 2] = 255; id.data[o + 3] = wet ? 255 * (0.18 + 0.15 * a) : 255 * (0.35 + 0.6 * a); }
-  x.putImageData(id, 0, 0); return SNOWCV = cv2; }
+function snowCanvas() { if (SNOWCV && SNOWCV.pk === PATHC.key) return SNOWCV; const M = 8, Sz = NMAP * M; const cv2 = SNOWCV || document.createElement('canvas'); cv2.width = cv2.height = Sz; const x = cv2.getContext('2d'); const id = x.createImageData(Sz, Sz); const nz = makeNoise(77), nz2 = makeNoise(78), nz3 = makeNoise(79); const WV = villageWater();
+  // manto di neve compatto: bordi netti, poche chiazze d'erba scoperta, leggere ombre azzurre
+  for (let py = 0; py < Sz; py++) for (let px = 0; px < Sz; px++) { const u = px / M, v = py / M; const n = nz(u / 7, v / 7, 3) * 0.75 + nz2(u / 2, v / 2, 2) * 0.25; const a = Math.min(1, Math.max(0, (n - 0.27) / 0.05)); const f = nz3(u * 1.6, v * 1.6, 2); const o = (py * Sz + px) * 4; const sh = 232 + f * 22 + (n - 0.5) * 10; let wet = 0; if (WV) { const gx = Math.max(0, Math.min(NMAP - 1.001, u - 0.5)), gy = Math.max(0, Math.min(NMAP - 1.001, v - 0.5)), xi = gx | 0, yi = gy | 0, fx = gx - xi, fy = gy - yi, W0 = (X, Y) => WV[Math.min(NMAP - 1, Y) * NMAP + Math.min(NMAP - 1, X)] ? 1 : 0; wet = W0(xi, yi) * (1 - fx) * (1 - fy) + W0(xi + 1, yi) * fx * (1 - fy) + W0(xi, yi + 1) * (1 - fx) * fy + W0(xi + 1, yi + 1) * fx * fy; wet = smooth(0.15, 0.6, wet + (f - 0.5) * 0.3); }
+    id.data[o] = sh - 8; id.data[o + 1] = sh - 3; id.data[o + 2] = Math.min(255, sh + 10); id.data[o + 3] = 255 * a * (1 - 0.9 * wet); }
+  x.putImageData(id, 0, 0);
+  // sentieri battuti: la neve è calpestata e sporca
+  if (PATHC.lines) { const st = (w, al, col, op) => { x.globalCompositeOperation = op; x.globalAlpha = al; x.strokeStyle = col; x.lineWidth = w * M; x.lineCap = 'round'; x.lineJoin = 'round'; x.beginPath(); for (const l0 of PATHC.lines) { const l = chaikin(l0); x.moveTo(l[0][0] * M, l[0][1] * M); for (let i = 1; i < l.length; i++) x.lineTo(l[i][0] * M, l[i][1] * M); } x.stroke(); };
+    st(0.9, 0.35, '#000', 'destination-out'); st(0.6, 0.45, '#000', 'destination-out'); x.globalCompositeOperation = 'source-over'; x.globalAlpha = 1; }
+  cv2.pk = PATHC.key; return SNOWCV = cv2; }
 function seasonGround(c, sc) {
   if (sc.mode !== 'village' && sc.mode !== 'visit') return; const si = seasonInfo(); const k = si.s.k;
   const tgt = k === 'inverno' ? Math.min(1, si.t * 8) * (si.t > 0.94 ? (1 - si.t) / 0.06 : 1) : 0; WX.snowA += (tgt - WX.snowA) * 0.02;
@@ -2428,7 +2434,7 @@ function seasonGround(c, sc) {
   else if (k === 'estate') { c.globalCompositeOperation = 'soft-light'; c.fillStyle = 'rgba(255,215,120,0.35)'; c.fillRect(0, 0, NMAP, NMAP); }
   else if (k === 'primavera') { c.globalCompositeOperation = 'soft-light'; c.fillStyle = 'rgba(120,220,90,0.3)'; c.fillRect(0, 0, NMAP, NMAP); }
   c.restore();
-  if (WX.snowA > 0.01) { c.save(); tileTransform(c, 4); c.globalAlpha = WX.snowA * 0.92; c.drawImage(snowCanvas(), 0, 0); c.restore(); }
+  if (WX.snowA > 0.01) { c.save(); tileTransform(c, 8); c.globalAlpha = WX.snowA * 0.95; c.drawImage(snowCanvas(), 0, 0); c.restore(); }
 }
 function treeSeasonTint(kind, base, k3) {
   if (!S || MODE !== 'village') return base; const s = seasonInfo().s.k;
