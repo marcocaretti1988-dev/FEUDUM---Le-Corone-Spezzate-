@@ -135,7 +135,7 @@ function g3init() {
   return true;
 }
 // ---- caricamento a pezzi dei modelli 3D: si scarica solo ciò che serve, il resto con calma ----
-const M3D_FILES = new Set(["staccionata", "steccato", "cavallofrisia", "cassa", "anfora", "cassafieno", "botte", "cassaortaggi", "fontanella", "stenditoio", "mucchiosassi", "felce", "segnavia", "gonfalone", "rovinamuro", "arco", "colonna", "rovine", "lastricato", "muretto", "rastrelliera", "carriola", "pozzo", "carretto", "croce", "lanterna", "abete3d", "accademia", "armeria", "balista", "balista_b", "balista_c", "bottino", "cancello", "capanno", "casa", "caserma", "castello", "cava", "chiesa", "falegnameria", "falo", "fattoria", "fucina", "generale", "granaio", "infermeria", "mercato", "miniera", "monastero", "municipio", "mura", "olmo3d", "palizzata", "poligono", "quercia3d", "spoglio3d", "stalla", "taverna", "tenda", "tesoreria", "torre", "torrepietra", "tronco3d", "cripta"]);
+const M3D_FILES = new Set(["lampione", "pozzogrande", "staccionata", "steccato", "cavallofrisia", "cassa", "anfora", "cassafieno", "botte", "cassaortaggi", "fontanella", "stenditoio", "mucchiosassi", "felce", "segnavia", "gonfalone", "rovinamuro", "arco", "colonna", "rovine", "lastricato", "muretto", "rastrelliera", "carriola", "pozzo", "carretto", "croce", "lanterna", "abete3d", "accademia", "armeria", "balista", "balista_b", "balista_c", "bottino", "cancello", "capanno", "casa", "caserma", "castello", "cava", "chiesa", "falegnameria", "falo", "fattoria", "fucina", "generale", "granaio", "infermeria", "mercato", "miniera", "monastero", "municipio", "mura", "olmo3d", "palizzata", "poligono", "quercia3d", "spoglio3d", "stalla", "taverna", "tenda", "tesoreria", "torre", "torrepietra", "tronco3d", "cripta"]);
 const M3D_ALIAS = { granaio: 'stalla', mastio: 'castello', tronco: 'tronco3d' };
 const L3 = { state: {}, q: [], active: 0, max: 3, prefetch: [] };
 function need3d(k, low) {
@@ -154,7 +154,7 @@ function pump3d() {
 // precarico gli edifici dell'era attuale (a bassa priorità) e quelli già costruiti (subito)
 function prefetchEra() {
   if (!S) return; for (const r of S.buildings) { need3d(r.t === 'mastio' ? 'castello' : r.t); if (BDEF[r.t] && BDEF[r.t].wall) need3d(r.lvl >= 2 ? 'mura' : 'palizzata'); }
-  need3d('quercia3d'); need3d('abete3d'); need3d('olmo3d', true); need3d('spoglio3d', true);
+  need3d('quercia3d'); need3d('abete3d'); need3d('lampione'); need3d('olmo3d', true); need3d('spoglio3d', true);
   for (const t in BDEF) { try { if (maxB(t) > 0) need3d(t, true); } catch (e) { } }
   if (hasB('balista')) { need3d('balista_b', true); need3d('balista_c', true); }
 }
@@ -768,7 +768,18 @@ function computePaths(sc) {
     if (G[dy * N + dx]) continue; const p = astar(dx, dy, (x, y) => G[y * N + x] === 1, cost, mx, my, 9000); G[dy * N + dx] = 1;
     if (p) { for (const [x, y] of p) G[y * N + x] = 1; const pts = [[dx + 0.5, dy + 0.5]]; for (const [x, y] of p) { const l = pts[pts.length - 1]; if (l[0] !== x + 0.5 || l[1] !== y + 0.5) pts.push([x + 0.5, y + 0.5]); } if (pts.length > 1) lines.push(pts); }
   }
-  PATHC = { key, grid: G, cv: null, P: 14, lines, plaza: [mx + 0.5, my + 0.5] }; sc.pathG = G;
+  PATHC = { key, grid: G, cv: null, P: 14, lines, plaza: [mx + 0.5, my + 0.5] }; PATHC.lamps = pathLamps(sc, lines, G, blocked); sc.pathG = G;
+}
+// lampioni lungo i sentieri: uno ogni ~4 caselle, a lato della strada, alternando i lati
+function pathLamps(sc, lines, G, blocked) {
+  const out = [], free = (x, y) => { const xi = Math.floor(x), yi = Math.floor(y); return inMap(xi, yi) && !G[yi * N + xi] && !blocked(xi, yi) && !sc.water[yi * N + xi] && !bAt(sc, xi, yi); };
+  const near = (x, y, r) => out.some(l => Math.hypot(l.x - x, l.y - y) < r); let side = 1;
+  for (const l0 of lines) { const l = chaikin(l0); let acc = 1.6;
+    for (let i = 1; i < l.length; i++) { const [ax, ay] = l[i - 1], [bx, by] = l[i]; const d = Math.hypot(bx - ax, by - ay); if (!d) continue; acc += d; if (acc < 4.2) continue;
+      const nx = -(by - ay) / d, ny = (bx - ax) / d; let put = false;
+      for (const sd of [side, -side]) { const x = bx + nx * 0.62 * sd, y = by + ny * 0.62 * sd; if (free(x, y) && !near(x, y, 2.6)) { out.push({ x, y, yaw: Math.atan2(-ny * sd, -nx * sd) }); put = true; side = -sd; break; } }
+      if (put) acc = 0; } }
+  return out;
 }
 function pathCanvas() {
   if (PATHC.cv || !PATHC.grid || !TEX_OK || !TEX.path) return PATHC.cv; const P = PATHC.P, G = PATHC.grid; const cv2 = document.createElement('canvas'); cv2.width = cv2.height = N * P; const c = cv2.getContext('2d');
@@ -1031,13 +1042,14 @@ const BDEF = {
   arco: { n: 'Arco Antico', w: 1, h: 1, hp: 300, cost: { pietra: 60, oro: 20 }, desc: 'Un arco di pietra rimasto in piedi da tempi dimenticati.', max: [0, 0, 1, 2, 2, 3, 3, 4], icon: '🚪', t: 5, decor: true, pr: 4 },
   colonna: { n: 'Colonna Antica', w: 1, h: 1, hp: 300, cost: { pietra: 50 }, desc: 'Colonna squadrata con capitello, segnata dai secoli.', max: [0, 0, 2, 2, 4, 4, 6, 6], icon: '🏛️', t: 5, decor: true, pr: 3 },
   rovine: { n: 'Rovine Antiche', w: 2, h: 2, hp: 400, cost: { pietra: 90, oro: 40 }, desc: 'Un angolo di muro e un pavimento di lastre: le rovine di un antico tempio.', max: [0, 0, 1, 1, 2, 2, 3, 3], icon: '🏛️', t: 6, decor: true, pr: 6 },
+  pozzogrande: { n: 'Pozzo Muschioso', w: 2, h: 2, hp: 300, cost: { pietra: 60, legno: 40, oro: 30 }, desc: 'Un grande pozzo di pietra coperto di muschio, con il tetto di assi e la carrucola.', max: [0, 1, 1, 2, 2, 3, 3, 4], icon: '🪣', t: 6, decor: true, pr: 5 },
   fontana: { n: 'Fontana di Pietra', w: 2, h: 2, hp: 400, cost: { pietra: 120, oro: 80 }, desc: 'Una vasca ottagonale con lo zampillo. Il cuore della piazza.', max: [0, 0, 1, 1, 2, 2, 2, 3], icon: '⛲', t: 10, decor: true, pr: 8 },
   statua: { n: 'Statua del Fondatore', w: 1, h: 1, hp: 500, cost: { pietra: 150, oro: 150 }, desc: 'Il primo signore della Marca, in bronzo, con la spada alzata.', max: [0, 0, 0, 0, 1, 1, 2, 2], icon: '🗽', t: 12, decor: true, pr: 12 },
 };
 const BUILD_ORDER = ['municipio', 'casa', 'taverna', 'mercato', 'fattoria', 'capanna', 'granaio', 'fucina', 'infermeria', 'armeria', 'miniera', 'cava', 'tesoreria', 'caserma', 'poligono', 'scuderia', 'monastero', 'chiesa', 'accademia', 'cripta', 'torre', 'torrepietra', 'cancello', 'balista', 'muro', 'fossato'];
-const DECOR_ORDER = ['pozzo', 'fontana', 'fontanella', 'statua', 'lastricato', 'lanterna', 'gonfalone', 'stendardo', 'aiuola', 'siepe', 'cespuglio', 'felce', 'staccionata', 'steccato', 'muretto', 'cavallofrisia', 'bancarella', 'carretto', 'carriola', 'rastrelliera', 'cassa', 'cassafieno', 'cassaortaggi', 'botte', 'anfora', 'panni', 'stenditoio', 'pagliaio', 'catasta', 'recinto', 'alveari', 'spaventapasseri', 'segnavia', 'croce', 'gogna', 'arco', 'colonna', 'rovinamuro', 'rovine', 'mucchiosassi', 'funghi', 'masso', 'tronco'];
+const DECOR_ORDER = ['pozzogrande', 'pozzo', 'fontana', 'fontanella', 'statua', 'lastricato', 'lanterna', 'gonfalone', 'stendardo', 'aiuola', 'siepe', 'cespuglio', 'felce', 'staccionata', 'steccato', 'muretto', 'cavallofrisia', 'bancarella', 'carretto', 'carriola', 'rastrelliera', 'cassa', 'cassafieno', 'cassaortaggi', 'botte', 'anfora', 'panni', 'stenditoio', 'pagliaio', 'catasta', 'recinto', 'alveari', 'spaventapasseri', 'segnavia', 'croce', 'gogna', 'arco', 'colonna', 'rovinamuro', 'rovine', 'mucchiosassi', 'funghi', 'masso', 'tronco'];
 // dimensione dei modelli delle decorazioni: w = larghezza in caselle, h = altezza in caselle
-const DFIT = { staccionata: { w: 1 }, steccato: { w: 0.95 }, cavallofrisia: { w: 0.85 }, cassa: { w: 0.5 }, cassafieno: { w: 0.55 }, cassaortaggi: { w: 0.55 }, botte: { h: 0.5 }, anfora: { h: 0.45 }, pozzo: { w: 0.85 }, fontanella: { h: 0.8 }, carretto: { w: 0.95 }, carriola: { w: 0.9 }, stenditoio: { w: 0.95 }, rastrelliera: { w: 1 }, mucchiosassi: { w: 0.55 }, felce: { w: 0.7 }, croce: { h: 0.85 }, segnavia: { h: 1.05 }, gonfalone: { h: 1.2 }, lanterna: { h: 1.2 }, rovinamuro: { w: 1 }, arco: { h: 1.25 }, colonna: { h: 1.3 }, rovine: { w: 1.9 }, lastricato: { w: 1.02 }, muretto: { w: 1 } };
+const DFIT = { pozzogrande: { w: 1.5 }, staccionata: { w: 1 }, steccato: { w: 0.95 }, cavallofrisia: { w: 0.85 }, cassa: { w: 0.5 }, cassafieno: { w: 0.55 }, cassaortaggi: { w: 0.55 }, botte: { h: 0.5 }, anfora: { h: 0.45 }, pozzo: { w: 0.85 }, fontanella: { h: 0.8 }, carretto: { w: 0.95 }, carriola: { w: 0.9 }, stenditoio: { w: 0.95 }, rastrelliera: { w: 1 }, mucchiosassi: { w: 0.55 }, felce: { w: 0.7 }, croce: { h: 0.85 }, segnavia: { h: 1.05 }, gonfalone: { h: 1.2 }, lanterna: { h: 1.2 }, rovinamuro: { w: 1 }, arco: { h: 1.25 }, colonna: { h: 1.3 }, rovine: { w: 1.9 }, lastricato: { w: 1.02 }, muretto: { w: 1 } };
 const DYAW_RND = { botte: 1, anfora: 1, felce: 1, mucchiosassi: 1, cassa: 1, cassafieno: 1, cassaortaggi: 1 };
 // prestigio: ogni decorazione completata dà punti; ogni 4 punti +1% produzione (max +20%)
 function prestige() { return lifeCache().pr; }
@@ -1719,11 +1731,13 @@ function render(sc, dt) {
   for (const t of sc.trees) { const [wx, wy] = W(t.x, t.y); if (vis(wx, wy)) { const gi = sc.grid[(t.y | 0) * N + (t.x | 0)]; if (gi >= 0 && sc.B[gi] && !sc.B[gi].dead && !BDEF[sc.B[gi].t].decor) continue; const p = rotP(t.x, t.y); L.push([p[0] + p[1], 2, t]); } }
   for (const r of sc.rocks) { const [wx, wy] = W(r.x, r.y); if (vis(wx, wy)) { const p = rotP(r.x, r.y); L.push([p[0] + p[1] - 0.3, 3, r]); } }
   if (sc.mode === 'village' && S && S.fauna) for (const a of S.fauna) { const [wx, wy] = W(a.x, a.y); if (vis(wx, wy)) { const p = rotP(a.x, a.y); L.push([p[0] + p[1], 5, a]); } }
+  if ((sc.mode === 'village' || sc.mode === 'raid') && PATHC.lamps && sc.pathG === PATHC.grid) for (const l of PATHC.lamps) { const [wx, wy] = W(l.x, l.y); if (vis(wx, wy)) { const p = rotP(l.x, l.y); L.push([p[0] + p[1], 8, l]); } }
   if (sc.ghost && sc.ghost.t) { const vr = vRect(sc.ghost); L.push([vr[0] + vr[1] + (sc.ghost.w + sc.ghost.h) / 2, 4, sc.ghost]); }
   L.sort((a, b) => a[0] - b[0]);
   for (const [, kind, o] of L) {
     if (kind === 0) drawBuilding(c, sc, o);
     else if (kind === 1) { if (sc.selU === o && !o.dead) { const [ux, uy] = W(o.x, o.y); c.strokeStyle = 'rgba(255,230,140,0.95)'; c.lineWidth = 2; c.beginPath(); c.ellipse(ux, uy, 13, 6, 0, 0, 7); c.stroke(); } drawUnit(c, sc, o); }
+    else if (kind === 8) drawLamp(c, o);
     else if (kind === 2) { const [wx, wy] = W(o.x, o.y); const tv = treeVariants();
       if (drawTree3D(c, o, wx, wy)) { }
       else if (tv) { const v = tv[o.k % 6]; const w = (v.k === 'quercia' ? 96 : 66) * o.s, h = w * v.cv.height / v.cv.width; const fl = ((o.x * 13 + o.y * 7) | 0) % 2; c.fillStyle = 'rgba(0,0,0,0.2)'; c.beginPath(); c.ellipse(wx, wy, w * 0.32, w * 0.14, 0, 0, 7); c.fill(); if (fl) { c.save(); c.translate(wx, 0); c.scale(-1, 1); c.drawImage(v.cv, -w / 2, wy - h + 5 * o.s, w, h); c.restore(); } else c.drawImage(v.cv, wx - w / 2, wy - h + 5 * o.s, w, h); }
@@ -3199,7 +3213,10 @@ function dayInfo() { const t0 = (S && S.seasonEpoch) || 0; const p = (((now() - 
   const night = p < 0.06 ? 1 - p / 0.06 : p < 0.62 ? 0 : p < 0.7 ? (p - 0.62) / 0.08 : p < 0.94 ? 1 : 1 - (p - 0.94) / 0.06;
   const ph = p < 0.08 ? ['🌅', 'Alba'] : p < 0.55 ? ['☀️', 'Giorno'] : p < 0.68 ? ['🌇', 'Tramonto'] : p < 0.94 ? ['🌙', 'Notte'] : ['🌅', 'Alba'];
   const hour = Math.floor((6 + p * 24) % 24); return { p, night: Math.max(0, Math.min(1, night)), ic: ph[0], n: ph[1], hour, dusk: p > 0.55 && p < 0.7 }; }
+function drawLamp(c, l) { if (!G3.models.lampione) need3d('lampione'); const [wx, wy] = W(l.x, l.y); const m = G3.models.lampione; if (!m || !m.ready) { c.fillStyle = '#4a3420'; c.fillRect(wx - 1.2, wy - 40, 2.4, 40); return; }
+  const yq = Math.round(((l.yaw - ANG) % 6.283 + 6.283) % 6.283 / 0.785) % 8 * 0.785; const sp = g3sprite('lampione', 84, yq, 0); if (sp) c.drawImage(sp.cv, wx + sp.x0, wy + sp.y0, sp.w, sp.h); }
 function nightLights(c, sc, k) {
+  if (PATHC.lamps && sc.pathG === PATHC.grid) for (const l of PATHC.lamps) { const [lx, ly] = W(l.x, l.y); const fl = 0.9 + Math.sin(sc.time * 6 + l.x * 3) * 0.08; for (const [x, y, r, a] of [[lx, ly - 64, 32, 0.5], [lx, ly, 50, 0.16]]) { const gr = c.createRadialGradient(x, y, 1, x, y, r * fl); gr.addColorStop(0, `rgba(255,200,110,${a * k})`); gr.addColorStop(1, 'rgba(255,150,60,0)'); c.fillStyle = gr; c.fillRect(x - r, y - r, r * 2, r * 2); } }
     for (const b of sc.B) { if (b.dead) continue; const d = BDEF[b.t]; if (b.t === 'lanterna') { const [lx, ly] = W(b.x + 0.5, b.y + 0.5); const x = lx + 7, y = ly - 37; const fl = 0.9 + Math.sin(sc.time * 7 + b.id) * 0.08; const gr = c.createRadialGradient(x, y, 1, x, y, 34 * fl); gr.addColorStop(0, `rgba(255,200,110,${0.55 * k})`); gr.addColorStop(1, 'rgba(255,150,60,0)'); c.fillStyle = gr; c.fillRect(x - 34, y - 34, 68, 68); const g2 = c.createRadialGradient(lx, ly, 1, lx, ly, 40); g2.addColorStop(0, `rgba(255,190,100,${0.18 * k})`); g2.addColorStop(1, 'rgba(255,150,60,0)'); c.fillStyle = g2; c.fillRect(lx - 40, ly - 40, 80, 80); continue; }
       if (d.wall || (d.decor && b.t !== 'falo') || b.nat) continue; const [wx, wy] = W(b.x + b.w / 2, b.y + b.h / 2); const h0 = ((b.x * 73856093) ^ (b.y * 19349663) ^ (b.id * 83492791)) >>> 0;
       if (b.t === 'falo') { const fl = 0.8 + Math.sin(sc.time * 11 + b.id) * 0.12 + Math.sin(sc.time * 17) * 0.06; const gr = c.createRadialGradient(wx, wy - 8, 1, wx, wy - 8, 26 * fl); gr.addColorStop(0, `rgba(255,190,90,${0.55 * k})`); gr.addColorStop(1, 'rgba(255,120,40,0)'); c.fillStyle = gr; c.beginPath(); c.arc(wx, wy - 8, 26 * fl, 0, 7); c.fill(); continue; }
