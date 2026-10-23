@@ -1,0 +1,10 @@
+# FEUDUM – Le Corone Spezzate (progetto unico)
+
+Questo repository è L'UNICA fonte del gioco. Pubblicato con GitHub Pages: https://marcocaretti1988-dev.github.io/feudum---le-corone-spezzate-/
+
+- Sorgenti: `src/` → `shell_pre.html` (HTML+CSS), `data.js` (atlanti sprite/texture), `fauna2_data.js`, `code.js` (tutto il gioco), `shell_post.html`.
+- NON modificare a mano `index.html` in radice: si genera con `python3 src/build.py`.
+- Modelli 3D: file `m3d_<nome>.js` in radice (caricati a pezzi). Nuovi modelli Meshy: `python3 src/tools/glb2m3d.py file.glb <nome> m3d_<nome>.js 30000`, poi aggiungere `<nome>` a `M3D_FILES` in `src/code.js`.
+- Musica: `feudum.mp3`. Icone/manifest: `icon-*.png`, `apple-touch-icon.png`, `manifest.json`.
+- Flusso: modifica `src/` → `python3 src/build.py` → prova → commit e push su `main`.
+- Lingua del progetto e dei testi: italiano. Utente: Marco.
