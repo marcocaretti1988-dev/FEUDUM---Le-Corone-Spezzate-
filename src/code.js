@@ -3701,6 +3701,12 @@ function heroCard(k) { const h = BT.heroes.find(h => h.k === k); if (!h) return;
 // ---------- title ----------
 // conferma dentro al gioco (i popup del browser sono bloccati nella pagina pubblicata)
 let ASK = null;
+// ---- aggiornamento automatico: se su GitHub c'è una versione nuova, ricarica scavalcando la cache ----
+const BUILD = '__BUILD__';
+function checkUpdate() { if (BUILD.startsWith('__') || !/github\.io$/.test(location.hostname)) return;
+  fetch('version.txt?t=' + Date.now(), { cache: 'no-store' }).then(r => r.ok ? r.text() : '').then(v => { v = (v || '').trim(); if (!v || v === BUILD) return; let tried = ''; try { tried = sessionStorage.getItem('feudum_upd') || ''; } catch (e) { } if (tried === v) return; try { sessionStorage.setItem('feudum_upd', v); } catch (e) { }
+    try { if (S && MODE !== 'title') save(); } catch (e) { } location.replace(location.pathname + '?v=' + v); }).catch(() => { }); }
+setTimeout(checkUpdate, 1500); document.addEventListener('visibilitychange', () => { if (!document.hidden) checkUpdate(); });
 function askYes(msg, fn, yes) { ASK = fn; let el = $('#askd'); if (!el) { el = document.createElement('div'); el.id = 'askd'; document.body.appendChild(el); }
   el.innerHTML = `<div class="ab"><p>${msg}</p><div class="aa"><button class="btn ghost" onclick="askClose()">Annulla</button><button class="btn" onclick="askOk()">${yes || 'Conferma'}</button></div></div>`; el.classList.remove('hidden'); document.body.classList.add('asking');
   el.querySelectorAll('button').forEach((b, i) => b.addEventListener('touchend', ev => { ev.preventDefault(); i === 0 ? askClose() : askOk(); }, { passive: false })); }
