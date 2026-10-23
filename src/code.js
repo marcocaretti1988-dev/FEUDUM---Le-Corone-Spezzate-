@@ -104,6 +104,7 @@ function applyTheme(name) {
 
 // ================= GL3D: mini WebGL renderer for real 3D buildings (isometric ortho, matches the 2D map) =================
 const G3 = { cv: null, gl: null, prog: null, models: {}, ok: false };
+const SHX = 0.44, SHY = -0.25; // ombra portata: direzione opposta al sole (in alto a sinistra), per unità di altezza
 const ISO_H = 39.19; // pixels per tile of height (ortho camera at 30° elevation)
 function b64u8(s) { const bin = atob(s); const a = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) a[i] = bin.charCodeAt(i); return a; }
 function g3init() {
@@ -112,22 +113,23 @@ function g3init() {
   const gl = cv.getContext('webgl', { alpha: true, antialias: true, premultipliedAlpha: true, preserveDrawingBuffer: true });
   if (!gl) return false;
   const vs = `attribute vec3 aP; attribute vec4 aN; attribute vec2 aU;
-  uniform vec3 uMin, uSize; uniform mat2 uM; uniform vec2 uC; uniform float uS, uY0; uniform vec4 uRect; uniform float uD0;
+  uniform vec3 uMin, uSize; uniform mat2 uM; uniform vec2 uC; uniform float uS, uY0; uniform vec4 uRect; uniform float uD0; uniform float uSh;
   varying vec2 vU; varying vec3 vN;
   void main(){ vec3 p = uMin + aP * uSize; vec2 g = uC + uM * vec2(p.x, p.z) * uS; float h = (p.y - uY0) * uS;
+    if (uSh > 0.5) { g += vec2(${SHX}, ${SHY}) * h; h = 0.0; }
     float X = (g.x - g.y) * 32.0, Y = (g.x + g.y) * 16.0 - h * ${ISO_H.toFixed(2)};
     float d = -(g.x + g.y) * 0.6124 - h * 0.5 - uD0;
     gl_Position = vec4((X - uRect.x) / uRect.z * 2.0 - 1.0, 1.0 - (Y - uRect.y) / uRect.w * 2.0, clamp(d / 12.0, -0.99, 0.99), 1.0);
     vec3 n = aN.xyz; vec2 nh = uM * vec2(n.x, n.z); vN = normalize(vec3(nh, n.y)); vU = aU; }`;
-  const fs = `precision mediump float; varying vec2 vU; varying vec3 vN; uniform sampler2D uT; uniform vec3 uL;
-  void main(){ vec4 c = texture2D(uT, vU); vec3 n = normalize(vN); float dif = max(dot(n, uL), 0.0); float back = max(dot(n, -uL), 0.0) * 0.12;
+  const fs = `precision mediump float; varying vec2 vU; varying vec3 vN; uniform sampler2D uT; uniform vec3 uL; uniform float uShF;
+  void main(){ if (uShF > 0.5) { gl_FragColor = vec4(0.0, 0.0, 0.0, 0.3); return; } vec4 c = texture2D(uT, vU); vec3 n = normalize(vN); float dif = max(dot(n, uL), 0.0); float back = max(dot(n, -uL), 0.0) * 0.12;
     float sky = 0.5 + 0.5 * n.z; vec3 col = c.rgb * (0.66 + 0.16 * sky + 0.5 * dif + back); col = mix(vec3(dot(col, vec3(0.299,0.587,0.114))), col, 1.12);
     gl_FragColor = vec4(col, 1.0); }`;
   const sh = (t, s) => { const o = gl.createShader(t); gl.shaderSource(o, s); gl.compileShader(o); if (!gl.getShaderParameter(o, gl.COMPILE_STATUS)) console.error(gl.getShaderInfoLog(o)); return o; };
   const pr = gl.createProgram(); gl.attachShader(pr, sh(gl.VERTEX_SHADER, vs)); gl.attachShader(pr, sh(gl.FRAGMENT_SHADER, fs)); gl.linkProgram(pr);
   if (!gl.getProgramParameter(pr, gl.LINK_STATUS)) { console.error(gl.getProgramInfoLog(pr)); return false; }
   G3.cv = cv; G3.gl = gl; G3.prog = pr;
-  const U = n => gl.getUniformLocation(pr, n); G3.u = { min: U('uMin'), size: U('uSize'), M: U('uM'), C: U('uC'), S: U('uS'), Y0: U('uY0'), rect: U('uRect'), D0: U('uD0'), T: U('uT'), L: U('uL') };
+  const U = n => gl.getUniformLocation(pr, n); G3.u = { min: U('uMin'), size: U('uSize'), M: U('uM'), C: U('uC'), S: U('uS'), Y0: U('uY0'), rect: U('uRect'), D0: U('uD0'), T: U('uT'), L: U('uL'), Sh: U('uSh'), ShF: U('uShF') };
   G3.a = { P: gl.getAttribLocation(pr, 'aP'), N: gl.getAttribLocation(pr, 'aN'), U: gl.getAttribLocation(pr, 'aU') };
   for (const k in M3D) { g3load(k, M3D[k]); delete M3D[k]; } for (const a in M3D_ALIAS) if (a !== 'mastio' && G3.models[M3D_ALIAS[a]]) G3.models[a] = G3.models[M3D_ALIAS[a]];
   return true;
@@ -167,6 +169,11 @@ function g3load(k, m) {
   G3.models[k] = o;
 }
 // draws model k for building b into ctx c (world-screen coords). fit = footprint tiles the model should span
+// due passate: prima l'ombra portata a terra (piatta, senza profondità), poi il modello sopra
+function g3passes(gl, o) {
+  gl.uniform1f(G3.u.Sh, 1); gl.uniform1f(G3.u.ShF, 1); gl.disable(gl.DEPTH_TEST); gl.depthMask(false); gl.drawElements(gl.TRIANGLES, o.count, gl.UNSIGNED_SHORT, 0);
+  gl.uniform1f(G3.u.Sh, 0); gl.uniform1f(G3.u.ShF, 0); gl.enable(gl.DEPTH_TEST); gl.depthMask(true); gl.drawElements(gl.TRIANGLES, o.count, gl.UNSIGNED_SHORT, 0);
+}
 function g3draw(c, b, k, fit, yaw) {
   if (!g3init()) return false; const o = G3.models[k]; if (!o || !o.ready) return false; const gl = G3.gl, m = o.m;
   const sx = m.size[0], sz = m.size[2]; const S = fit / Math.max(sx, sz);
@@ -182,6 +189,7 @@ function g3draw(c, b, k, fit, yaw) {
   for (const ax of [m.min[0], m.min[0] + sx]) for (const az of [m.min[2], m.min[2] + sz]) for (const ay of [m.min[1], m.min[1] + m.size[1]]) {
     const gx = cen[0] + (M[0] * ax + M[2] * az) * S, gy = cen[1] + (M[1] * ax + M[3] * az) * S, h = (ay - y0) * S;
     const X = (gx - gy) * 32, Y = (gx + gy) * 16 - h * ISO_H; x0 = Math.min(x0, X); x1 = Math.max(x1, X); y0s = Math.min(y0s, Y); y1 = Math.max(y1, Y);
+    const sgx = gx + SHX * h, sgy = gy + SHY * h, SX = (sgx - sgy) * 32, SY = (sgx + sgy) * 16; x0 = Math.min(x0, SX); x1 = Math.max(x1, SX); y0s = Math.min(y0s, SY); y1 = Math.max(y1, SY);
   }
   x0 -= 4; y0s -= 4; x1 += 4; y1 += 4; const rw = x1 - x0, rh = y1 - y0s;
   const res = Math.min(2.5, cam.z * DPR * 1.15); const key = ANG.toFixed(4) + '|' + res.toFixed(2) + '|' + k + '|' + (yaw || 0).toFixed(3);
@@ -197,7 +205,7 @@ function g3draw(c, b, k, fit, yaw) {
   gl.bindBuffer(gl.ARRAY_BUFFER, o.pos); gl.enableVertexAttribArray(A.P); gl.vertexAttribPointer(A.P, 3, gl.UNSIGNED_SHORT, true, 0, 0);
   gl.bindBuffer(gl.ARRAY_BUFFER, o.nor); gl.enableVertexAttribArray(A.N); gl.vertexAttribPointer(A.N, 4, gl.BYTE, true, 0, 0);
   gl.bindBuffer(gl.ARRAY_BUFFER, o.uv); gl.enableVertexAttribArray(A.U); gl.vertexAttribPointer(A.U, 2, gl.UNSIGNED_SHORT, true, 0, 0);
-  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, o.idx); gl.drawElements(gl.TRIANGLES, o.count, gl.UNSIGNED_SHORT, 0);
+  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, o.idx); g3passes(gl, o);
   if (!b.c3cv) b.c3cv = document.createElement('canvas'); if (b.c3cv.width !== W || b.c3cv.height !== H) { b.c3cv.width = W; b.c3cv.height = H; } const cc = b.c3cv.getContext('2d'); cc.clearRect(0, 0, W, H); cc.drawImage(G3.cv, 0, 0); b.c3k = key;
   c.drawImage(b.c3cv, x0, y0s, rw, rh);
   b.r3d = [x0, y0s, rw, rh];
@@ -219,7 +227,8 @@ function g3sprite(k, hpx, yaw, tint) {
   let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9;
   for (const ax of [m.min[0], m.min[0] + m.size[0]]) for (const az of [m.min[2], m.min[2] + m.size[2]]) for (const ay of [m.min[1], m.min[1] + m.size[1]]) {
     const gx = C0[0] + (M[0] * ax + M[2] * az) * S, gy = C0[1] + (M[1] * ax + M[3] * az) * S, h = (ay - m.min[1]) * S;
-    const X = (gx - gy) * 32, Y = (gx + gy) * 16 - h * ISO_H; x0 = Math.min(x0, X); x1 = Math.max(x1, X); y0 = Math.min(y0, Y); y1 = Math.max(y1, Y); }
+    const X = (gx - gy) * 32, Y = (gx + gy) * 16 - h * ISO_H; x0 = Math.min(x0, X); x1 = Math.max(x1, X); y0 = Math.min(y0, Y); y1 = Math.max(y1, Y);
+    const sgx = gx + SHX * h, sgy = gy + SHY * h, SX = (sgx - sgy) * 32, SY = (sgx + sgy) * 16; x0 = Math.min(x0, SX); x1 = Math.max(x1, SX); y0 = Math.min(y0, SY); y1 = Math.max(y1, SY); }
   x0 -= 2; y0 -= 2; x1 += 2; y1 += 2; const rw = x1 - x0, rh = y1 - y0; const W = Math.min(1024, Math.ceil(rw * res)), H = Math.min(1024, Math.ceil(rh * res));
   if (G3.cv.width !== W || G3.cv.height !== H) { G3.cv.width = W; G3.cv.height = H; }
   gl.viewport(0, 0, W, H); gl.clearColor(0, 0, 0, 0); gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
@@ -231,7 +240,7 @@ function g3sprite(k, hpx, yaw, tint) {
   gl.bindBuffer(gl.ARRAY_BUFFER, o.pos); gl.enableVertexAttribArray(A.P); gl.vertexAttribPointer(A.P, 3, gl.UNSIGNED_SHORT, true, 0, 0);
   gl.bindBuffer(gl.ARRAY_BUFFER, o.nor); gl.enableVertexAttribArray(A.N); gl.vertexAttribPointer(A.N, 4, gl.BYTE, true, 0, 0);
   gl.bindBuffer(gl.ARRAY_BUFFER, o.uv); gl.enableVertexAttribArray(A.U); gl.vertexAttribPointer(A.U, 2, gl.UNSIGNED_SHORT, true, 0, 0);
-  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, o.idx); gl.drawElements(gl.TRIANGLES, o.count, gl.UNSIGNED_SHORT, 0);
+  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, o.idx); g3passes(gl, o);
   const sp = e || {}; if (!sp.cv) sp.cv = document.createElement('canvas'); if (sp.cv.width !== W || sp.cv.height !== H) { sp.cv.width = W; sp.cv.height = H; }
   const cc = sp.cv.getContext('2d'); cc.globalCompositeOperation = 'source-over'; cc.clearRect(0, 0, W, H); cc.drawImage(G3.cv, 0, 0);
   if (tint) { cc.globalCompositeOperation = 'source-atop'; cc.fillStyle = tint; cc.fillRect(0, 0, W, H); cc.globalCompositeOperation = 'source-over'; }
@@ -698,17 +707,17 @@ function computePaths(sc) {
   const G = new Uint8Array(N * N); const blocked = (x, y) => { const b = bAt(sc, x, y); if (!b) return false; const d = BDEF[b.t]; return !(d.decor || b.t === 'cancello'); };
   const m = sc.B.find(b => b.t === 'mastio');
   const doors = []; for (const b of sc.B) { const d = BDEF[b.t]; if (b.dead || d.wall || d.decor || b.nat) continue; doors.push([b, frontTile(sc, b)]); }
-  if (!m) { PATHC = { key, grid: G, cv: null, P: 14 }; sc.pathG = G; return; }
-  const [mx, my] = frontTile(sc, m); G[my * N + mx] = 1;
+  if (!m) { PATHC = { key, grid: G, cv: null, P: 14, lines: [] }; sc.pathG = G; return; }
+  const [mx, my] = frontTile(sc, m); G[my * N + mx] = 1; const lines = [];
   // piazza davanti al mastio
   for (let yy = -1; yy <= 1; yy++) for (let xx = -1; xx <= 1; xx++) { const x = mx + xx, y = my + yy; if (inMap(x, y) && !blocked(x, y) && !sc.water[y * N + x]) G[y * N + x] = 1; }
   doors.sort((a, b) => Math.hypot(a[1][0] - mx, a[1][1] - my) - Math.hypot(b[1][0] - mx, b[1][1] - my));
   const cost = (x, y) => { if (blocked(x, y)) return Infinity; if (sc.water[y * N + x]) return 40; const b = bAt(sc, x, y); if (b && BDEF[b.t].wall) return 3; return G[y * N + x] ? 0.35 : 1.6; };
   for (const [b, [dx, dy]] of doors) {
     if (G[dy * N + dx]) continue; const p = astar(dx, dy, (x, y) => G[y * N + x] === 1, cost, mx, my, 9000); G[dy * N + dx] = 1;
-    if (p) for (const [x, y] of p) G[y * N + x] = 1;
+    if (p) { for (const [x, y] of p) G[y * N + x] = 1; const pts = [[dx + 0.5, dy + 0.5]]; for (const [x, y] of p) { const l = pts[pts.length - 1]; if (l[0] !== x + 0.5 || l[1] !== y + 0.5) pts.push([x + 0.5, y + 0.5]); } if (pts.length > 1) lines.push(pts); }
   }
-  PATHC = { key, grid: G, cv: null, P: 14 }; sc.pathG = G;
+  PATHC = { key, grid: G, cv: null, P: 14, lines, plaza: [mx + 0.5, my + 0.5] }; sc.pathG = G;
 }
 function pathCanvas() {
   if (PATHC.cv || !PATHC.grid || !TEX_OK || !TEX.path) return PATHC.cv; const P = PATHC.P, G = PATHC.grid; const cv2 = document.createElement('canvas'); cv2.width = cv2.height = N * P; const c = cv2.getContext('2d');
@@ -742,6 +751,7 @@ function makeNoise(seed) {
   const n = (x, y) => { const xi = Math.floor(x), yi = Math.floor(y), xf = x - xi, yf = y - yi; const u = xf * xf * (3 - 2 * xf), v = yf * yf * (3 - 2 * yf); const a = h(xi, yi), b = h(xi + 1, yi), c = h(xi, yi + 1), d = h(xi + 1, yi + 1); return a + (b - a) * u + (c - a) * v + (a - b - c + d) * u * v; };
   return (x, y, oct) => { let s = 0, amp = 0.5, f = 1, t = 0; for (let o = 0; o < (oct || 3); o++) { s += n(x * f, y * f) * amp; t += amp; amp *= 0.5; f *= 2.03; } return s / t; };
 }
+const chaikin = (l, it = 2) => { let p = l; for (let k = 0; k < it; k++) { if (p.length < 3) return p; const o = [p[0]]; for (let i = 0; i < p.length - 1; i++) { const [ax, ay] = p[i], [bx, by] = p[i + 1]; o.push([ax * 0.75 + bx * 0.25, ay * 0.75 + by * 0.25], [ax * 0.25 + bx * 0.75, ay * 0.25 + by * 0.75]); } o.push(p[p.length - 1]); p = o; } return p; };
 const smooth = (a, b, x) => { const t = Math.min(1, Math.max(0, (x - a) / (b - a))); return t * t * (3 - 2 * t); };
 // maschere del terreno (M px per casella)
 function groundMasks(enemy, decals, seed) {
@@ -779,22 +789,22 @@ function groundMasks(enemy, decals, seed) {
     // seconda erba (ruotata) per spezzare la ripetizione
     D.varg.data[o] = 255 * smooth(0.42, 0.62, n1) * 0.75;
     // erba secca: grandi chiazze, meno vicino all'acqua e al villaggio
-    let dry = smooth(0.58, 0.7, n0 * 0.75 + n3 * 0.35) * smooth(1.5, 4, wd);
-    if (!enemy) dry *= smooth(7, 13, dc); else dry = Math.max(dry, smooth(12, 9, dc) * 0.5);
+    let dry = smooth(0.64, 0.78, n0 * 0.75 + n3 * 0.35) * smooth(1.5, 4, wd) * 0.55;
+    if (!enemy) dry *= smooth(16, 26, dc); else dry = Math.max(dry, smooth(12, 9, dc) * 0.5);
     D.dry.data[o] = 255 * dry;
     // terra battuta: piazza, sentieri, accampamento, zolle sparse
     let dirt = 0;
-    const r0 = enemy ? 10.5 : 6.2; dirt = smooth(r0 + 1.2, r0 - 1.2, dc + (n2 - 0.5) * (enemy ? 7 : 3.2) + (n0 - 0.5) * (enemy ? 9 : 4));
-    if (segs.length) { const sd = segD(x, y); dirt = Math.max(dirt, smooth(1.25, 0.55, sd + (n2 - 0.5) * 0.9) * (enemy ? 0.85 : 1)); }
-    dirt = Math.max(dirt, smooth(0.8, 0.88, n4 * 0.6 + n0 * 0.5) * 0.85);
+    const r0 = enemy ? 10.5 : 4.2; dirt = smooth(r0 + 1.6, r0 - 1.6, dc + (n2 - 0.5) * (enemy ? 7 : 2.4) + (n0 - 0.5) * (enemy ? 9 : 3)) * (enemy ? 1 : 0.75);
+    if (segs.length) { const sd = segD(x, y); dirt = Math.max(dirt, smooth(0.95, 0.25, sd + (n2 - 0.5) * 0.5) * (enemy ? 0.85 : 0.6)); }
+    if (enemy) dirt = Math.max(dirt, smooth(0.8, 0.88, n4 * 0.6 + n0 * 0.5) * 0.5);
     dirt *= smooth(0.2, 1.2, wd);
     D.dirt.data[o] = 255 * Math.min(1, dirt);
     // fango lungo le rive e qualche pozzanghera nei prati
     let mud = smooth(2.6, 0.9, wd + (n2 - 0.5) * 1.6) * smooth(0.15, 0.7, wd);
-    mud = Math.max(mud, smooth(0.86, 0.93, n2 * 0.7 + n1 * 0.45) * 0.9 * smooth(8, 12, dc));
+    mud *= 0.7; if (enemy) mud = Math.max(mud, smooth(0.86, 0.93, n2 * 0.7 + n1 * 0.45) * 0.6 * smooth(8, 12, dc));
     D.mud.data[o] = 255 * Math.min(1, mud);
     // luce/ombra: nuvole dipinte e bordo scuro della foresta
-    D.dark.data[o] = 255 * Math.min(1, smooth(0.5, 0.8, n3) * 0.55 + smooth(6, 0, edge) * 0.8);
+    D.dark.data[o] = 255 * Math.min(1, smooth(0.5, 0.85, n3) * 0.22 + smooth(9, 0, edge) * 0.7);
     D.light.data[o] = 255 * smooth(0.55, 0.85, 1 - n3) * 0.6;
   }
   for (const k in L) L[k].getContext('2d').putImageData(D[k], 0, 0);
@@ -823,14 +833,15 @@ function paintGroundRegion(g, ctx, x0, y0, x1, y1, T) {
   layer(Lm.mud, c => fillTex(c, texTile('mud', T, 7)), 0.95);
   layer(Lm.dirt, c => fillTex(c, texTile('dirt', T, 9)), 1);
   // sentieri lastricati (dalla rete calcolata sugli edifici)
-  if (PATHC.grid && TEX.path && g.pathOn) { const G = PATHC.grid, segs = [];
-    for (let y = Math.max(0, Math.floor(ry0)); y < Math.min(NMAP, Math.ceil(ry0 + rh)); y++) for (let x = Math.max(0, Math.floor(rx0)); x < Math.min(NMAP, Math.ceil(rx0 + rw)); x++) if (G[y * NMAP + x]) { segs.push([x, y, x, y]); for (const [ex, ey] of [[1, 0], [0, 1], [1, 1], [-1, 1], [-1, 0], [0, -1], [1, -1], [-1, -1]]) { const nx = x + ex, ny = y + ey; if (nx < 0 || ny < 0 || nx >= NMAP || ny >= NMAP || !G[ny * NMAP + nx]) continue; if (ex && ey && (G[y * NMAP + nx] || G[ny * NMAP + x])) continue; segs.push([x, y, nx, ny]); } }
-    if (segs.length) { const pathStroke = (cx, w) => { cx.lineCap = 'round'; cx.lineJoin = 'round'; cx.lineWidth = w * T; cx.beginPath(); for (const [a, b, d, e] of segs) { cx.moveTo((a + 0.5) * T, (b + 0.5) * T); cx.lineTo((d + 0.5) * T + 0.01, (e + 0.5) * T); } cx.stroke(); };
-      ctx.save(); ctx.globalAlpha = 0.55; ctx.strokeStyle = '#3e2c1a'; pathStroke(ctx, 1.5); ctx.globalAlpha = 0.9; ctx.strokeStyle = '#6b5236'; pathStroke(ctx, 1.22); ctx.restore();
-      tc.setTransform(1, 0, 0, 1, 0, 0); tc.globalCompositeOperation = 'source-over'; tc.globalAlpha = 1; tc.clearRect(0, 0, W, H); tc.save(); tc.translate(-rx0 * T, -ry0 * T); tc.strokeStyle = '#000'; pathStroke(tc, 1.04);
-      tc.globalCompositeOperation = 'source-in'; tc.fillStyle = tc.createPattern(texTile('path', T, 2.2), 'repeat'); tc.fillRect(rx0 * T, ry0 * T, W, H);
-      tc.globalCompositeOperation = 'source-atop'; tc.fillStyle = 'rgba(190,150,95,0.16)'; tc.fillRect(rx0 * T, ry0 * T, W, H); tc.restore(); tc.globalCompositeOperation = 'source-over';
-      ctx.drawImage(tmp, 0, 0, W, H, rx0 * T, ry0 * T, W, H); } }
+  if (PATHC.grid && TEX.path && g.pathOn && PATHC.lines) {
+    const lines = PATHC.lines.filter(l => l.some(([x, y]) => x > rx0 - 2 && y > ry0 - 2 && x < rx0 + rw + 2 && y < ry0 + rh + 2)).map(l => chaikin(l));
+    const pathStroke = (cx, w) => { cx.lineCap = 'round'; cx.lineJoin = 'round'; cx.lineWidth = w * T; cx.beginPath(); for (const l of lines) { cx.moveTo(l[0][0] * T, l[0][1] * T); for (let i = 1; i < l.length; i++) cx.lineTo(l[i][0] * T, l[i][1] * T); } if (PATHC.plaza) { const [px, py] = PATHC.plaza; cx.moveTo(px * T + 0.01, py * T); cx.lineTo(px * T, py * T); } cx.stroke(); if (PATHC.plaza) { const [px, py] = PATHC.plaza; cx.beginPath(); cx.arc(px * T, py * T, w * T * 1.05, 0, 7); cx.fill(); } };
+    if (lines.length || PATHC.plaza) {
+      // alone sfumato di erba calpestata, poi la terra battuta
+      ctx.save(); for (const [w, al] of [[1.25, 0.10], [1.0, 0.14], [0.82, 0.2]]) { ctx.globalAlpha = al; ctx.strokeStyle = ctx.fillStyle = '#5b4426'; pathStroke(ctx, w); } ctx.restore();
+      tc.setTransform(1, 0, 0, 1, 0, 0); tc.globalCompositeOperation = 'source-over'; tc.globalAlpha = 1; tc.clearRect(0, 0, W, H); tc.save(); tc.translate(-rx0 * T, -ry0 * T); tc.strokeStyle = tc.fillStyle = '#000'; pathStroke(tc, 0.66);
+      tc.globalCompositeOperation = 'source-in'; tc.fillStyle = tc.createPattern(texTile('path', T, 3), 'repeat'); tc.fillRect(rx0 * T, ry0 * T, W, H); tc.restore(); tc.globalCompositeOperation = 'source-over';
+      ctx.save(); ctx.globalAlpha = 0.92; ctx.drawImage(tmp, 0, 0, W, H, rx0 * T, ry0 * T, W, H); ctx.restore(); } }
   layer(Lm.dark, c => { c.fillStyle = '#16200a'; c.fillRect(rx0 * T, ry0 * T, W, H); }, 0.32);
   layer(Lm.light, c => { c.fillStyle = '#fff3c8'; c.fillRect(rx0 * T, ry0 * T, W, H); }, 0.1);
   for (const d of g.decals) if (EATL_OK) { const f = EFR[d.k]; if (d.x > x1 + 1 || d.y > y1 + 1 || d.x + d.w < x0 - 1 || d.y + d.h < y0 - 1) continue; ctx.drawImage(EATL, f[0], f[1], f[2], f[3], d.x * T, d.y * T, d.w * T, d.h * T); }
@@ -1541,7 +1552,7 @@ function render(sc, dt) {
   const L = [];
   for (const b of sc.B) if (!b.dead) { const vr = vRect(b); const [wx, wy] = WR(vr[0], vr[1]); if (vis(wx, wy + 40)) L.push([vr[0] + vr[1] + (b.w + b.h) / 2 - (BDEF[b.t].wall ? 0.0 : 0.02), 0, b]); }
   for (const u of sc.U) { const [wx, wy] = W(u.x, u.y); const p = rotP(u.x, u.y); if (vis(wx, wy)) L.push([u.dead ? p[0] + p[1] - 1.2 : p[0] + p[1], 1, u]); }
-  for (const t of sc.trees) { const [wx, wy] = W(t.x, t.y); if (vis(wx, wy)) { const p = rotP(t.x, t.y); L.push([p[0] + p[1], 2, t]); } }
+  for (const t of sc.trees) { const [wx, wy] = W(t.x, t.y); if (vis(wx, wy)) { const gi = sc.grid[(t.y | 0) * N + (t.x | 0)]; if (gi >= 0 && sc.B[gi] && !sc.B[gi].dead && !BDEF[sc.B[gi].t].decor) continue; const p = rotP(t.x, t.y); L.push([p[0] + p[1], 2, t]); } }
   for (const r of sc.rocks) { const [wx, wy] = W(r.x, r.y); if (vis(wx, wy)) { const p = rotP(r.x, r.y); L.push([p[0] + p[1] - 0.3, 3, r]); } }
   if (sc.mode === 'village' && S && S.fauna) for (const a of S.fauna) { const [wx, wy] = W(a.x, a.y); if (vis(wx, wy)) { const p = rotP(a.x, a.y); L.push([p[0] + p[1], 5, a]); } }
   if (sc.ghost && sc.ghost.t) { const vr = vRect(sc.ghost); L.push([vr[0] + vr[1] + (sc.ghost.w + sc.ghost.h) / 2, 4, sc.ghost]); }
@@ -1646,7 +1657,7 @@ function drawBuilding(c, sc, b) {
     if (b.t === 'tronco') { const hh = (((b.x * 7 + b.y * 13) | 0) >>> 0) + (b.ref ? b.ref.id : 0); yaw = [-Math.PI / 4, 3 * Math.PI / 4, Math.PI / 4, -3 * Math.PI / 4][hh % 4] + ((hh >> 2) % 5 - 2) * 0.07; }
     if (b.t === 'balista') { need3d('balista_b'); need3d('balista_c'); fitm = 0.68; if (b.yawT != null) { let d = b.yawT - (b.yaw || 0); while (d > Math.PI) d -= 2 * Math.PI; while (d < -Math.PI) d += 2 * Math.PI; b.yaw = (b.yaw || 0) + d * 0.18; } yaw = b.yaw || 0;
       const tf = b.fired != null ? sc.time - b.fired : 99; if (tf < 0.35 && G3.models.balista_c && G3.models.balista_c.ready) k3 = 'balista_c'; else if (tf < 1.4 && G3.models.balista_b && G3.models.balista_b.ready) k3 = 'balista_b'; }
-    let fit3 = fitm * b.w * 1.23 * (b.t === 'mastio' ? (b.lvl <= 8 ? 1.25 + 0.03 * b.lvl : 1.49 + 0.014 * (b.lvl - 8)) : b.t === 'caserma' ? 0.82 : b.t === 'falo' ? 0.8 : b.t === 'tronco' ? 0.55 : 1);
+    let fit3 = fitm * b.w * 1.3 * (b.t === 'mastio' ? (b.lvl <= 8 ? 1.25 + 0.03 * b.lvl : 1.49 + 0.014 * (b.lvl - 8)) : b.t === 'caserma' ? 0.82 : b.t === 'falo' ? 0.8 : b.t === 'tronco' ? 0.55 : 1);
     // nessun edificio deve superare in altezza il Mastio: tetto all'altezza in base all'impronta
     if (b.t !== 'mastio' && !H3FREE[b.t] && b.w >= 2) { const mm = G3.models[k3].m, hNow = mm.size[1] * fit3 / Math.max(mm.size[0], mm.size[2]), hMax = 0.75 * b.w + 0.3; if (hNow > hMax) fit3 *= hMax / hNow; }
     g3draw(c, b, k3, fit3, yaw); c.globalAlpha = ga;
@@ -1788,8 +1799,7 @@ function buildVillage() {
 function villageSetup(sc) {
   sc.water.set(villageWater()); sc.decals = [RIVER_AT, POND_AT, ...EXTRA_PONDS];
   if (!GROUND_V || (GROUND_V.stale && EATL_OK && TEX_OK)) GROUND_V = paintGround(false, sc.decals, 42); sc.ground = GROUND_V;
-  addTrees(sc, 7, true); addGroves(sc, 7, 11);
-  for (const [x, y, s] of [[2.6, 20.2, 1.1], [10.6, 22.4, 0.95], [10.2, 28.5, 1.05], [18.3, 28.8, 1.0], [30.2, 18.6, 1.1], [24.4, 30.2, 0.9]].map(p => [p[0] + OFF, p[1] + OFF, p[2]])) if (!isWater(sc, x | 0, y | 0)) sc.trees.push({ x, y, k: 1 + 2 * ((x * 3 | 0) % 3), s });
+  addForests(sc, 7);
   for (const [x, y] of [[28.6, 19.4], [5.2, 6.4], [24.5, 3.5]].map(p => [p[0] + OFF, p[1] + OFF])) if (!isWater(sc, x | 0, y | 0)) sc.rocks.push({ x, y, s: 7, big: true });
   const rem = new Set(S && S.removed || []); sc.trees = sc.trees.filter(t => !rem.has(natKey(t))); sc.rocks = sc.rocks.filter(r => !rem.has(natKey(r)));
 }
@@ -1833,6 +1843,19 @@ function demolish(id) {
   const base = d.cost ? scaleCost(d.cost, r.lvl) : {}; const gain = {}; for (const k in base) gain[k] = Math.floor(base[k] * 0.3);
   pay(dc); r.demo = 1; addWork({ kind: 'demo', key: r.id, x: r.x + d.w / 2, y: r.y + d.h / 2, w: d.w, h: d.h, gain, dur: dt2 });
   closeSheet(); sfx('tock'); save(); updateHUD();
+}
+// foreste fitte stile RTS: una fascia di bosco ai bordi dal profilo irregolare e qualche macchia isolata, prati puliti al centro
+function addForests(sc, seed) {
+  const R = rng(seed * 13 + 1), nA = makeNoise(seed * 5 + 3), nB = makeNoise(seed * 5 + 4), nC = makeNoise(seed * 5 + 9), c0 = N / 2;
+  for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) {
+    const e = Math.min(x, y, N - 1 - x, N - 1 - y), dc = Math.hypot(x + .5 - c0, y + .5 - c0);
+    const band = 6 + nA(x / 9, y / 9, 3) * 9; // spessore del bosco ai bordi: 6..15 caselle
+    const clump = dc > 21 && nB(x / 7, y / 7, 3) > 0.64; // macchie di bosco nel prato esterno
+    let p = e < band ? (e < band - 2 ? 0.62 : 0.32) : clump ? 0.55 : dc > 18 ? 0.004 : 0;
+    if (!p || isWater(sc, x, y) || isWater(sc, x - 1, y) || isWater(sc, x, y - 1) || isWater(sc, x + 1, y) || isWater(sc, x, y + 1)) continue;
+    if (R() < p) { const oak = nC(x / 14, y / 14, 2) > 0.52; sc.trees.push({ x: x + 0.15 + R() * 0.7, y: y + 0.15 + R() * 0.7, k: (oak ? 3 : 0) + ((R() * 3) | 0), s: 0.85 + R() * 0.4 }); }
+    else if (e >= band && dc > 14 && R() < 0.003) sc.rocks.push({ x: x + 0.5, y: y + 0.5, s: (R() * 1000) | 0 });
+  }
 }
 function addGroves(sc, seed, minD) {
   const R = rng(seed * 31 + 5); const cx = N / 2;
@@ -1926,7 +1949,7 @@ function genEnemy(tg) {
   const sc = newScene('attack');
   if (R() < 0.7) { const sp = [[3, 3], [N - 10, 3], [3, N - 11], [N - 10, N - 11]][(R() * 4) | 0]; const pd = { k: 'lago', x: sp[0], y: sp[1], w: 7, h: 8 }; stampMask(sc.water, EMASK.pond.mask, sp[0], sp[1]); sc.decals.push(pd); }
   sc.ground = paintGround(true, sc.decals, 99 + (tg.seed % 50));
-  addTrees(sc, tg.seed % 1000, false);
+  addForests(sc, tg.seed % 1000);
   for (let i = 0; i < 4; i++) { const x = 3.5 + R() * (N - 7), y = 3.5 + R() * (N - 7); if (Math.hypot(x - MCX, y - MCX) > 9 && !isWater(sc, x | 0, y | 0)) sc.rocks.push({ x, y, s: 7, big: true }); }
   const c = N / 2 - 1; const add = (t, x, y, lvl) => { const dd = BDEF[t]; for (let yy = y; yy < y + dd.h; yy++) for (let xx = x; xx < x + dd.w; xx++) if (!inMap(xx, yy) || xx < 3 || yy < 3 || xx >= N - 3 || yy >= N - 3 || bAt(sc, xx, yy) || sc.water[yy * N + xx]) return null; const b = mkBuilding(t, x, y, lvl, 'D'); b.hp = Math.round(b.hp * DF().ehp); b.maxhp = b.hp; sc.B.push(b); sceneIndex(sc); return b; };
   const rl = Math.min(8, 1 + Math.floor(d * 0.75));
@@ -1956,7 +1979,6 @@ function genEnemy(tg) {
   const roster = ENEMY_UNITS.slice(0, Math.min(ENEMY_UNITS.length, 2 + Math.floor(d / 1.5)));
   const nD = Math.max(1, Math.round((2 + d) * DF().def));
   for (let i = 0; i < nD; i++) { const k = roster[(R() * roster.length) | 0]; const a = R() * 6.28, rr = 1.8 + R() * (r - 1.5); let x = c + 0.5 + Math.cos(a) * rr, y = c + 0.5 + Math.sin(a) * rr; if (bAt(sc, Math.floor(x), Math.floor(y))) { x = c + 0.5 + Math.cos(a) * (r - 0.5); y = c + 0.5 + Math.sin(a) * (r - 0.5); } if (bAt(sc, Math.floor(x), Math.floor(y)) || isWater(sc, Math.floor(x), Math.floor(y))) continue; const u = mkUnit(k, 'D', x, y); u.guardR = 4.5; u.leash = 9; u.hp *= DF().ehp; u.maxhp *= DF().ehp; u.dm = DF().edmg; sc.U.push(u); }
-  addGroves(sc, tg.seed % 997, 13);
   sc.countable = sc.B.filter(b => !BDEF[b.t].wall && !BDEF[b.t].decor).length;
   return sc;
 }
@@ -2112,7 +2134,7 @@ function endBattle() {
   save();
   setTimeout(() => { openSheet('Esito', `<div class="result">${html}<button class="btn big" onclick="backToVillage()">Torna al feudo</button></div>`, 'result'); }, 900);
 }
-function backToVillage() { if (TENS.kind) tensionStop(); else if (MUS.duck) { MUS.duck = false; musicStart(); musicApply(); } closeSheet(); BT = null; MODE = 'village'; SC = buildVillage(); $('#bhud').classList.add('hidden'); $('#hud').classList.remove('hidden'); centerCam(MCX, MCX); cam.z = VW < 600 ? 0.9 : Math.max(0.6, Math.min(1.15, VW / 1000)); updateHUD(); save(); }
+function backToVillage() { if (TENS.kind) tensionStop(); else if (MUS.duck) { MUS.duck = false; musicStart(); musicApply(); } closeSheet(); BT = null; MODE = 'village'; SC = buildVillage(); $('#bhud').classList.add('hidden'); $('#hud').classList.remove('hidden'); centerCam(MCX, MCX); cam.z = VW < 600 ? 1.05 : Math.max(0.7, Math.min(1.25, VW / 900)); updateHUD(); save(); }
 function retreat() { if (BT && !BT.ended) { if (MODE === 'raid') { BT.timer = 0; } else endBattle(); } }
 
 // ---------- camera & input ----------
@@ -2133,7 +2155,7 @@ function rotateView(d) {
 }
 function snapRot(pivot, sx, sy) { const tgt = Math.round(ANG / Q90) * Q90; animRot(tgt, Math.min(0.35, 0.12 + Math.abs(tgt - ANG) * 0.5), pivot); if (sx != null) { ROTA.px = sx; ROTA.py = sy; } }
 function centerCam(tx, ty) { const [wx, wy] = W(tx, ty); cam.x = wx; cam.y = wy; }
-function clampCam() { cam.z = Math.max(0.2, Math.min(2.4, cam.z)); cam.x = Math.max(-N * 30, Math.min(N * 30, cam.x)); cam.y = Math.max(N * 2, Math.min(N * 30, cam.y)); }
+function clampCam() { cam.z = Math.max(0.32, Math.min(2.4, cam.z)); cam.x = Math.max(-N * 30, Math.min(N * 30, cam.x)); cam.y = Math.max(N * 2, Math.min(N * 30, cam.y)); }
 const ptr = new Map(); let G = null, holdTimer = null, holdIv = null, lastPos = null;
 function stopHold() { clearTimeout(holdTimer); clearInterval(holdIv); holdTimer = holdIv = null; }
 cv.addEventListener('pointerdown', e => {
@@ -2152,7 +2174,7 @@ cv.addEventListener('pointermove', e => {
   else if (G.k === 'pinch' && ptr.size >= 2) {
     const [a, b] = [...ptr.values()]; let da = Math.atan2(b.y - a.y, b.x - a.x) - G.f0; while (da > Math.PI) da -= 2 * Math.PI; while (da < -Math.PI) da += 2 * Math.PI;
     if (MODE !== 'title' && (G.rot || Math.abs(da) > 0.14)) { if (!G.rot) { G.rot = true; G.f0 += Math.sign(da) * 0.14; da -= Math.sign(da) * 0.14; } setAng(G.a0 - da); }
-    const d = Math.hypot(a.x - b.x, a.y - b.y); cam.z = Math.max(0.2, Math.min(2.4, G.z0 * d / G.d0));
+    const d = Math.hypot(a.x - b.x, a.y - b.y); cam.z = Math.max(0.32, Math.min(2.4, G.z0 * d / G.d0));
     const mx = (a.x + b.x) / 2, my = (a.y + b.y) / 2; keepPivot(G.pivot, mx, my); G.mx = mx; G.my = my; clampCam(); }
   else if (G.k === 'twist') { setAng(G.a0 + (e.clientX - G.sx) * 0.009); keepPivot(G.pivot, VW / 2, VH / 2); }
 });
@@ -2165,7 +2187,7 @@ function endPtr(e) {
 cv.addEventListener('pointerup', endPtr); cv.addEventListener('pointercancel', endPtr);
 cv.addEventListener('contextmenu', e => e.preventDefault());
 window.addEventListener('keydown', e => { if (e.key === 'q' || e.key === 'Q') rotateView(-1); if (e.key === 'e' || e.key === 'E') rotateView(1); });
-cv.addEventListener('wheel', e => { e.preventDefault(); const z0 = cam.z, z = Math.max(0.2, Math.min(2.4, z0 * Math.exp(-e.deltaY * 0.0015))); const wx = (e.clientX - VW / 2) / z0 + cam.x, wy = (e.clientY - VH / 2) / z0 + cam.y; cam.z = z; cam.x = wx - (e.clientX - VW / 2) / z; cam.y = wy - (e.clientY - VH / 2) / z; clampCam(); }, { passive: false });
+cv.addEventListener('wheel', e => { e.preventDefault(); const z0 = cam.z, z = Math.max(0.32, Math.min(2.4, z0 * Math.exp(-e.deltaY * 0.0015))); const wx = (e.clientX - VW / 2) / z0 + cam.x, wy = (e.clientY - VH / 2) / z0 + cam.y; cam.z = z; cam.x = wx - (e.clientX - VW / 2) / z; cam.y = wy - (e.clientY - VH / 2) / z; clampCam(); }, { passive: false });
 function onTap(sx, sy) {
   if (MODE === 'visit') { visitTap(sx, sy); return; }
   if (MODE === 'attack' || MODE === 'raid') { deployAt(sx, sy); return; }
@@ -3460,7 +3482,7 @@ function beginGame(fresh, preset) {
   for (const r of RES) if (S.res[r] == null) S.res[r] = 0; if (S.mq == null) S.mq = 0; if (S.best3 == null) S.best3 = 0;
   if (!S.creative && !S.buildings.some(b => b.t === 'casa')) { let n = 0; for (let rr = 4; rr < 12 && n < 2; rr++) for (let y = (MCX | 0) - rr; y <= (MCX | 0) + rr && n < 2; y++) for (let x = (MCX | 0) - rr; x <= (MCX | 0) + rr && n < 2; x++) if (canPlace('casa', x, y)) { S.buildings.push({ id: S.nextId++, t: 'casa', x, y, lvl: 1, stock: 0, end: 0 }); n++; } if (n) setTimeout(() => toast('🏠 Il feudo cresce: 2 Case regalate ai tuoi contadini'), 1200); }
   refreshTargets(false);
-  questMigrate(); MODE = 'village'; SC = buildVillage(); prefetchEra(); centerCam(MCX, MCX); cam.z = VW < 600 ? 0.9 : Math.max(0.6, Math.min(1.15, VW / 1000));
+  questMigrate(); MODE = 'village'; SC = buildVillage(); prefetchEra(); centerCam(MCX, MCX); cam.z = VW < 600 ? 1.05 : Math.max(0.7, Math.min(1.25, VW / 900));
   $('#hud').classList.remove('hidden'); $('#rotbar').classList.remove('hidden'); updateHUD();
   if (fresh && !S.creative && !S.sandbox) tutStart();
 }
