@@ -135,7 +135,7 @@ function g3init() {
   return true;
 }
 // ---- caricamento a pezzi dei modelli 3D: si scarica solo ciò che serve, il resto con calma ----
-const M3D_FILES = new Set(["abete3d", "accademia", "armeria", "balista", "balista_b", "balista_c", "bottino", "cancello", "capanno", "casa", "caserma", "castello", "cava", "chiesa", "falegnameria", "falo", "fattoria", "fucina", "generale", "granaio", "infermeria", "mercato", "miniera", "monastero", "municipio", "mura", "olmo3d", "palizzata", "poligono", "quercia3d", "spoglio3d", "stalla", "taverna", "tenda", "tesoreria", "torre", "torrepietra", "tronco3d", "cripta"]);
+const M3D_FILES = new Set(["staccionata", "steccato", "cavallofrisia", "cassa", "anfora", "cassafieno", "botte", "cassaortaggi", "fontanella", "stenditoio", "mucchiosassi", "felce", "segnavia", "gonfalone", "rovinamuro", "arco", "colonna", "rovine", "lastricato", "muretto", "rastrelliera", "carriola", "pozzo", "carretto", "croce", "lanterna", "abete3d", "accademia", "armeria", "balista", "balista_b", "balista_c", "bottino", "cancello", "capanno", "casa", "caserma", "castello", "cava", "chiesa", "falegnameria", "falo", "fattoria", "fucina", "generale", "granaio", "infermeria", "mercato", "miniera", "monastero", "municipio", "mura", "olmo3d", "palizzata", "poligono", "quercia3d", "spoglio3d", "stalla", "taverna", "tenda", "tesoreria", "torre", "torrepietra", "tronco3d", "cripta"]);
 const M3D_ALIAS = { granaio: 'stalla', mastio: 'castello', tronco: 'tronco3d' };
 const L3 = { state: {}, q: [], active: 0, max: 3, prefetch: [] };
 function need3d(k, low) {
@@ -1009,11 +1009,36 @@ const BDEF = {
   bancarella: { n: 'Bancarella', w: 1, h: 1, hp: 80, cost: { legno: 40, oro: 30 }, desc: 'Banco a strisce con frutta, spezie e stoffe.', max: [0, 1, 2, 3, 4, 5, 6, 7], icon: '🎪', t: 4, decor: true, pr: 3 },
   croce: { n: 'Croce Votiva', w: 1, h: 1, hp: 150, cost: { pietra: 40 }, desc: 'Croce di pietra sui gradini, dove si prega per il raccolto.', max: [0, 1, 1, 2, 2, 3, 3, 4], icon: '✝️', t: 5, decor: true, pr: 2 },
   gogna: { n: 'Gogna', w: 1, h: 1, hp: 100, cost: { legno: 40, ferro: 10 }, desc: 'La gogna in piazza: la giustizia del signore è sotto gli occhi di tutti.', max: [0, 0, 1, 1, 1, 2, 2, 2], icon: '⛓️', t: 5, decor: true, pr: 2 },
+  staccionata: { n: 'Staccionata', w: 1, h: 1, hp: 60, cost: { legno: 12 }, desc: 'Staccionata di pali grezzi. Toccala e usa ↻ Ruota per orientarla.', max: [6, 10, 14, 18, 24, 30, 36, 44], icon: '🪵', t: 2, decor: true, pr: 1 },
+  steccato: { n: 'Steccato Appuntito', w: 1, h: 1, hp: 80, cost: { legno: 18 }, desc: 'Pali appuntiti piantati fitti: un recinto da villaggio di frontiera.', max: [4, 8, 12, 16, 20, 24, 28, 32], icon: '🪵', t: 2, decor: true, pr: 1 },
+  cavallofrisia: { n: 'Cavallo di Frisia', w: 1, h: 1, hp: 120, cost: { legno: 30, ferro: 5 }, desc: 'Tronchi incrociati e appuntiti contro le cariche dei cavalieri.', max: [0, 2, 4, 6, 8, 10, 12, 14], icon: '✖️', t: 3, decor: true, pr: 1 },
+  cassa: { n: 'Cassa di Legno', w: 1, h: 1, hp: 40, cost: { legno: 15 }, desc: 'Una cassa inchiodata, piena di attrezzi e chiodi.', max: [3, 5, 7, 9, 11, 13, 15, 18], icon: '📦', t: 2, decor: true, pr: 1 },
+  cassafieno: { n: 'Cassa di Fieno', w: 1, h: 1, hp: 40, cost: { legno: 12, cibo: 10 }, desc: 'Fieno fresco per le bestie della stalla.', max: [2, 4, 6, 8, 10, 12, 14, 16], icon: '📦', t: 2, decor: true, pr: 1 },
+  cassaortaggi: { n: 'Cassa di Ortaggi', w: 1, h: 1, hp: 40, cost: { legno: 12, cibo: 15 }, desc: 'Cavoli e verze appena raccolti dall\'orto.', max: [2, 4, 6, 8, 10, 12, 14, 16], icon: '🥬', t: 2, decor: true, pr: 1 },
+  botte: { n: 'Botte', w: 1, h: 1, hp: 50, cost: { legno: 20 }, desc: 'Botte di rovere cerchiata di ferro: vino, birra o acqua piovana.', max: [2, 4, 6, 8, 10, 12, 14, 16], icon: '🛢️', t: 2, decor: true, pr: 1 },
+  anfora: { n: 'Anfora', w: 1, h: 1, hp: 30, cost: { oro: 15 }, desc: 'Anfora di terracotta per olio e granaglie.', max: [2, 3, 4, 5, 6, 7, 8, 9], icon: '🏺', t: 2, decor: true, pr: 1 },
+  fontanella: { n: 'Pompa dell\'Acqua', w: 1, h: 1, hp: 120, cost: { pietra: 30, ferro: 10 }, desc: 'Pompa di pietra con il secchio appeso: acqua fresca per il borgo.', max: [0, 1, 2, 2, 3, 3, 4, 4], icon: '🚰', t: 4, decor: true, pr: 2 },
+  stenditoio: { n: 'Stenditoio delle Pelli', w: 1, h: 1, hp: 50, cost: { legno: 20, pelli: 1 }, desc: 'Pelli conciate tese ad asciugare al sole.', max: [1, 2, 3, 4, 5, 6, 7, 8], icon: '🦌', t: 3, decor: true, pr: 2 },
+  rastrelliera: { n: 'Rastrelliera d\'Armi', w: 1, h: 1, hp: 150, cost: { legno: 40, ferro: 25 }, desc: 'Spade, asce, lance e uno scudo tondo, pronti per la milizia.', max: [0, 1, 2, 3, 4, 5, 6, 7], icon: '⚔️', t: 4, decor: true, pr: 3 },
+  carriola: { n: 'Carriola', w: 1, h: 1, hp: 40, cost: { legno: 25 }, desc: 'Carriola di legno con la ruota a raggi, lasciata dai muratori.', max: [1, 2, 3, 4, 5, 6, 7, 8], icon: '🛞', t: 2, decor: true, pr: 1 },
+  mucchiosassi: { n: 'Ometto di Pietre', w: 1, h: 1, hp: 100, cost: { pietra: 20 }, desc: 'Pietre tonde impilate a mano, come si fa lungo i sentieri.', max: [2, 3, 4, 5, 6, 7, 8, 9], icon: '🪨', t: 2, decor: true, pr: 1 },
+  felce: { n: 'Felce', w: 1, h: 1, hp: 20, cost: { cibo: 8 }, desc: 'Un ciuffo di felci verdi.', max: [4, 6, 8, 10, 12, 14, 16, 20], icon: '🌿', t: 1, decor: true, pr: 1 },
+  segnavia: { n: 'Segnavia', w: 1, h: 1, hp: 40, cost: { legno: 15 }, desc: 'Palo con le frecce di legno verso i villaggi vicini.', max: [1, 2, 3, 4, 5, 6, 7, 8], icon: '🪧', t: 2, decor: true, pr: 1 },
+  gonfalone: { n: 'Gonfalone', w: 1, h: 1, hp: 60, cost: { oro: 40, pelli: 1 }, desc: 'Gonfalone cremisi sul palo di quercia, per le feste e le parate.', max: [0, 1, 2, 3, 4, 5, 6, 7], icon: '🚩', t: 3, decor: true, pr: 2 },
+  lastricato: { n: 'Lastricato', w: 1, h: 1, hp: 999, cost: { pietra: 10 }, desc: 'Lastre di pietra per pavimentare piazze e cortili attorno agli edifici.', max: [0, 10, 20, 30, 45, 60, 80, 100], icon: '🔲', t: 1, decor: true, pr: 1, flat: true },
+  muretto: { n: 'Muretto di Pietra', w: 1, h: 1, hp: 200, cost: { pietra: 25 }, desc: 'Muretto a secco di pietre squadrate. Ruotalo con ↻.', max: [0, 4, 8, 12, 16, 20, 24, 30], icon: '🧱', t: 3, decor: true, pr: 1 },
+  rovinamuro: { n: 'Muro Diroccato', w: 1, h: 1, hp: 200, cost: { pietra: 30 }, desc: 'Ciò che resta di una vecchia cinta, coperto di muschio.', max: [0, 1, 2, 3, 4, 5, 6, 7], icon: '🏚️', t: 3, decor: true, pr: 2 },
+  arco: { n: 'Arco Antico', w: 1, h: 1, hp: 300, cost: { pietra: 60, oro: 20 }, desc: 'Un arco di pietra rimasto in piedi da tempi dimenticati.', max: [0, 0, 1, 2, 2, 3, 3, 4], icon: '🚪', t: 5, decor: true, pr: 4 },
+  colonna: { n: 'Colonna Antica', w: 1, h: 1, hp: 300, cost: { pietra: 50 }, desc: 'Colonna squadrata con capitello, segnata dai secoli.', max: [0, 0, 2, 2, 4, 4, 6, 6], icon: '🏛️', t: 5, decor: true, pr: 3 },
+  rovine: { n: 'Rovine Antiche', w: 2, h: 2, hp: 400, cost: { pietra: 90, oro: 40 }, desc: 'Un angolo di muro e un pavimento di lastre: le rovine di un antico tempio.', max: [0, 0, 1, 1, 2, 2, 3, 3], icon: '🏛️', t: 6, decor: true, pr: 6 },
   fontana: { n: 'Fontana di Pietra', w: 2, h: 2, hp: 400, cost: { pietra: 120, oro: 80 }, desc: 'Una vasca ottagonale con lo zampillo. Il cuore della piazza.', max: [0, 0, 1, 1, 2, 2, 2, 3], icon: '⛲', t: 10, decor: true, pr: 8 },
   statua: { n: 'Statua del Fondatore', w: 1, h: 1, hp: 500, cost: { pietra: 150, oro: 150 }, desc: 'Il primo signore della Marca, in bronzo, con la spada alzata.', max: [0, 0, 0, 0, 1, 1, 2, 2], icon: '🗽', t: 12, decor: true, pr: 12 },
 };
 const BUILD_ORDER = ['municipio', 'casa', 'taverna', 'mercato', 'fattoria', 'capanna', 'granaio', 'fucina', 'infermeria', 'armeria', 'miniera', 'cava', 'tesoreria', 'caserma', 'poligono', 'scuderia', 'monastero', 'chiesa', 'accademia', 'cripta', 'torre', 'torrepietra', 'cancello', 'balista', 'muro', 'fossato'];
-const DECOR_ORDER = ['pozzo', 'fontana', 'statua', 'lanterna', 'aiuola', 'siepe', 'cespuglio', 'stendardo', 'bancarella', 'carretto', 'panni', 'pagliaio', 'catasta', 'recinto', 'alveari', 'spaventapasseri', 'croce', 'gogna', 'funghi', 'masso', 'tronco'];
+const DECOR_ORDER = ['pozzo', 'fontana', 'fontanella', 'statua', 'lastricato', 'lanterna', 'gonfalone', 'stendardo', 'aiuola', 'siepe', 'cespuglio', 'felce', 'staccionata', 'steccato', 'muretto', 'cavallofrisia', 'bancarella', 'carretto', 'carriola', 'rastrelliera', 'cassa', 'cassafieno', 'cassaortaggi', 'botte', 'anfora', 'panni', 'stenditoio', 'pagliaio', 'catasta', 'recinto', 'alveari', 'spaventapasseri', 'segnavia', 'croce', 'gogna', 'arco', 'colonna', 'rovinamuro', 'rovine', 'mucchiosassi', 'funghi', 'masso', 'tronco'];
+// dimensione dei modelli delle decorazioni: w = larghezza in caselle, h = altezza in caselle
+const DFIT = { staccionata: { w: 1 }, steccato: { w: 0.95 }, cavallofrisia: { w: 0.85 }, cassa: { w: 0.5 }, cassafieno: { w: 0.55 }, cassaortaggi: { w: 0.55 }, botte: { h: 0.5 }, anfora: { h: 0.45 }, pozzo: { w: 0.85 }, fontanella: { h: 0.8 }, carretto: { w: 0.95 }, carriola: { w: 0.9 }, stenditoio: { w: 0.95 }, rastrelliera: { w: 1 }, mucchiosassi: { w: 0.55 }, felce: { w: 0.7 }, croce: { h: 0.85 }, segnavia: { h: 1.05 }, gonfalone: { h: 1.2 }, lanterna: { h: 1.2 }, rovinamuro: { w: 1 }, arco: { h: 1.25 }, colonna: { h: 1.3 }, rovine: { w: 1.9 }, lastricato: { w: 1.02 }, muretto: { w: 1 } };
+const DYAW_RND = { botte: 1, anfora: 1, felce: 1, mucchiosassi: 1, cassa: 1, cassafieno: 1, cassaortaggi: 1 };
 // prestigio: ogni decorazione completata dà punti; ogni 4 punti +1% produzione (max +20%)
 function prestige() { return lifeCache().pr; }
 function prestige0() { if (!S) return 0; let p = 0; for (const b of S.buildings) { const d = BDEF[b.t]; if (d.decor && !b.end && !b.nat) p += d.pr || (d.cost ? 1 : 0); } return p; }
@@ -1689,7 +1714,7 @@ function render(sc, dt) {
   if (sc.ghost) { const ok = sc.ghost.ok; const gh = sc.ghost; poly(c, [W(gh.x, gh.y), W(gh.x + gh.w, gh.y), W(gh.x + gh.w, gh.y + gh.h), W(gh.x, gh.y + gh.h)], ok ? 'rgba(120,220,120,0.35)' : 'rgba(230,80,60,0.4)', ok ? '#9f9' : '#f88', 2); }
   // drawables
   const L = [];
-  for (const b of sc.B) if (!b.dead) { const vr = vRect(b); const [wx, wy] = WR(vr[0], vr[1]); if (vis(wx, wy + 40)) L.push([BDEF[b.t].moat ? -1e6 + vr[0] + vr[1] : vr[0] + vr[1] + (b.w + b.h) / 2 - (BDEF[b.t].wall ? 0.0 : 0.02), 0, b]); }
+  for (const b of sc.B) if (!b.dead) { const vr = vRect(b); const [wx, wy] = WR(vr[0], vr[1]); if (vis(wx, wy + 40)) L.push([BDEF[b.t].moat || BDEF[b.t].flat ? -1e6 + vr[0] + vr[1] : vr[0] + vr[1] + (b.w + b.h) / 2 - (BDEF[b.t].wall ? 0.0 : 0.02), 0, b]); }
   for (const u of sc.U) { const [wx, wy] = W(u.x, u.y); const p = rotP(u.x, u.y); if (vis(wx, wy)) L.push([u.dead ? p[0] + p[1] - 1.2 : p[0] + p[1], 1, u]); }
   for (const t of sc.trees) { const [wx, wy] = W(t.x, t.y); if (vis(wx, wy)) { const gi = sc.grid[(t.y | 0) * N + (t.x | 0)]; if (gi >= 0 && sc.B[gi] && !sc.B[gi].dead && !BDEF[sc.B[gi].t].decor) continue; const p = rotP(t.x, t.y); L.push([p[0] + p[1], 2, t]); } }
   for (const r of sc.rocks) { const [wx, wy] = W(r.x, r.y); if (vis(wx, wy)) { const p = rotP(r.x, r.y); L.push([p[0] + p[1] - 0.3, 3, r]); } }
@@ -1793,11 +1818,12 @@ function drawBuilding(c, sc, b) {
   if (!G3.models[b.t === 'mastio' ? 'castello' : b.t]) need3d(b.t === 'mastio' ? 'castello' : b.t);
   const sk = b.t === 'mastio' && G3.models.castello && G3.models.castello.ready ? 'castello' : (G3.models[b.t] && G3.models[b.t].ready ? b.t : bSprite(b));
   if (sk && G3.models[sk] && G3.models[sk].ready) {
-    if (!BDEF[b.t].decor) { const p = plotCache(b.w, b.h); c.drawImage(p.cv, wx - p.ox, wy - p.oy, p.w, p.h); } else { const [cx2, cy2] = W(b.x + b.w / 2, b.y + b.h / 2); c.fillStyle = 'rgba(0,0,0,0.2)'; c.beginPath(); c.ellipse(cx2, cy2, (b.w + b.h) * 13, (b.w + b.h) * 5.5, 0, 0, 7); c.fill(); } const ga = c.globalAlpha; if (b.ref && b.ref.end && b.ref.toLvl === 1) c.globalAlpha = 0.5; let k3 = sk, yaw = 0, fitm = 1;
+    if (!BDEF[b.t].decor) { const p = plotCache(b.w, b.h); c.drawImage(p.cv, wx - p.ox, wy - p.oy, p.w, p.h); } else if (!DFIT[b.t]) { const [cx2, cy2] = W(b.x + b.w / 2, b.y + b.h / 2); c.fillStyle = 'rgba(0,0,0,0.2)'; c.beginPath(); c.ellipse(cx2, cy2, (b.w + b.h) * 13, (b.w + b.h) * 5.5, 0, 0, 7); c.fill(); } const ga = c.globalAlpha; if (b.ref && b.ref.end && b.ref.toLvl === 1) c.globalAlpha = 0.5; let k3 = sk, yaw = 0, fitm = 1;
     if (b.t === 'tronco') { const hh = (((b.x * 7 + b.y * 13) | 0) >>> 0) + (b.ref ? b.ref.id : 0); yaw = [-Math.PI / 4, 3 * Math.PI / 4, Math.PI / 4, -3 * Math.PI / 4][hh % 4] + ((hh >> 2) % 5 - 2) * 0.07; }
     if (b.t === 'balista') { need3d('balista_b'); need3d('balista_c'); fitm = 0.68; if (b.yawT != null) { let d = b.yawT - (b.yaw || 0); while (d > Math.PI) d -= 2 * Math.PI; while (d < -Math.PI) d += 2 * Math.PI; b.yaw = (b.yaw || 0) + d * 0.18; } yaw = b.yaw || 0;
       const tf = b.fired != null ? sc.time - b.fired : 99; if (tf < 0.35 && G3.models.balista_c && G3.models.balista_c.ready) k3 = 'balista_c'; else if (tf < 1.4 && G3.models.balista_b && G3.models.balista_b.ready) k3 = 'balista_b'; }
     if (b.t === 'cancello' && M3D_FILES.has('cancello_aperto')) { need3d('cancello_aperto'); const om = G3.models.cancello_aperto; if (om && om.ready && sc.U.some(u => !u.dead && u.side === b.side && Math.hypot(u.x - (b.x + 1), u.y - (b.y + 1)) < 2.2)) k3 = 'cancello_aperto'; }
+    const dfit = DFIT[b.t] && G3.models[k3] && G3.models[k3].m; if (dfit) { const mm = G3.models[k3].m, hz = Math.max(mm.size[0], mm.size[2]); fitm = DFIT[b.t].h ? DFIT[b.t].h * hz / Math.max(1e-6, mm.size[1]) / (b.w * 1.3) : DFIT[b.t].w / (b.w * 1.3); yaw = ((b.ref && b.ref.rot) || 0) * Math.PI / 2 + (DYAW_RND[b.t] ? ((b.id * 2654435761) >>> 0) % 628 / 100 : 0); }
     let fit3 = fitm * b.w * 1.3 * (b.t === 'mastio' ? (b.lvl <= 8 ? 1.25 + 0.03 * b.lvl : 1.49 + 0.014 * (b.lvl - 8)) : b.t === 'caserma' ? 0.82 : b.t === 'falo' ? 0.8 : b.t === 'tronco' ? 0.55 : 1);
     // nessun edificio deve superare in altezza il Mastio: tetto all'altezza in base all'impronta
     if (b.t !== 'mastio' && !H3FREE[b.t] && b.w >= 2) { const mm = G3.models[k3].m, hNow = mm.size[1] * fit3 / Math.max(mm.size[0], mm.size[2]), hMax = 0.75 * b.w + 0.3; if (hNow > hMax) fit3 *= hMax / hNow; }
@@ -2897,6 +2923,7 @@ function openArms() { if (!S) return; if (!S.arms) S.arms = Object.assign({}, AR
     <h4>Figura</h4><div class="arow">${ARMS_SYM.map(v => `<button class="achip s ${a.sym === v ? 'on' : ''}" onclick="setArms('sym','${v}')">${v}</button>`).join('')}</div>
     <div class="acts"><button class="btn" onclick="closeSheet()">✓ Fatto</button></div></div>`, 'arms'); }
 function setArms(k, v) { if (!S.arms) S.arms = Object.assign({}, ARMS()); S.arms[k] = v; for (const key in CACHE) if (key.startsWith('stendardo')) delete CACHE[key]; save(); updateHUD(); openArms(); }
+function rotDeco(id) { const r = S.buildings.find(b => b.id === id); if (!r) return; r.rot = ((r.rot || 0) + 1) % 4; const b = SC && SC.B.find(x => x.ref === r); if (b) { b.c3k = null; } save(); sfx('tock'); }
 let BTAB = 'b';
 function openBuild(tab) {
   if (tab) BTAB = tab; const deco = BTAB === 'd';
@@ -2949,6 +2976,7 @@ function openBuildingInfo(r) {
   if (r.nat) body = body.replace('<p class="desc">', '<p class="desc"><b>Ostacolo naturale.</b> Impedisce di costruire qui: rimuovilo per liberare spazio e ottenere risorse. ');
   if (r.t !== 'mastio' && !(d.decor && d.rm)) body += workOn('demo', r.id) ? `<button class="btn dis">🔨 Demolizione… ${fmtT(workOn('demo', r.id).end - now())}</button>` : `<button class="btn ghost" onclick="demolish(${r.id})">🔨 Demolisci<small>${costStr({ cibo: 10 * r.lvl })} · ⏱ ${Math.max(4, Math.round((d.t || 4) * 0.6 * r.lvl))}s · rimborso 30%</small></button>`;
   if (r.t !== 'mastio' && !r.nat) body += `<button class="btn ghost" onclick="startPlacement('${r.t}', S.buildings.find(b=>b.id===${r.id}))">✥ Sposta</button>`;
+  if (d.decor && DFIT[r.t] && !DYAW_RND[r.t]) body += `<button class="btn ghost" onclick="rotDeco(${r.id})">↻ Ruota</button>`;
   body += `</div>`;
   body = body.replace('<div class="acts">', extra + '<div class="acts">');
   openSheet(`${d.icon} ${d.n}`, body, 'b:' + r.id);
