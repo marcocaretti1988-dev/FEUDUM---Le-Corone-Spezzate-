@@ -421,6 +421,20 @@ html[data-theme=pietra] #askd .ab{background:linear-gradient(180deg,#30353a,#222
 #tbtns .btn.cont{background:linear-gradient(180deg,#5c3a25,#3a2414);display:flex;flex-direction:column;align-items:center}#tbtns .btn.cont small{font-family:var(--fb);font-size:11px;opacity:.85;text-transform:none;letter-spacing:0}#tbtns .btn.cont.dis{opacity:.5}
 .cloudst{font-size:11px;opacity:.75;text-align:center;margin:-2px 0 2px}
 #tbtns .savex{display:flex;gap:6px;justify-content:center}#tbtns .savex .btn{font-size:11.5px;padding:6px 10px}
+#bord{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(var(--sab) + 132px);z-index:16;display:flex;gap:6px;pointer-events:auto}
+#bord button{display:flex;align-items:center;gap:4px;padding:6px 10px;border-radius:18px;border:1px solid #6b5338;background:rgba(28,20,12,.82);color:#f5e6c4;font-family:var(--fh);font-weight:700;font-size:11.5px;box-shadow:0 2px 6px rgba(0,0,0,.45)}
+#bord button span{font-size:15px}#bord button.on{background:linear-gradient(180deg,#b3201f,#7a1414);border-color:#ffd27a;color:#fff}
+#bhud.hidden~#bord,#bhud.hidden #bord{display:none}
+.crypt{margin:6px 0 10px;padding:8px 10px;border-radius:10px;background:rgba(40,30,20,.08);border:1px solid rgba(0,0,0,.15);font-size:12px;max-height:220px;overflow:auto}.crypt>b{display:block;margin-bottom:4px}.crypt div{display:flex;flex-direction:column;padding:3px 0;border-top:1px dashed rgba(0,0,0,.12)}.crypt span{font-family:var(--fh);font-weight:700}.crypt small{opacity:.75;font-size:10.5px}
+.row.fallen{color:#5a1a12}#fcard .ftr2{display:inline-block;font-family:var(--fb);font-size:10px;font-weight:700;padding:1px 6px;border-radius:8px;background:#5c3a25;color:#ffe9b8;vertical-align:2px}
+#tutb{position:fixed;left:8px;right:8px;bottom:calc(var(--sab) + 92px);z-index:35;display:flex;gap:10px;align-items:flex-start;max-width:460px;margin:0 auto;padding:10px 12px;border-radius:14px;background:linear-gradient(180deg,#f8eed4,#e6d1a2);border:2px solid #5c3a25;box-shadow:0 8px 24px rgba(0,0,0,.55);color:var(--ink);animation:fpop .2s ease-out}
+#tutb.low{opacity:.25;pointer-events:none}
+#tutb .tav{font-size:30px;flex:0 0 auto;width:44px;height:44px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#4a3420,#1f150c);display:flex;align-items:center;justify-content:center;border:2px solid #d9b25a}
+#tutb .ttx{flex:1;min-width:0}#tutb small{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--crim);font-weight:800}#tutb b{display:block;font-family:var(--fh);font-size:15px;margin:1px 0 3px}#tutb p{margin:0 0 7px;font-size:13px;line-height:1.35}
+#tutb .tbt{display:flex;gap:6px;justify-content:flex-end}#tutb .tbt .btn{padding:6px 12px;font-size:12px}
+#tuta{position:fixed;z-index:36;font-size:34px;pointer-events:none;filter:drop-shadow(0 3px 3px rgba(0,0,0,.6));animation:tbob .8s ease-in-out infinite alternate}@keyframes tbob{to{transform:translateY(10px)}}
+html[data-theme=pietra] #tutb{background:linear-gradient(180deg,#3a4046,#262a2e);color:#eef0f1;border-color:#8d959c}
+#tutb.top{bottom:auto;top:calc(var(--sat) + 150px)}
 </style>
 </head>
 <body>
@@ -443,7 +457,7 @@ html[data-theme=pietra] #askd .ab{background:linear-gradient(180deg,#30353a,#222
     <button class="pbtn ok" onclick="confirmPlace()">✓</button>
   </div>
 </div>
-<div id="bhud" class="hidden"><div id="btop"></div><div id="bbot"><div id="bcards"></div><button class="rbtn" onclick="retreat()">🏳 Ritirata</button></div></div>
+<div id="bhud" class="hidden"><div id="btop"></div><div id="bord"></div><div id="bbot"><div id="bcards"></div><button class="rbtn" onclick="retreat()">🏳 Ritirata</button></div></div>
 <div id="sheet" class="hidden"><div class="sh-h"><div id="sheet-t"></div><button class="x" onclick="closeSheet()">✕</button></div><div id="sheet-b"></div></div>
 <div id="wxw" class="hidden" onclick="openWeather()"></div>
 <button id="memob" class="hidden" onclick="sfx('click');openMemo()" title="Promemoria"><span>📜</span><b>0</b></button>
@@ -603,7 +617,7 @@ function g3init() {
 }
 // ---- caricamento a pezzi dei modelli 3D: si scarica solo ciò che serve, il resto con calma ----
 const M3D_FILES = new Set(["abete3d", "accademia", "armeria", "balista", "balista_b", "balista_c", "bottino", "cancello", "capanno", "casa", "caserma", "castello", "cava", "chiesa", "falegnameria", "falo", "fattoria", "fucina", "generale", "granaio", "infermeria", "mercato", "miniera", "monastero", "municipio", "mura", "olmo3d", "palizzata", "poligono", "quercia3d", "spoglio3d", "stalla", "taverna", "tenda", "tesoreria", "torre", "torrepietra", "tronco3d"]);
-const M3D_ALIAS = { granaio: 'stalla', mastio: 'castello', tronco: 'tronco3d' };
+const M3D_ALIAS = { granaio: 'stalla', mastio: 'castello', tronco: 'tronco3d', cripta: 'monastero' };
 const L3 = { state: {}, q: [], active: 0, max: 3, prefetch: [] };
 function need3d(k, low) {
   k = M3D_ALIAS[k] && !M3D_FILES.has(k) ? M3D_ALIAS[k] : k; if (!M3D_FILES.has(k) || L3.state[k]) return; L3.state[k] = 'q';
@@ -1387,6 +1401,7 @@ const BDEF = {
   stendardo: { n: 'Stendardo di Casata', w: 1, h: 1, hp: 120, cost: { oro: 30 }, desc: 'Colori blu e cremisi. Puro orgoglio feudale.', max: [2, 2, 3, 3, 4, 4, 5, 5], icon: '🚩', t: 5, decor: true },
   municipio: { n: 'Municipio', w: 3, h: 3, hp: 1000, cost: { legno: 300, pietra: 120, oro: 150 }, prod: ['oro', 20], pop: 20, desc: 'Cuore amministrativo con torre dell\'orologio. +20 Popolazione per livello e tasse (+20 Oro/min). Sblocca Chiesa, Mercato e Accademia.', max: [0, 1, 1, 1, 1, 1, 1, 1], icon: '🏛️', t: 15, spr: 'municipio' },
   mercato: { n: 'Mercato', w: 3, h: 3, hp: 600, cost: { legno: 220, oro: 80 }, prod: ['oro', 10], req: 'municipio', desc: 'Cinque bancarelle colorate. +10 Oro/min e scambi: vendi legno, cibo e ferro in cambio d\'oro, o compra ferro.', max: [0, 0, 1, 1, 1, 1, 2, 2], icon: '🏪', t: 12, spr: 'mercato' },
+  cripta: { n: 'Cripta degli Eroi', w: 2, h: 2, hp: 900, cost: { pietra: 160, oro: 90, legno: 40 }, desc: 'Qui riposano i veterani caduti, col loro nome e le loro gesta. Ogni eroe custodito dà +1% vita a tutte le truppe (massimo +15%).', max: [0, 0, 1, 1, 1, 1, 1, 1], icon: '⚱️', t: 14, spr: 'chiesa' },
   chiesa: { n: 'Chiesa', w: 2, h: 2, hp: 700, cost: { pietra: 200, legno: 120, oro: 100 }, req: 'municipio', desc: 'Pietra gotica, vetrate e campane. Morale: +10% vita a tutte le truppe. L\'Infermeria cura il 20% in più e di notte cura i difensori vicini.', max: [0, 0, 1, 1, 1, 1, 1, 1], icon: '⛪', t: 14, spr: 'chiesa' },
   accademia: { n: 'Accademia', w: 3, h: 3, hp: 800, cost: { legno: 300, pietra: 200, oro: 250 }, req: 'municipio', desc: 'Biblioteca e scuola di guerra: ricerche permanenti su armature, balistica e logistica.', max: [0, 0, 0, 1, 1, 1, 1, 1], icon: '📚', t: 18, spr: 'accademia' },
   cancello: { n: 'Mura con Cancello', w: 2, h: 2, hp: 1000, cost: { pietra: 150, legno: 80, ferro: 30 }, gate: true, desc: 'Torri merlate, saracinesca e porta ferrata. 1000 vita, i nemici devono abbatterla, le tue truppe passano. Ospita 2 arcieri.', max: [0, 0, 1, 1, 2, 2, 3, 4], icon: '🏯', t: 12, shoot: { range: 6, dmg: 8, cd: 0.8, type: 'arrow' }, spr: 'cancello' },
@@ -1401,7 +1416,7 @@ const BDEF = {
   capanno: { n: 'Capanno', w: 2, h: 2, hp: 320, icon: '🛖' },
   falo: { n: 'Falò', w: 1, h: 1, hp: 80, icon: '🔥', decor: true },
 };
-const BUILD_ORDER = ['municipio', 'casa', 'taverna', 'mercato', 'fattoria', 'capanna', 'granaio', 'fucina', 'infermeria', 'armeria', 'miniera', 'cava', 'tesoreria', 'caserma', 'poligono', 'scuderia', 'monastero', 'chiesa', 'accademia', 'torre', 'torrepietra', 'cancello', 'balista', 'muro', 'stendardo', 'funghi', 'cespuglio', 'masso', 'tronco'];
+const BUILD_ORDER = ['municipio', 'casa', 'taverna', 'mercato', 'fattoria', 'capanna', 'granaio', 'fucina', 'infermeria', 'armeria', 'miniera', 'cava', 'tesoreria', 'caserma', 'poligono', 'scuderia', 'monastero', 'chiesa', 'accademia', 'cripta', 'torre', 'torrepietra', 'cancello', 'balista', 'muro', 'stendardo', 'funghi', 'cespuglio', 'masso', 'tronco'];
 const NATURE = ['funghi', 'cespuglio', 'cespuglio', 'masso', 'funghi', 'cespuglio', 'masso', 'tronco'];
 const TRONCHI_MAX = 8;
 // units
@@ -1482,7 +1497,7 @@ function armsMult() { return 1 + 0.08 * lvlSum('armeria'); }
 function curePct() { return Math.min(0.7, 0.15 * lvlSum('infermeria') * (lvlSum('chiesa') ? 1.2 : 1)); }
 const TECH = { arm: { n: 'Armature', icon: '🛡️', d: '+8% vita a tutte le truppe', cost: l => ({ ferro: 80 * l, oro: 120 * l, pelli: 4 * l }) }, bal: { n: 'Balistica', icon: '🎯', d: '+10% danno a distanza (arcieri, balestre, torri)', cost: l => ({ legno: 150 * l, oro: 120 * l }) }, log: { n: 'Logistica', icon: '🐾', d: '+8% velocità di marcia', cost: l => ({ cibo: 200 * l, oro: 100 * l }) } };
 function tech(k) { return (S.tech && S.tech[k]) || 0; }
-function unitBonus(u) { if (!S) return; const hm = (1 + 0.08 * tech('arm')) * (lvlSum('chiesa') ? 1.1 : 1); u.maxhp *= hm; u.hp *= hm; u.sm = (1 + 0.08 * tech('log')) * (!u.hero && UDEF[u.k] && UDEF[u.k].at === 'scuderia' ? 1.3 : 1); u.rm = 1 + 0.1 * tech('bal'); }
+function unitBonus(u) { if (!S) return; const hm = (1 + 0.08 * tech('arm')) * (lvlSum('chiesa') ? 1.1 : 1) * (1 + cryptBonus()); u.maxhp *= hm; u.hp *= hm; u.sm = (1 + 0.08 * tech('log')) * (!u.hero && UDEF[u.k] && UDEF[u.k].at === 'scuderia' ? 1.3 : 1); u.rm = 1 + 0.1 * tech('bal'); }
 let BTHUMB = {};
 function bThumb(k) { if (BTHUMB[k] || !BATL_OK || !BFR[k]) return BTHUMB[k] || null; const f = BFR[k], s = 64 / Math.max(f[2], f[3]); const cv2 = document.createElement('canvas'); cv2.width = 64; cv2.height = 64; cv2.getContext('2d').drawImage(BATL, f[0], f[1], f[2], f[3], (64 - f[2] * s) / 2, (64 - f[3] * s) / 2, f[2] * s, f[3] * s); return BTHUMB[k] = cv2.toDataURL(); }
 function armyUsed() { let n = 0; for (const k in S.army) n += S.army[k] * UDEF[k].sp; for (const q of S.queue) n += UDEF[q.k].sp; return n; }
@@ -1757,11 +1772,11 @@ function tPos(t) { return t.isB ? [t.x + t.w / 2, t.y + t.h / 2] : [t.x, t.y]; }
 function enemiesOf(side) { return side === 'A' ? 'D' : 'A'; }
 function nearestUnit(sc, u, side, maxD) { let best = null, bd = maxD; for (const o of sc.U) { if (o.dead || o.side !== side) continue; const d = Math.hypot(o.x - u.x, o.y - u.y); if (d < bd) { bd = d; best = o; } } return best; }
 function pickBuilding(sc, u) {
-  let best = null, bd = 1e9;
+  let best = null, bd = 1e9; const towersFirst = u.pl && sc.order === 'towers';
   for (const b of sc.B) {
     if (b.dead || b.side === u.side) continue; const d = BDEF[b.t]; if (d.wall || d.decor) continue;
     let dist = distToB(u.x, u.y, b);
-    if (u.d.bld && !d.shoot) dist *= 0.9;
+    if (u.d.bld && !d.shoot) dist *= 0.9; if (towersFirst) dist *= d.shoot ? 0.25 : 3;
     if (dist < bd) { bd = dist; best = b; }
   }
   return best;
@@ -1808,13 +1823,14 @@ function dealDamage(sc, t, amt, src, kind) {
     if (src && src.d && src.d.bld) amt *= 1.6;
     if (src && src.d && src.d.ranged && !src.hero) amt *= 0.55;
   }
-  if (t.df) amt *= t.df; t.hp -= amt; t.hitT = 0.15;
+  if (t.df) amt *= t.df; t.hp -= amt; t.hitT = 0.15; if (amt > 30 && sc.mode !== 'village') shake(amt > 60 ? 4 : 2);
+  if (t.hp <= 0 && t.duro) { t.duro = 0; t.hp = Math.max(1, t.maxhp * 0.15); t.inv = 1.2; floatText(sc, t.x, t.y, '💀 Duro a Morire!', '#ffd27a', 1.3); }
   if (t.hp <= 0) { t.hp = 0; kill(sc, t); }
 }
 function kill(sc, t) {
   t.dead = true; t.deadT = 0;
   if (t.isB) {
-    sfx('crash'); sceneIndex(sc);
+    sfx('crash'); sceneIndex(sc); if (sc.mode !== 'village') { debris(sc, t); shake(BDEF[t.t].wall ? 3 : t.t === 'mastio' ? 14 : 7); }
     for (let i = 0; i < 10; i++) puff(sc, t.x + Math.random() * t.w, t.y + Math.random() * t.h, 10 + Math.random() * 30, '#7a6a55');
     if (sc.onBDead) sc.onBDead(t);
   } else { if (Math.random() < 0.5) sfx('hit'); if (sc.onUDead) sc.onUDead(t); }
@@ -1851,15 +1867,21 @@ function updateScene(sc, dt) {
       if (u.rt <= 0) {
         u.rt = 0.5;
         const aggro = u.d.ranged ? u.d.rng + 1 : 2.6;
-        const nu = u.d.bld ? null : nearestUnit(sc, u, foe, aggro);
+        const hero = u.pl && sc.order === 'hero' && !u.hero ? sc.U.find(o => o.hero && o.pl && !o.dead) : null;
+        if (hero) { const nu = nearestUnit(sc, hero, foe, 3.2); if (nu) { if (u.tgt !== nu) { u.tgt = nu; u.wall = null; repath(sc, u); } } else if (Math.hypot(hero.x - u.x, hero.y - u.y) > 1.8) { u.tgt = null; u.wall = null; u.path = astar(Math.floor(u.x), Math.floor(u.y), (x, y) => Math.hypot(x + .5 - hero.x, y + .5 - hero.y) < 1.5, (x, y) => { const b = bAt(sc, x, y); return sc.water[y * N + x] ? Infinity : b ? (b.side === u.side ? Infinity : 8) : 1; }, Math.floor(hero.x), Math.floor(hero.y), 1500); u.pi = 0; u.follow = hero; } }
+        else {
+        if (sc.order === 'towers' && u.pl && u.tgt && !u.tgt.isB && !u.d.ranged) { u.tgt = null; }
+        const nu = u.d.bld || (u.pl && sc.order === 'towers' && !u.d.ranged) ? null : nearestUnit(sc, u, foe, aggro);
         if (nu && (!u.tgt || u.tgt.isB)) { u.tgt = nu; u.wall = null; repath(sc, u); }
-        else if (!u.tgt) { u.tgt = pickBuilding(sc, u); if (u.tgt) repath(sc, u); }
+        else if (!u.tgt) { u.tgt = pickBuilding(sc, u); if (u.tgt) repath(sc, u); } }
       }
     } else { // defender guard
       if (u.rt <= 0) {
         u.rt = 0.5;
-        const nu = nearestUnit(sc, u, foe, u.guardR || 5);
-        if (nu && Math.hypot(nu.x - u.post.x, nu.y - u.post.y) < (u.leash || 8)) { if (u.tgt !== nu) { u.tgt = nu; repath(sc, u); } }
+        if (u.pl && sc.order === 'hero' && !u.hero) { const h = sc.U.find(o => o.hero && o.pl && !o.dead); if (h) u.post = { x: h.x + ((u.id % 5) - 2) * 0.45, y: h.y + (((u.id / 5) | 0) % 3 - 1) * 0.45 }; }
+        const charge = u.pl && sc.order === 'charge';
+        const nu = nearestUnit(sc, u, foe, charge ? 60 : (u.guardR || 5));
+        if (nu && (charge || Math.hypot(nu.x - u.post.x, nu.y - u.post.y) < (u.leash || 8))) { if (u.tgt !== nu) { u.tgt = nu; repath(sc, u); } }
         else if (u.tgt) { u.tgt = null; u.path = null; }
       }
     }
@@ -1884,7 +1906,7 @@ function updateScene(sc, dt) {
       }
     } else if (u.side === 'D') {
       if (Math.hypot(u.x - u.post.x, u.y - u.post.y) > 0.4) moveTo(sc, u, u.post.x, u.post.y, dt);
-    }
+    } else if (u.follow && u.path && u.pi < u.path.length) { const [px, py] = u.path[u.pi]; if (moveTo(sc, u, px + 0.5, py + 0.5, dt)) u.pi++; }
   }
   // separation
   for (let i = 0; i < U.length; i++) {
@@ -1920,7 +1942,7 @@ function updateScene(sc, dt) {
   for (const b of sc.B) {
     if (b.dead ? (b.deadT < 8) : (b.hp < b.maxhp * 0.5 && !BDEF[b.t].wall)) { b.smokeT -= dt; if (b.smokeT <= 0) { b.smokeT = 0.25 + Math.random() * 0.3; puff(sc, b.x + b.w / 2 + (Math.random() - .5) * b.w * 0.5, b.y + b.h / 2 + (Math.random() - .5) * b.h * .5, b.dead ? 5 : 30, b.dead ? '#3d3833' : '#4a4540'); } }
   }
-  for (const f of sc.FX) { f.t += dt; if (f.k === 'puff') { f.x += f.vx * dt; f.z += f.vz * dt; f.r += dt * 6; } if (f.upd) f.upd(sc, f, dt); }
+  for (const f of sc.FX) { f.t += dt; if (f.k === 'deb') debrisUpd(f, dt); else if (f.k === 'puff') { f.x += f.vx * dt; f.z += f.vz * dt; f.r += dt * 6; } if (f.upd) f.upd(sc, f, dt); }
   sc.FX = sc.FX.filter(f => f.t < f.dur);
   for (const t of sc.T) t.t += dt; sc.T = sc.T.filter(t => t.t < t.dur);
   // remove long-dead units to keep lists small
@@ -1970,8 +1992,8 @@ function unitFrame(u) {
 function render(sc, dt) {
   const c = ctx;
   c.setTransform(1, 0, 0, 1, 0, 0); c.fillStyle = sc.night ? '#1b2016' : '#2f3a1f'; c.fillRect(0, 0, cv.width, cv.height);
-  const z = cam.z * DPR;
-  c.setTransform(z, 0, 0, z, DPR * (VW / 2 - cam.x * cam.z), DPR * (VH / 2 - cam.y * cam.z));
+  const z = cam.z * DPR; let shx = 0, shy = 0; if (SHAKE.a > 0.2) { shx = (Math.random() - .5) * SHAKE.a; shy = (Math.random() - .5) * SHAKE.a; SHAKE.a *= 0.86; } else SHAKE.a = 0;
+  c.setTransform(z, 0, 0, z, DPR * (VW / 2 - cam.x * cam.z + shx), DPR * (VH / 2 - cam.y * cam.z + shy));
   c.imageSmoothingEnabled = true; c.imageSmoothingQuality = 'high';
   // view bounds in world
   const vx0 = cam.x - VW / 2 / cam.z - 120, vx1 = cam.x + VW / 2 / cam.z + 120, vy0 = cam.y - VH / 2 / cam.z - 60, vy1 = cam.y + VH / 2 / cam.z + 260;
@@ -2024,7 +2046,8 @@ function render(sc, dt) {
   // fx
   for (const f of sc.FX) {
     const [wx, wy] = f.k === 'chim' ? [0, 0] : W(f.x, f.y); const k = f.t / f.dur;
-    if (f.k === 'puff') { c.fillStyle = shade(f.col, 1, 0.35 * (1 - k)); c.beginPath(); c.arc(wx, wy - f.z, f.r, 0, 7); c.fill(); }
+    if (f.k === 'deb') { c.save(); c.globalAlpha = Math.min(1, (1 - k) * 2.5); c.translate(wx, wy - f.z); c.rotate(f.rot); c.fillStyle = f.col; c.fillRect(-f.s / 2, -f.s / 3, f.s, f.s * 0.66); c.restore(); }
+    else if (f.k === 'puff') { c.fillStyle = shade(f.col, 1, 0.35 * (1 - k)); c.beginPath(); c.arc(wx, wy - f.z, f.r, 0, 7); c.fill(); }
     else if (f.k === 'ring') { c.strokeStyle = `rgba(${f.col},${1 - k})`; c.lineWidth = 3; c.beginPath(); c.ellipse(wx, wy, f.r * 32 * k, f.r * 16 * k, 0, 0, 7); c.stroke(); c.fillStyle = `rgba(${f.col},${0.15 * (1 - k)})`; c.fill(); }
     else if (f.k === 'rain') { c.strokeStyle = 'rgba(40,25,10,0.8)'; c.lineWidth = 1.2; for (let i = 0; i < 26; i++) { const R = rng(i * 13 + (f.t * 10 | 0)); const ox = (R() - 0.5) * 150, oy = (R() - 0.5) * 70; const h = (f.t * 300 + R() * 200) % 160; c.beginPath(); c.moveTo(wx + ox - 8, wy + oy - 160 + h); c.lineTo(wx + ox, wy + oy - 160 + h + 14); c.stroke(); } c.fillStyle = 'rgba(120,20,10,0.12)'; c.beginPath(); c.ellipse(wx, wy, 90, 45, 0, 0, 7); c.fill(); }
     else if (f.k === 'dome') { const u = f.follow; const [ux, uy] = u && !u.dead ? W(u.x, u.y) : [wx, wy]; c.strokeStyle = `rgba(150,210,255,${0.8 * (1 - k * 0.5)})`; c.lineWidth = 2; c.fillStyle = `rgba(150,210,255,${0.14})`; c.beginPath(); c.ellipse(ux, uy, 100, 50, 0, 0, 7); c.fill(); c.stroke(); }
@@ -2040,6 +2063,7 @@ function render(sc, dt) {
     for (const b of sc.B) if (b.dead && b.deadT < 8) { const [wx, wy] = W(b.x + b.w / 2, b.y + b.h / 2); const gr = c.createRadialGradient(wx, wy, 2, wx, wy, 80); gr.addColorStop(0, 'rgba(255,90,30,0.35)'); gr.addColorStop(1, 'rgba(255,60,20,0)'); c.fillStyle = gr; c.beginPath(); c.arc(wx, wy, 80, 0, 7); c.fill(); }
     c.restore();
   }
+  drawDayNight(c, sc, z);
   drawWeather(c, sc, Math.min(0.05, dt || 0.016));
   // overlays: hp bars, bubbles, texts
   for (const b of sc.B) {
@@ -2148,7 +2172,7 @@ function drawHero3D(c, sc, u, wx, wy) {
 const HPORT = {};
 function heroPortrait(k) { if (HPORT[k]) return HPORT[k]; need3d(k); const sp = G3.models[k] && G3.models[k].ready ? g3sprite(k, 140, 0.5, 0) : null; if (!sp) return ''; const cv2 = document.createElement('canvas'); cv2.width = 120; cv2.height = 148; const s = Math.min(140 / sp.h, 116 / sp.w); cv2.getContext('2d').drawImage(sp.cv, (120 - sp.w * s) / 2, 148 - sp.h * s, sp.w * s, sp.h * s); return HPORT[k] = cv2.toDataURL(); }
 function drawUnit(c, sc, u) {
-  const [wx, wy] = W(u.x, u.y);
+  const [wx, wy] = W(u.x, u.y); if (u.k === 'carro') { if (!u.dead) drawCart(c, u, wx, wy); return; }
   if (u.d.beast) { if (!BATL_OK || !BFR[u.k]) return; const fight = !u.dead && u.atkT > 0.32 - u.d.cd; const [f, w, h] = animFrame(u.k, u.moving && !u.dead && !fight, u.phase * 1.4, fight ? 'atk' : null, fight ? (0.32 - u.atkT) / (u.d.cd / 4) : 0);
     let a = 1, rot = 0; if (u.dead) { a = Math.max(0, 1 - Math.max(0, u.deadT - 4) / 3); if (a <= 0) return; rot = Math.min(1, u.deadT / 0.4) * 1.4; }
     u.phase += (u.moving ? 1 : 0.15) * (1 / 60) * 6; const bob = u.moving && !u.dead ? Math.abs(Math.sin(u.phase * 2)) * 0.8 : 0; const lunge = 0;
@@ -2417,6 +2441,28 @@ function buildZone(sc) {
   sc.zoneCv = cvs;
 }
 
+// ================= BATTAGLIE 2: ordini, impatto, assedio nel villaggio del regno =================
+const ORDERS = { attack: [['free', '⚔', 'Libera', 'Ognuno attacca ciò che ha vicino'], ['towers', '🗼', 'Alle torri', 'La fanteria punta torri e baliste'], ['hero', '🛡', 'Con l\'eroe', 'Tutti seguono e proteggono l\'eroe']],
+  raid: [['guard', '🏰', 'In difesa', 'Ognuno difende il suo posto'], ['charge', '⚔', 'Carica', 'Tutti all\'assalto dei predoni'], ['hero', '🛡', 'Con l\'eroe', 'Tutti si stringono attorno all\'eroe']] };
+function renderOrders() { const el = $('#bord'); if (!el || !SC) return; const list = ORDERS[MODE === 'raid' ? 'raid' : 'attack']; const cur = SC.order || list[0][0];
+  el.innerHTML = list.map(([k, ic, n, d]) => `<button class="${cur === k ? 'on' : ''}" title="${d}" onclick="setOrder('${k}')"><span>${ic}</span>${n}</button>`).join(''); }
+function setOrder(k) { if (!SC) return; SC.order = k; sfx('horn'); const o = ORDERS[MODE === 'raid' ? 'raid' : 'attack'].find(x => x[0] === k); toast(`${o[1]} Ordine: ${o[3]}`); for (const u of SC.U) if (u.pl && !u.dead) { u.rt = 0; u.follow = null; if (k !== 'hero' && MODE === 'raid' && u.home0) u.post = { ...u.home0 }; } renderOrders(); }
+// --- impatto: scossa e macerie ---
+const SHAKE = { a: 0 };
+function shake(a) { SHAKE.a = Math.min(14, Math.max(SHAKE.a, a)); }
+function debris(sc, b) { const cols = BDEF[b.t].wall ? ['#7d7468', '#5c5248', '#8b6b47'] : ['#6b4e2e', '#8a6a42', '#7d7468', '#3e2c1a', '#a08356'];
+  for (let i = 0; i < 26; i++) { const a = Math.random() * 6.283, v = 0.6 + Math.random() * 1.8; sc.FX.push({ k: 'deb', x: b.x + b.w / 2 + (Math.random() - .5) * b.w * 0.6, y: b.y + b.h / 2 + (Math.random() - .5) * b.h * 0.6, z: 10 + Math.random() * 30, vx: Math.cos(a) * v, vy: Math.sin(a) * v, vz: 40 + Math.random() * 70, s: 2 + Math.random() * 4, rot: Math.random() * 6, col: cols[(Math.random() * cols.length) | 0], t: 0, dur: 1.6 + Math.random() * 0.8 }); } }
+function debrisUpd(f, dt) { if (f.z > 0) { f.x += f.vx * dt; f.y += f.vy * dt; f.vz -= 220 * dt; f.z += f.vz * dt; f.rot += dt * 9; if (f.z <= 0) { f.z = 0; f.vx *= 0.2; f.vy *= 0.2; } } }
+// --- assedio dentro il villaggio di un regno visitato ---
+function genRealmSiege(tg) {
+  const r = realms()[tg.rid]; const sc = buildRealmScene(r); sc.mode = 'attack'; sc.U = []; sc.realmSiege = true;
+  for (const b of sc.B) { b.hp = Math.round(b.hp * DF().ehp); b.maxhp = b.hp; }
+  const d = tg.d; const pool = lootPool(d); const wt = b => ({ mastio: 3, bottino: 3, granaio: 2, fattoria: 1, torre: 0.3, balista: 0.4, casa: 1.2, taverna: 2, mercato: 2.5, municipio: 3, chiesa: 1.5, scuderia: 1.2, miniera: 1.5, fucina: 1.5, armeria: 1.5, infermeria: 1, capanna: 1.2, tesoreria: 3, cava: 1.5 })[b.t] || 0;
+  const tot = sc.B.reduce((s, b) => s + wt(b), 0) || 1; for (const b of sc.B) { const w = wt(b); for (const k in pool) b.loot[k] = Math.round(pool[k] * w / tot); }
+  const m = sc.B.find(b => b.t === 'mastio'); const roster = ENEMY_UNITS.slice(0, Math.min(ENEMY_UNITS.length, 2 + Math.floor(d / 1.5))); const nD = Math.max(2, Math.round((3 + d * 1.3) * DF().def)); const R = rng(r.seed + 5);
+  for (let i = 0, tries = 0; i < nD && tries < 200; tries++) { const a = R() * 6.28, rr = 2 + R() * 7; const x = m.x + 1.5 + Math.cos(a) * rr, y = m.y + 1.5 + Math.sin(a) * rr; if (!inMap(x | 0, y | 0) || bAt(sc, x | 0, y | 0) || isWater(sc, x | 0, y | 0)) continue; const u = mkUnit(roster[(R() * roster.length) | 0], 'D', x, y); u.guardR = 4.5; u.leash = 9; u.hp *= DF().ehp; u.maxhp *= DF().ehp; u.dm = DF().edmg; sc.U.push(u); i++; }
+  sc.countable = sc.B.filter(b => !BDEF[b.t].wall && !BDEF[b.t].decor).length; return sc;
+}
 // ---------- battle flow ----------
 let BT = null; // battle meta
 function startAttack(i) {
@@ -2424,7 +2470,7 @@ function startAttack(i) {
   const total = Object.values(S.army).reduce((a, b) => a + b, 0); const heroes = heroList();
   if (!total && !heroes.length) { toast('Non hai truppe! Addestra prima un esercito.'); return; }
   closeSheet(); sfx('horn'); tensionStart('attack');
-  closeFolk(); SC = genEnemy(tg); MODE = 'attack'; buildZone(SC); SC.arms = armsMult();
+  closeFolk(); SC = tg.rid != null ? genRealmSiege(tg) : genEnemy(tg); MODE = 'attack'; buildZone(SC); SC.arms = armsMult();
   BT = { tg, idx: i, avail: { ...S.army }, used: {}, heroes: heroes.map(k => ({ k, u: null })), timer: 210, started: false, lootGot: {}, mastioDown: false, ended: false };
   SC.onBDead = b => { for (const k in b.loot) { BT.lootGot[k] = (BT.lootGot[k] || 0) + b.loot[k]; } if (b.t === 'mastio') BT.mastioDown = true; buildZone(SC); const [x, y] = [b.x + b.w / 2, b.y + b.h / 2]; const s = Object.entries(b.loot).filter(e => e[1] > 0).map(e => `+${e[1]}${RICON[e[0]]}`).join(' '); if (s) floatText(SC, x, y, s, '#ffe9a6', 1.6); };
   SC.onRevive = u => { if (!u.hero) BT.used[u.k] = BT.used[u.k]; };
@@ -2443,7 +2489,7 @@ function startRaid() {
   // defenders = army
   const m = sc.B.find(b => b.t === 'mastio'); const cas = sc.B.filter(b => b.t === 'caserma' || b.t === 'mastio');
   let i = 0;
-  for (const k of UNIT_ORDER) for (let n = 0; n < (S.army[k] || 0); n++) { if (i > 45) break; const home = cas[i % cas.length]; const [fx, fy] = frontTile(sc, home); const u = mkUnit(k, 'D', fx + 0.5 + (Math.random() - .5) * 1.5, fy + 0.5 + (Math.random() - .5) * 1.5); if (bAt(sc, Math.floor(u.x), Math.floor(u.y))) { u.x = fx + 0.5; u.y = fy + 0.5; } u.post = { x: u.x, y: u.y }; u.guardR = 7; u.leash = 13; u.pl = true; unitBonus(u); recApply(u, vets(k)[n]); sc.U.push(u); i++; }
+  for (const k of UNIT_ORDER) for (let n = 0; n < (S.army[k] || 0); n++) { if (i > 45) break; const home = cas[i % cas.length]; const [fx, fy] = frontTile(sc, home); const u = mkUnit(k, 'D', fx + 0.5 + (Math.random() - .5) * 1.5, fy + 0.5 + (Math.random() - .5) * 1.5); if (bAt(sc, Math.floor(u.x), Math.floor(u.y))) { u.x = fx + 0.5; u.y = fy + 0.5; } u.post = { x: u.x, y: u.y }; u.guardR = 7; u.leash = 13; u.pl = true; u.home0 = { ...u.post }; unitBonus(u); recApply(u, vets(k)[n]); sc.U.push(u); i++; }
   { const al = allyReinforcements(); const m0 = sc.B.find(b => b.t === 'mastio'); if (al.length && m0) { let j = 0; for (const k of al) { const [fx, fy] = frontTile(sc, m0); const u = mkUnit(k, 'D', fx + 0.5 + (Math.random() - .5) * 3, fy + 0.5 + (Math.random() - .5) * 3); if (bAt(sc, Math.floor(u.x), Math.floor(u.y))) { u.x = fx + 0.5; u.y = fy + 0.5; } u.post = { x: u.x, y: u.y }; u.guardR = 8; u.leash = 14; u.ally = true; sc.U.push(u); j++; } setTimeout(() => toast(`🤝 Gli alleati mandano ${j} uomini in tuo aiuto`), 1500); } }
   const lv = S.mastio; const pool = ['miliziano', 'arccorto', 'miliziano']; if (lv >= 2) pool.push('scudata'); if (lv >= 3) pool.push('picchiere', 'arccorto'); if (lv >= 4) pool.push('balestriere'); if (lv >= 5) pool.push('berserker', 'scudata'); if (lv >= 6) pool.push('uomoarme');
   const pack = S.raids >= 2 && Math.random() < 0.3; if (pack) { pool.length = 0; pool.push('lupo', 'lupo', 'lupo'); if (lv >= 2) pool.push('orso'); } else { pool.push('lupo'); if (lv >= 3) pool.push('orso'); }
@@ -2506,12 +2552,13 @@ function endBattle() {
   BT.ended = true; SC.deploySel = null; tensionStop();
   const dead = {}; for (const u of SC.U) if (u.dead && !u.hero && !u.ally && (u.side === (MODE === 'raid' ? 'D' : 'A'))) dead[u.k] = (dead[u.k] || 0) + 1;
   const cp = curePct(); const cured = {}; let curedN = 0; for (const k in dead) { cured[k] = Math.floor(dead[k] * cp + (Math.random() < (dead[k] * cp) % 1 ? 1 : 0)); curedN += cured[k]; dead[k] -= cured[k]; if (!dead[k]) delete dead[k]; }
+  const fallen = [];
   { const side = MODE === 'raid' ? 'D' : 'A'; const left = Object.assign({}, dead); let ups = 0;
     for (const u of SC.U) if (u.rec && u.hero && u.side === side) { if (recGainXP(u.rec, u.dead ? 20 : 50)) ups++; continue; }
-    for (const u of SC.U) if (u.rec && !u.hero && u.side === side) { if (u.dead && left[u.k] > 0) { left[u.k]--; u.rec.dead = true; } else if (recGainXP(u.rec, u.dead ? 15 : 35)) ups++; }
+    for (const u of SC.U) if (u.rec && !u.hero && u.side === side) { if (u.dead && left[u.k] > 0) { left[u.k]--; u.rec.dead = true; if (u.rec.lvl >= 2 || u.rec.tr) { (S.crypt = S.crypt || []).unshift({ nm: u.rec.nm, k: u.k, lvl: u.rec.lvl, tr: u.rec.tr || null, t: now(), w: MODE === 'raid' ? 'difendendo il feudo' : (BT.tg ? 'all\'assedio di ' + BT.tg.name : 'in battaglia') }); S.crypt = S.crypt.slice(0, 60); fallen.push(u.rec); } } else if (recGainXP(u.rec, u.dead ? 15 : 35)) ups++; }
     BT.vetUps = ups; }
   for (const k in dead) S.army[k] = Math.max(0, (S.army[k] || 0) - dead[k]);
-  const cureLine = ((curedN ? `<div class="row"><b>✚ Curati dall'Infermeria:</b> ${curedN}</div>` : '') + (BT.vetUps ? `<div class="row"><b>⬆ Veterani:</b> ${BT.vetUps} soldati salgono di livello</div>` : ''));
+  const cureLine = ((curedN ? `<div class="row"><b>✚ Curati dall'Infermeria:</b> ${curedN}</div>` : '') + (BT.vetUps ? `<div class="row"><b>⬆ Veterani:</b> ${BT.vetUps} soldati salgono di livello</div>` : '') + (fallen.length ? `<div class="row fallen"><b>✝ Caduti con onore:</b> ${fallen.map(r => `${r.nm} (liv. ${r.lvl}${r.tr ? ', ' + TRAITS[r.tr].n : ''})`).join(', ')}${hasB('cripta') ? ' — i loro nomi riposano nella Cripta' : ''}</div>` : ''));
   let html = '';
   if (MODE === 'attack') {
     const st = BT.stars; const got = {};
@@ -2685,22 +2732,34 @@ function heroRec(k) { S.hrec = S.hrec || {}; let r = S.hrec[k]; if (!r) { r = S.
 function workRec(bid, k) { S.wrk = S.wrk || {}; let r = S.wrk[bid]; if (!r || r.k !== k) r = S.wrk[bid] = newRec(k); return r; }
 function workMult(r) { const w = S && S.wrk && S.wrk[r.id]; return w ? 1 + 0.08 * (w.lvl - 1) + 0.06 * (w.abi || 0) : 1; }
 // effetti in battaglia
+// ---- tratti dei veterani (dal livello 3) ----
+const TRAITS = {
+  furia: { n: 'Furia del Nord', ic: '🔥', d: '+20% danno' }, scudo: { n: 'Scudo di Quercia', ic: '🛡', d: '-15% danno subito' },
+  duro: { n: 'Duro a Morire', ic: '💀', d: 'sopravvive al primo colpo mortale' }, lesto: { n: 'Piè Veloce', ic: '🏃', d: '+20% velocità' },
+  gigante: { n: 'Gigante', ic: '🪨', d: '+25% vita, -10% velocità' }, cento: { n: 'Cento Battaglie', ic: '⚔', d: '+10% a tutto' },
+  occhio: { n: 'Occhio di Falco', ic: '🦅', d: '+25% danno a distanza' }, codardo: { n: 'Codardo', ic: '🐇', d: '-15% danno, +25% velocità' },
+};
+function giveTrait(rec) { if (rec.tr || !UDEF[rec.k] || rec.lvl < 3) return; const pool = Object.keys(TRAITS).filter(k => k !== 'occhio' || UDEF[rec.k].ranged); const R = rng(rec.id * 131 + 7); rec.tr = pool[(R() * pool.length) | 0]; const T = TRAITS[rec.tr]; setTimeout(() => toast(`${T.ic} ${rec.nm} si è guadagnato un soprannome di guerra: «${T.n}» (${T.d})`), 900); }
+function cryptHTML() { const L = S.crypt || []; return `<div class="crypt"><b>⚱️ ${L.length ? L.length + ' eroi custoditi · +' + Math.round(cryptBonus() * 100) + '% vita alle truppe' : 'Nessun eroe ancora: i veterani caduti verranno sepolti qui'}</b>${L.slice(0, 20).map(x => `<div><span>✝ ${x.nm}</span><small>${UDEF[x.k] ? UDEF[x.k].n : x.k} · liv. ${x.lvl}${x.tr ? ' · ' + TRAITS[x.tr].ic + ' ' + TRAITS[x.tr].n : ''} · caduto ${x.w}</small></div>`).join('')}</div>`; }
+function cryptBonus() { return S && hasB('cripta') ? Math.min(0.15, 0.01 * (S.crypt || []).length) : 0; }
 function recApply(u, rec) {
   if (!rec) return; u.rec = rec; const L = 1 + 0.03 * (rec.lvl - 1);
   const hm = L * (1 + 0.12 * rec.vit); u.maxhp *= hm; u.hp *= hm;
   u.dm = (u.dm || 1) * L * (1 + 0.12 * rec.str); u.df = Math.max(0.55, 1 - 0.06 * rec.def);
+  const t = rec.tr; if (t === 'furia') u.dm *= 1.2; else if (t === 'scudo') u.df *= 0.85; else if (t === 'lesto') u.sm = (u.sm || 1) * 1.2; else if (t === 'gigante') { u.maxhp *= 1.25; u.hp *= 1.25; u.sm = (u.sm || 1) * 0.9; } else if (t === 'cento') { u.dm *= 1.1; u.maxhp *= 1.1; u.hp *= 1.1; } else if (t === 'occhio' && u.d.ranged) u.dm *= 1.25; else if (t === 'codardo') { u.dm *= 0.85; u.sm = (u.sm || 1) * 1.25; }
+  if (t === 'duro') u.duro = 1;
 }
 function recGainXP(rec, v) {
   if (!rec || rec.lvl >= FOLK_MAX()) { if (rec) rec.xp = Math.min(rec.xp + v, xpNeed(rec.lvl)); return false; }
   rec.xp += v; let up = false;
-  while (rec.lvl < FOLK_MAX() && rec.xp >= xpNeed(rec.lvl)) { rec.xp -= xpNeed(rec.lvl); rec.lvl++; rec.pts++; up = true; }
+  while (rec.lvl < FOLK_MAX() && rec.xp >= xpNeed(rec.lvl)) { rec.xp -= xpNeed(rec.lvl); rec.lvl++; rec.pts++; up = true; } if (up) giveTrait(rec);
   return up;
 }
 function trainCost(rec) { const l = rec.lvl; if (HDEF[rec.k]) return { cibo: 40 + l * 25, oro: 30 + l * 25 }; return UDEF[rec.k] ? { cibo: 20 + l * 15, oro: 10 + l * 12 } : { cibo: 15 + l * 12, oro: 5 + l * 8 }; }
 // selezione sulla mappa
 function pickFolk(sx, sy, tx, ty) {
   if (!SC || MODE !== 'village') return null; const wx = (sx - VW / 2) / cam.z + cam.x, wy = (sy - VH / 2) / cam.z + cam.y; let best = null, bd = 1e9;
-  for (const u of SC.U) { if (u.dead || u.side !== 'V') continue; const [bx, by] = W(u.x, u.y); const tall = u.d && u.d.model ? 34 : 26; const dx = wx - bx, dy = wy - (by - (tall === 34 ? 28 : 20)); if (Math.abs(dx) < 16 && Math.abs(dy) < tall) { const d = dx * dx + dy * dy; if (d < bd) { bd = d; best = u; } } }
+  for (const u of SC.U) { if (u.dead || u.side !== 'V' || u.k === 'carro') continue; const [bx, by] = W(u.x, u.y); const tall = u.d && u.d.model ? 34 : 26; const dx = wx - bx, dy = wy - (by - (tall === 34 ? 28 : 20)); if (Math.abs(dx) < 16 && Math.abs(dy) < tall) { const d = dx * dx + dy * dy; if (d < bd) { bd = d; best = u; } } }
   return best;
 }
 function folkOf(u) {
@@ -2732,7 +2791,7 @@ function openFolk(u) {
   let el = $('#fcard'); if (!el) { el = document.createElement('div'); el.id = 'fcard'; document.body.appendChild(el); } el.classList.toggle('hero', hero);
   el.innerHTML = `<button class="fx" onclick="closeFolk()">✕</button>
     <div class="ftop"><div class="fpor" style="${hero ? thumbStyle(u.k) : thumbAt(u.k, 74)}"></div>
-      <div class="fid"><div class="fnm">${rec.nm}</div><div class="frl">${hero ? 'Eroe · ' + role.title.split(',')[0] : role.n}</div><div class="fds">${desc}</div></div>
+      <div class="fid"><div class="fnm">${rec.nm}${rec.tr ? ` <span class="ftr2" title="${TRAITS[rec.tr].d}">${TRAITS[rec.tr].ic} ${TRAITS[rec.tr].n}</span>` : ''}</div><div class="frl">${hero ? 'Eroe · ' + role.title.split(',')[0] : role.n}</div><div class="fds">${desc}</div></div>
       <div class="flv"><small>LIV</small><b>${rec.lvl}</b><small>/${mx}</small></div></div>
     <div class="fxp" title="Esperienza"><i style="width:${maxed ? 100 : Math.min(100, rec.xp / need * 100)}%"></i><span>${maxed ? (rec.lvl >= 10 ? 'Livello massimo' : 'Max per ora · sali di Mastio') : `Esp. ${rec.xp}/${need}`}${rec.pts ? ` · <b>${rec.pts} punt${rec.pts > 1 ? 'i' : 'o'}!</b>` : ''}</span></div>
     <div class="fsts">${st.map(([k, ic, n, v]) => { const cap = 5 + Math.floor(rec.lvl / 3), up = rec.pts && (rec[k] || 0) < cap; return `<div class="fst ${up ? 'up' : ''}" ${up ? `onclick="folkPoint('${k}')"` : ''}><span class="i">${ic}</span><b>${v}</b><small>${n}${rec[k] ? ' ' + '•'.repeat(rec[k]) : ''}</small>${up ? '<em>+1</em>' : ''}</div>`; }).join('')}</div>
@@ -2878,12 +2937,12 @@ function drawWeather(c, sc, dt) {
 function compassAngle() { const v = rotV(-1, -1); const sx = (v[0] - v[1]) * 32, sy = (v[0] + v[1]) * 16; return Math.atan2(sx, -sy); }
 function updateWxWidget() {
   let el = $('#wxw'); if (!el) return; if (!S || MODE !== 'village') { el.classList.add('hidden'); return; } el.classList.remove('hidden');
-  const si = seasonInfo(), w = S.wx || { k: 'sereno', ws: 0.2 }; const [ic, nm] = WXN[w.k];
+  const si = seasonInfo(), w = S.wx || { k: 'sereno', ws: 0.2 }; let [ic, nm] = WXN[w.k]; if (w.k === 'sereno' && dayInfo().night > 0.5) { ic = '🌙'; nm = 'Notte serena'; }
   const ang = compassAngle() * 180 / Math.PI; const wv = rotV(Math.cos(w.wa || 0), Math.sin(w.wa || 0)); const wa = Math.atan2(wv[0] - wv[1], -(wv[0] + wv[1]) / 2) * 180 / Math.PI;
-  const key = si.i + '|' + w.k + '|' + Math.round(ang) + '|' + Math.round(wa / 5) + '|' + Math.floor(si.left / 10000);
+  const key = dayInfo().n + '|' + si.i + '|' + w.k + '|' + Math.round(ang) + '|' + Math.round(wa / 5) + '|' + Math.floor(si.left / 10000);
   if (el.dataset.k === key) return; el.dataset.k = key;
   const mm = Math.floor(si.left / 60000), ss = Math.floor(si.left / 1000) % 60;
-  el.innerHTML = `<div class="wxp"><span class="wi">${ic}</span><div class="wt"><b>${nm}</b><small>${si.s.ic} ${si.s.n} · ${mm}:${String(ss).padStart(2, '0')}</small></div></div>
+  el.innerHTML = `<div class="wxp"><span class="wi">${ic}</span><div class="wt"><b>${nm}</b><small>${dayInfo().ic} ${dayInfo().n} · ${si.s.ic} ${si.s.n}</small></div></div>
     <div class="cmp"><svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="29" class="r1"/><circle cx="32" cy="32" r="24" class="r2"/>
       <g transform="rotate(${ang.toFixed(1)} 32 32)">${['N', 'E', 'S', 'O'].map((l, i) => `<text x="32" y="15" transform="rotate(${i * 90} 32 32)" class="${l === 'N' ? 'n' : ''}">${l}</text>`).join('')}
       <path d="M32 12 37 32 32 30 27 32z" class="nd"/><path d="M32 52 37 32 32 34 27 32z" class="sd"/></g>
@@ -3096,6 +3155,7 @@ function openMenu(tab) {
   else if (tab === 'diff') body = `<div class="dif">${diffCards(`openMenu('diff')`)}</div>`;
   else body = `<div class="mlist">
     <button class="btn ghost" onclick="openHelp()">${ICO('scroll')} Come si gioca · missioni</button>
+    ${S && !S.creative && !S.sandbox ? `<button class="btn ghost" onclick="closeSheet();tutStart()">🕯️ Rifai la guida passo passo</button>` : ''}
     <button class="btn ghost" onclick="save();saveCode()">📋 Copia codice partita<small>salvalo in Note: con Importa la riprendi ovunque</small></button>
     <button class="btn ghost" onclick="save();cloudPush(true);toast(CLOUD.ready ? '💾 Partita salvata anche nel cloud' : '💾 Partita salvata su questo browser')">💾 Salva ora</button>
     ${S && !S.creative && !S.sandbox ? `<button class="btn ghost" onclick="openDiary()">📈 Diario del ritmo<small>quanto dura davvero ogni traguardo</small></button>` : ''}
@@ -3120,7 +3180,7 @@ function openBuild() {
 }
 function openBuildingInfo(r) {
   const d = BDEF[r.t]; const why = canUp(r); const res = resOf(r);
-  let body = `<p class="desc">${d.desc}</p><div class="stats">`;
+  let body = `<p class="desc">${d.desc}</p>${r.t === 'cripta' ? cryptHTML() : ''}<div class="stats">`;
   body += `<span>Livello <b>${r.lvl}</b>${r.end ? ` → ${r.toLvl}` : ''}</span><span>Vita <b>${Math.round(d.hp * (1 + 0.35 * (r.lvl - 1)))}</b></span>`;
   if (res) body += `<span>${ICO(res)} <b>${rateOf(r) < 1 ? rateOf(r).toFixed(1) : Math.round(rateOf(r))}</b>/min</span><span>In deposito <b>${Math.floor(r.stock || 0)}</b>/${stockCap(r)}</span>`;
   if (d.store) body += `<span>Capienza ${Object.keys(d.store).map(k => ICO(k) + ' +' + d.store[k] * r.lvl).join(' ')}</span>`;
@@ -3336,6 +3396,91 @@ function visitTap(sx, sy) {
   const [tx, ty] = screenToTile(sx, sy); const b = bAt(SC, Math.floor(tx), Math.floor(ty)); if (!b) return;
   const d = BDEF[b.t]; toast(`${d.icon || '🏠'} ${b.t === 'mastio' ? (b.lvl >= 5 ? 'Castello' : 'Mastio') : d.n}${d.decor || d.wall ? '' : ' · livello ' + b.lvl}`);
 }
+// ================= GUIDA DEI PRIMI 10 MINUTI: il Siniscalco ti accompagna passo passo =================
+const TUT = [
+  { t: 'Benvenuto, mio signore', x: 'Sono il vostro Siniscalco. Questo è il Mastio di legno che vostro padre vi ha lasciato. Vi mostro come far crescere il feudo: ci vorrà qualche minuto.', next: 'Cominciamo' },
+  { t: 'Raccogli le monete', x: 'Le botteghe producono da sole. Quando sopra un edificio compare un\'icona, toccala per raccogliere. Tocca la moneta sopra il Mastio.', world: () => { const b = SC.B.find(b => b.t === 'mastio'); return b && [b.x + b.w / 2, b.y + b.h / 2, 110]; }, done: () => (S.collects || 0) > 0, prep: () => { const m = S.buildings.find(b => b.t === 'mastio'); if (m) m.stock = Math.max(m.stock || 0, 40); } },
+  { t: 'Costruisci la Taverna', x: 'La Taverna dà cibo al borgo ed è la vostra prima missione. Tocca «Costruisci», scegli la Taverna e posizionala dove preferite.', el: () => $('#hud-bot .hb'), done: () => (placing && placing.t === 'taverna') || S.buildings.some(b => b.t === 'taverna') },
+  { t: 'Conferma il posto', x: 'Spostala col dito o con le frecce, poi tocca ✓ per far partire i lavori. I mastri d\'opera ci metteranno un minuto.', el: () => placing && $('#placebar .pbtn.ok'), skipIf: () => S.buildings.some(b => b.t === 'taverna'), done: () => S.buildings.some(b => b.t === 'taverna') },
+  { t: 'Addestra i soldati', x: 'Di notte arrivano i predoni. Tocca «Esercito» e addestra qualche Miliziano: costano solo cibo.', el: () => $('#hud-bot .hb:nth-child(2)'), done: () => S.queue.length > 0 || (S.tutArmy != null && Object.values(S.army).reduce((a, b) => a + b, 0) > S.tutArmy), prep: () => { S.tutArmy = Object.values(S.army).reduce((a, b) => a + b, 0); } },
+  { t: 'Conosci la tua gente', x: 'Ogni contadino e soldato ha un nome e può crescere. Tocca una persona che cammina per il villaggio.', world: () => { const u = SC.U.find(u => !u.dead && u.side === 'V' && u.home); return u && [u.x, u.y, 46]; }, done: () => !!(SC.folkU) },
+  { t: 'Il Promemoria', x: 'Quando non sapete cosa fare, toccate la pergamena: vi dico io cosa attende la vostra attenzione.', el: () => $('#memob'), done: () => $('#sheet').dataset.p === 'memo' },
+  { t: 'Le missioni', x: 'In alto c\'è la missione del capitolo. Quando è compiuta compare «Riscuoti»: la ricompensa vi aiuta a crescere. Finite la Taverna e riscuotetela.', el: () => $('#quest'), done: () => S.mq >= 1 },
+  { t: 'Il feudo è vostro', x: 'Ora sapete l\'essenziale. Dalla «Mappa» potrete assediare i vicini, trattare con i signori e commerciare. Che le campane suonino il vostro nome!', next: 'Al lavoro!' },
+];
+let TUT_SHOWN = -1;
+function tutActive() { return S && !S.creative && !S.sandbox && S.tut != null && S.tut >= 0 && S.tut < TUT.length; }
+function tutStart() { S.tut = 0; TUT_SHOWN = -1; }
+function tutSkip() { S.tut = -1; tutHide(); save(); toast('Guida chiusa: la trovi in Menu → Partita'); }
+function tutNext() { S.tut++; TUT_SHOWN = -1; sfx('click'); if (S.tut >= TUT.length) { S.tut = -1; tutHide(); } save(); }
+function tutHide() { const b = $('#tutb'), a = $('#tuta'); if (b) b.classList.add('hidden'); if (a) a.classList.add('hidden'); }
+function tutTick() {
+  if (!tutActive() || MODE !== 'village') { tutHide(); return; }
+  const st = TUT[S.tut]; if (st.skipIf && st.skipIf()) { tutNext(); return; }
+  if (st.done && st.done()) { sfx('coin'); tutNext(); return; }
+  const sheetOpen = !$('#sheet').classList.contains('hidden') && $('#sheet').dataset.p !== 'memo' && $('#sheet').dataset.p !== 'build' && $('#sheet').dataset.p !== 'army';
+  let b = $('#tutb'); if (!b) { b = document.createElement('div'); b.id = 'tutb'; document.body.appendChild(b); } let a = $('#tuta'); if (!a) { a = document.createElement('div'); a.id = 'tuta'; a.textContent = '👇'; document.body.appendChild(a); }
+  if (sheetOpen && !st.next && $('#sheet').dataset.p !== 'chapter') { b.classList.add('low'); } else b.classList.remove('low');
+  if ($('#sheet').dataset.p === 'chapter' || $('#sheet').dataset.p === 'event') { tutHide(); return; }
+  if (TUT_SHOWN !== S.tut) { TUT_SHOWN = S.tut; if (st.prep) st.prep(); b.innerHTML = `<div class="tav">🕯️</div><div class="ttx"><small>Guida · ${S.tut + 1}/${TUT.length}</small><b>${st.t}</b><p>${st.x}</p><div class="tbt">${st.next ? `<button class="btn" onclick="tutNext()">${st.next}</button>` : ''}<button class="btn ghost" onclick="tutSkip()">Salta guida</button></div></div>`; }
+  b.classList.remove('hidden'); b.classList.toggle('top', !!placing);
+  // freccia
+  let pt = null;
+  if (st.el) { const e = st.el(); if (e && e.offsetParent !== null) { const r = e.getBoundingClientRect(); pt = [r.left + r.width / 2, r.top]; } }
+  else if (st.world) { const w = st.world(); if (w) { const [px, py] = W(w[0], w[1]); pt = [(px - cam.x) * cam.z + VW / 2, (py - cam.y) * cam.z + VH / 2 - w[2] * cam.z]; } }
+  if (pt && pt[0] > 0 && pt[0] < VW && pt[1] > 0 && pt[1] < VH) { a.style.left = (pt[0] - 18) + 'px'; a.style.top = (pt[1] - 46) + 'px'; a.classList.remove('hidden'); } else a.classList.add('hidden');
+}
+// ================= VITA NEL VILLAGGIO: giorno e notte, carovane, suoni d'ambiente =================
+const DAY_MS = 24 * 60 * 1000; // una giornata = 24 minuti reali
+function dayInfo() { const t0 = (S && S.seasonEpoch) || 0; const p = (((now() - t0) % DAY_MS) + DAY_MS) % DAY_MS / DAY_MS; // 0=alba
+  const night = p < 0.06 ? 1 - p / 0.06 : p < 0.62 ? 0 : p < 0.7 ? (p - 0.62) / 0.08 : p < 0.94 ? 1 : 1 - (p - 0.94) / 0.06;
+  const ph = p < 0.08 ? ['🌅', 'Alba'] : p < 0.55 ? ['☀️', 'Giorno'] : p < 0.68 ? ['🌇', 'Tramonto'] : p < 0.94 ? ['🌙', 'Notte'] : ['🌅', 'Alba'];
+  const hour = Math.floor((6 + p * 24) % 24); return { p, night: Math.max(0, Math.min(1, night)), ic: ph[0], n: ph[1], hour, dusk: p > 0.55 && p < 0.7 }; }
+function drawDayNight(c, sc, z) {
+  if (sc.mode !== 'village' && sc.mode !== 'visit') return; const D = dayInfo(); const k = D.night;
+  c.save(); c.setTransform(1, 0, 0, 1, 0, 0);
+  if (D.dusk) { c.fillStyle = `rgba(255,120,40,${0.12 * Math.sin(Math.PI * (D.p - 0.55) / 0.15)})`; c.globalCompositeOperation = 'soft-light'; c.fillRect(0, 0, cv.width, cv.height); c.globalCompositeOperation = 'source-over'; }
+  if (k > 0.01) {
+    c.fillStyle = `rgba(12,20,45,${0.5 * k})`; c.fillRect(0, 0, cv.width, cv.height);
+    c.globalCompositeOperation = 'lighter'; c.setTransform(z, 0, 0, z, DPR * (VW / 2 - cam.x * cam.z), DPR * (VH / 2 - cam.y * cam.z));
+    for (const b of sc.B) { if (b.dead) continue; const d = BDEF[b.t]; if (d.wall || (d.decor && b.t !== 'falo')) continue; const [wx, wy] = W(b.x + b.w / 2, b.y + b.h / 2); const big = b.t === 'mastio' ? 1.6 : b.t === 'falo' ? 1.3 : 0.8 + b.w * 0.15; const fl = 0.88 + Math.sin(sc.time * (b.t === 'falo' ? 11 : 3) + b.id) * 0.07; const R0 = 70 * big * fl; const gr = c.createRadialGradient(wx, wy - 14, 2, wx, wy - 14, R0); gr.addColorStop(0, `rgba(255,175,80,${0.42 * k})`); gr.addColorStop(0.5, `rgba(255,140,50,${0.14 * k})`); gr.addColorStop(1, 'rgba(255,120,40,0)'); c.fillStyle = gr; c.beginPath(); c.arc(wx, wy - 14, R0, 0, 7); c.fill(); }
+    // lucciole d'estate e stelle
+    if (seasonInfo().s.k === 'estate') for (let i = 0; i < 18; i++) { const px = ((i * 977 + sc.time * 6 * (i % 3 + 1)) % VW), py = ((i * 613 + Math.sin(sc.time + i) * 30) % VH); const al = (0.5 + 0.5 * Math.sin(sc.time * 3 + i * 2)) * k; c.setTransform(1, 0, 0, 1, 0, 0); c.fillStyle = `rgba(220,255,140,${al * 0.8})`; c.beginPath(); c.arc(px * DPR, py * DPR, 1.8 * DPR, 0, 7); c.fill(); }
+  }
+  c.restore();
+}
+// --- carovane che arrivano lungo i sentieri ---
+function caravanSpawn(sc, label) {
+  if (!sc || sc.mode !== 'village') return; const dest = sc.B.find(b => b.t === 'mercato' && !b.dead) || sc.B.find(b => b.t === 'mastio'); if (!dest) return;
+  const [tx, ty] = frontTile(sc, dest); const edges = []; for (let i = 4; i < N - 4; i += 6) edges.push([i, 3], [i, N - 4], [3, i], [N - 4, i]);
+  const G = sc.pathG; let best = null, bd = 1e9; for (const [ex, ey] of edges) { if (isWater(sc, ex, ey) || bAt(sc, ex, ey)) continue; const d = Math.hypot(ex - tx, ey - ty) + Math.random() * 25; if (d < bd) { bd = d; best = [ex, ey]; } } if (!best) return;
+  const path = astar(best[0], best[1], (x, y) => x === tx && y === ty, villagerCost(sc), tx, ty, 9000); if (!path) return;
+  const u = mkUnit('miliziano', 'V', best[0] + 0.5, best[1] + 0.5); u.k = 'carro'; u.d = { spd: 0.9, hp: 1, cd: 1, rng: 0, model: 1 }; u.path = path; u.pi = 0; u.cart = label || 'Carovana di mercanti';
+  u.ai = (sc, u, dt) => { if (followPath(sc, u, dt)) { u.dead = true; u.deadT = 9; if (u.cart) floatText(sc, u.x, u.y, '🐴 ' + u.cart, '#ffe9a6', 1.6); } };
+  sc.U.push(u); return u;
+}
+function drawCart(c, u, wx, wy) {
+  if (!G3.models.bottino) need3d('bottino'); if (!G3.models.bottino || !G3.models.bottino.ready) { c.font = '22px serif'; c.textAlign = 'center'; c.fillText('🐴', wx, wy - 4); return true; }
+  const yaw = u.face === 'B' ? (u.flip ? 2.4 : 3.9) : (u.flip ? 0.75 : -0.75); const sp = g3sprite('bottino', 44, yaw, 0); if (!sp) return false;
+  const bob = Math.abs(Math.sin(u.phase * 6)) * 1.2; u.phase += 1 / 60;
+  c.fillStyle = 'rgba(0,0,0,0.25)'; c.beginPath(); c.ellipse(wx, wy, 18, 7, 0, 0, 7); c.fill(); c.drawImage(sp.cv, wx + sp.x0, wy + sp.y0 - bob, sp.w, sp.h); return true;
+}
+let CARAVAN_T = 90;
+function lifeTick(dt) { if (!S || MODE !== 'village' || S.creative) return; CARAVAN_T -= dt; if (CARAVAN_T <= 0) { CARAVAN_T = 150 + Math.random() * 150; if (dayInfo().night < 0.5 && SC.U.filter(u => u.k === 'carro' && !u.dead).length < 2) caravanSpawn(SC, ['Mercanti di stoffe', 'Carro del mugnaio', 'Pellegrini con un carro', 'Venditori di sale'][(Math.random() * 4) | 0]); } ambientTick(dt); }
+// --- suoni d'ambiente (sintetizzati, al volume degli effetti) ---
+const AMB = { t: 2, hammer: 1, bell: -1 };
+function ambientTick(dt) {
+  if (SET.mute || SET.fvol <= 0 || document.hidden || !AC || MODE !== 'village') return; const a = AC; const out = fxOut(a); const D = dayInfo(), si = seasonInfo().s.k, w = S.wx || { k: 'sereno' };
+  const blip = (f0, f1, dur, vol, type, delay) => { const t = a.currentTime + (delay || 0); const o = a.createOscillator(); o.type = type || 'sine'; o.frequency.setValueAtTime(f0, t); o.frequency.exponentialRampToValueAtTime(f1, t + dur); const g = a.createGain(); g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + dur * 0.15); g.gain.exponentialRampToValueAtTime(0.0001, t + dur); o.connect(g).connect(out); o.start(t); o.stop(t + dur + 0.05); };
+  AMB.t -= dt; if (AMB.t <= 0) {
+    AMB.t = 2.5 + Math.random() * 4;
+    if (D.night < 0.5 && w.k !== 'pioggia' && w.k !== 'temporale' && si !== 'inverno') { const n = 2 + ((Math.random() * 4) | 0), f = 2600 + Math.random() * 1800; for (let i = 0; i < n; i++) blip(f * (1 + Math.random() * 0.2), f * (0.75 + Math.random() * 0.5), 0.09 + Math.random() * 0.06, 0.035, 'sine', i * 0.12); }
+    else if (D.night >= 0.5 && si !== 'inverno') { for (let i = 0; i < 6; i++) blip(4300, 4200, 0.035, 0.012, 'square', i * 0.07); }
+    if (D.night >= 0.5 && Math.random() < 0.15) { blip(420, 380, 0.5, 0.03, 'sine'); blip(330, 300, 0.7, 0.03, 'sine', 0.55); } // gufo
+  }
+  AMB.hammer -= dt; if (AMB.hammer <= 0) { AMB.hammer = 1.1 + Math.random() * 1.5; if (S.buildings.some(b => b.end && !BDEF[b.t].wall && !BDEF[b.t].decor)) for (let i = 0; i < 2; i++) blip(900, 300, 0.06, 0.05, 'triangle', i * 0.32); }
+  const dawn = D.p < 0.02; if (dawn && AMB.bell !== Math.floor((now() - (S.seasonEpoch || 0)) / DAY_MS)) { AMB.bell = Math.floor((now() - (S.seasonEpoch || 0)) / DAY_MS); for (let i = 0; i < 3; i++) [1, 2.01, 2.76].forEach((m, j) => blip(330 * m, 330 * m, 2.2 - j * 0.4, 0.05 / (j + 1), 'sine', i * 1.4)); toast('🔔 Le campane suonano: è l\'alba'); }
+}
 // ================= MEMO: la pergamena delle cose da fare =================
 function memoItems() {
   if (!S || S.creative || MODE !== 'village') return []; const it = []; const add = (pri, ic, t, sub, act, lbl) => it.push({ pri, ic, t, sub, act, lbl });
@@ -3527,7 +3672,7 @@ function diploTick(dt) {
   }
   for (const f of feudi()) {
     const P = fPow(f);
-    if ((f.st === 'patto' || f.st === 'alleato') && f.next && t >= f.next) { f.next = t + CARAVAN_MS; const pool = ['cibo', 'legno', 'pietra', 'ferro']; const r = pool[(Math.random() * pool.length) | 0]; const g = { oro: 20 + 10 * P }; g[r] = (g[r] || 0) + 25 + 12 * P; const got = []; for (const k in g) { const v = addRes(k, g[k]); if (v) got.push(ICO(k) + '+' + v); } S.caravans = (S.caravans || 0) + 1; relAdd(f, 1); if (MODE === 'village') toast(`🐴 Carovana da ${fBase(f).name}: ${got.join(' ')}`); }
+    if ((f.st === 'patto' || f.st === 'alleato') && f.next && t >= f.next) { f.next = t + CARAVAN_MS; const pool = ['cibo', 'legno', 'pietra', 'ferro']; const r = pool[(Math.random() * pool.length) | 0]; const g = { oro: 20 + 10 * P }; g[r] = (g[r] || 0) + 25 + 12 * P; const got = []; for (const k in g) { const v = addRes(k, g[k]); if (v) got.push(ICO(k) + '+' + v); } S.caravans = (S.caravans || 0) + 1; relAdd(f, 1); if (MODE === 'village') caravanSpawn(SC, 'Carovana di ' + fBase(f).name); if (MODE === 'village') toast(`🐴 Carovana da ${fBase(f).name}: ${got.join(' ')}`); }
     if (f.st === 'vassallo' && f.next && t >= f.next) { f.next = t + TRIBUTE_MS; const g = { oro: 40 + 20 * P, cibo: 30 + 15 * P }; const got = []; for (const k in g) { const v = addRes(k, g[k]); if (v) got.push(ICO(k) + '+' + v); } if (MODE === 'village') toast(`👑 Tributo da ${fBase(f).name}: ${got.join(' ')}`); }
     if (f.st === 'neutrale' && Math.random() < 0.0005) relAdd(f, f.rel > 0 ? -1 : 1); // i rapporti tornano piano verso il neutro
   }
@@ -3683,7 +3828,7 @@ function questHTML() {
 function claimQuest() { const q = QUESTS[S.mq]; if (!q || !q.c()) return; for (const k in q.r) addRes(k, q.r[k]); const chDone = !QUESTS[S.mq + 1] || QUESTS[S.mq + 1].ch !== q.ch; S.mq++; if (chDone) { const C = CHAPTERS[q.ch]; for (const k in C.r) addRes(k, C.r[k]); setTimeout(() => toast(`🏆 Capitolo ${C.n} «${C.t}» completato! ${Object.keys(C.r).map(k => ICO(k) + ' +' + C.r[k]).join(' ')}`), 1800); } sfx('coin'); toast(`📜 Missione compiuta! ${Object.keys(q.r).map(k => ICO(k) + ' +' + q.r[k]).join(' ')}`); save(); updateHUD(); }
 
 // ---------- battle HUD ----------
-function showBattleHUD() { $('#hud').classList.add('hidden'); $('#bhud').classList.remove('hidden'); $('#placebar').classList.add('hidden'); updateBattleHUD(true); }
+function showBattleHUD() { $('#hud').classList.add('hidden'); $('#bhud').classList.remove('hidden'); $('#placebar').classList.add('hidden'); if (SC) SC.order = MODE === 'raid' ? 'guard' : 'free'; renderOrders(); updateBattleHUD(true); }
 let lastCards = '';
 function updateBattleHUD(force) {
   if (!BT) return;
@@ -3772,7 +3917,7 @@ function beginGame(fresh, preset) {
   refreshTargets(false);
   questMigrate(); MODE = 'village'; SC = buildVillage(); prefetchEra(); centerCam(MCX, MCX); cam.z = VW < 600 ? 0.9 : Math.max(0.6, Math.min(1.15, VW / 1000));
   $('#hud').classList.remove('hidden'); $('#rotbar').classList.remove('hidden'); updateHUD();
-  if (fresh) setTimeout(openHelp, 400);
+  if (fresh && !S.creative && !S.sandbox) tutStart();
 }
 
 // ---------- main loop ----------
@@ -3782,7 +3927,7 @@ function frame(t) {
   if (!S && MODE === 'visit' && SC) { rotTick(dt); updateScene(SC, dt); }
   if (S && MODE !== 'title') {
     economy(dt);
-    rotTick(dt); if (MODE === 'village' && S) { faunaTick(dt); campaignTick(dt); }
+    rotTick(dt); if (MODE === 'village' && S) { faunaTick(dt); campaignTick(dt); lifeTick(dt); }
     if (SC) updateScene(SC, dt);
     if (MODE === 'attack' || MODE === 'raid') battleTick(dt);
     hudT -= dt; if (hudT <= 0 && MODE === 'village') { hudT = 0.5; updateHUD(); if ($('#sheet').dataset.p && $('#sheet').dataset.p.startsWith('b:')) { const r = S.buildings.find(b => b.id === +$('#sheet').dataset.p.slice(2)); if (r && r.end) openBuildingInfo(r); } }
@@ -3794,7 +3939,7 @@ function frame(t) {
       S.nightIn = DF().night * seasonRaidMul(); { const rv = realms().filter(r => Math.abs(r.lvl - S.mastio) <= 2); const who = rv.length && Math.random() < 0.5 ? rv[(Math.random() * rv.length) | 0] : null; toast(who ? `🌙 Cala la notte: i predoni di ${who.user} ${who.ic} attaccano!` : '🌙 Cala la notte. Le campane della torre…'); } setTimeout(() => { if (MODE === 'village') startRaid(); }, 2500);
     }
   }
-  if (SC) { render(SC, dt); updateWxWidget(); memoTick(dt); } else { ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.fillStyle = '#1c150e'; ctx.fillRect(0, 0, cv.width, cv.height); }
+  if (SC) { render(SC, dt); updateWxWidget(); memoTick(dt); tutTick(); } else { ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.fillStyle = '#1c150e'; ctx.fillRect(0, 0, cv.width, cv.height); }
   requestAnimationFrame(frame);
 }
 window.addEventListener('resize', resize);

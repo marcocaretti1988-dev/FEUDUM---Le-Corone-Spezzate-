@@ -415,6 +415,20 @@ html[data-theme=pietra] #askd .ab{background:linear-gradient(180deg,#30353a,#222
 #tbtns .btn.cont{background:linear-gradient(180deg,#5c3a25,#3a2414);display:flex;flex-direction:column;align-items:center}#tbtns .btn.cont small{font-family:var(--fb);font-size:11px;opacity:.85;text-transform:none;letter-spacing:0}#tbtns .btn.cont.dis{opacity:.5}
 .cloudst{font-size:11px;opacity:.75;text-align:center;margin:-2px 0 2px}
 #tbtns .savex{display:flex;gap:6px;justify-content:center}#tbtns .savex .btn{font-size:11.5px;padding:6px 10px}
+#bord{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(var(--sab) + 132px);z-index:16;display:flex;gap:6px;pointer-events:auto}
+#bord button{display:flex;align-items:center;gap:4px;padding:6px 10px;border-radius:18px;border:1px solid #6b5338;background:rgba(28,20,12,.82);color:#f5e6c4;font-family:var(--fh);font-weight:700;font-size:11.5px;box-shadow:0 2px 6px rgba(0,0,0,.45)}
+#bord button span{font-size:15px}#bord button.on{background:linear-gradient(180deg,#b3201f,#7a1414);border-color:#ffd27a;color:#fff}
+#bhud.hidden~#bord,#bhud.hidden #bord{display:none}
+.crypt{margin:6px 0 10px;padding:8px 10px;border-radius:10px;background:rgba(40,30,20,.08);border:1px solid rgba(0,0,0,.15);font-size:12px;max-height:220px;overflow:auto}.crypt>b{display:block;margin-bottom:4px}.crypt div{display:flex;flex-direction:column;padding:3px 0;border-top:1px dashed rgba(0,0,0,.12)}.crypt span{font-family:var(--fh);font-weight:700}.crypt small{opacity:.75;font-size:10.5px}
+.row.fallen{color:#5a1a12}#fcard .ftr2{display:inline-block;font-family:var(--fb);font-size:10px;font-weight:700;padding:1px 6px;border-radius:8px;background:#5c3a25;color:#ffe9b8;vertical-align:2px}
+#tutb{position:fixed;left:8px;right:8px;bottom:calc(var(--sab) + 92px);z-index:35;display:flex;gap:10px;align-items:flex-start;max-width:460px;margin:0 auto;padding:10px 12px;border-radius:14px;background:linear-gradient(180deg,#f8eed4,#e6d1a2);border:2px solid #5c3a25;box-shadow:0 8px 24px rgba(0,0,0,.55);color:var(--ink);animation:fpop .2s ease-out}
+#tutb.low{opacity:.25;pointer-events:none}
+#tutb .tav{font-size:30px;flex:0 0 auto;width:44px;height:44px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#4a3420,#1f150c);display:flex;align-items:center;justify-content:center;border:2px solid #d9b25a}
+#tutb .ttx{flex:1;min-width:0}#tutb small{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--crim);font-weight:800}#tutb b{display:block;font-family:var(--fh);font-size:15px;margin:1px 0 3px}#tutb p{margin:0 0 7px;font-size:13px;line-height:1.35}
+#tutb .tbt{display:flex;gap:6px;justify-content:flex-end}#tutb .tbt .btn{padding:6px 12px;font-size:12px}
+#tuta{position:fixed;z-index:36;font-size:34px;pointer-events:none;filter:drop-shadow(0 3px 3px rgba(0,0,0,.6));animation:tbob .8s ease-in-out infinite alternate}@keyframes tbob{to{transform:translateY(10px)}}
+html[data-theme=pietra] #tutb{background:linear-gradient(180deg,#3a4046,#262a2e);color:#eef0f1;border-color:#8d959c}
+#tutb.top{bottom:auto;top:calc(var(--sat) + 150px)}
 </style>
 </head>
 <body>
@@ -437,7 +451,7 @@ html[data-theme=pietra] #askd .ab{background:linear-gradient(180deg,#30353a,#222
     <button class="pbtn ok" onclick="confirmPlace()">✓</button>
   </div>
 </div>
-<div id="bhud" class="hidden"><div id="btop"></div><div id="bbot"><div id="bcards"></div><button class="rbtn" onclick="retreat()">🏳 Ritirata</button></div></div>
+<div id="bhud" class="hidden"><div id="btop"></div><div id="bord"></div><div id="bbot"><div id="bcards"></div><button class="rbtn" onclick="retreat()">🏳 Ritirata</button></div></div>
 <div id="sheet" class="hidden"><div class="sh-h"><div id="sheet-t"></div><button class="x" onclick="closeSheet()">✕</button></div><div id="sheet-b"></div></div>
 <div id="wxw" class="hidden" onclick="openWeather()"></div>
 <button id="memob" class="hidden" onclick="sfx('click');openMemo()" title="Promemoria"><span>📜</span><b>0</b></button>
