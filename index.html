@@ -1533,7 +1533,7 @@ const HDEF = {
 };
 const ENEMY_UNITS = ['miliziano', 'arccorto', 'scudata', 'picchiere', 'balestriere', 'uomoarme', 'berserker'];
 const MASTIO_UP = [null,
-  { legno: 200, cibo: 100 }, { legno: 450, cibo: 250, oro: 120 }, { legno: 750, oro: 300, pietra: 150 },
+  { legno: 200, cibo: 100 }, { legno: 650, cibo: 400, oro: 200 }, { legno: 1100, cibo: 600, oro: 450, pietra: 250 },
   { legno: 1000, oro: 600, pietra: 400, ferro: 150, favore: 5 }, { legno: 1400, oro: 900, pietra: 700, ferro: 250 }, { legno: 2000, oro: 1300, pietra: 1000, ferro: 400, favore: 10 }, { legno: 2800, oro: 1800, pietra: 1500, ferro: 600, favore: 20 },
   { legno: 3800, oro: 2500, pietra: 2100, ferro: 850, favore: 25 }, { legno: 5000, oro: 3300, pietra: 2800, ferro: 1100, favore: 30 }, { legno: 6500, oro: 4300, pietra: 3600, ferro: 1450, favore: 35 }, { legno: 8400, oro: 5600, pietra: 4600, ferro: 1900, favore: 40 },
   { legno: 11000, oro: 7300, pietra: 6000, ferro: 2500, favore: 50 }, { legno: 14000, oro: 9500, pietra: 7800, ferro: 3200, favore: 60 }, { legno: 18000, oro: 12000, pietra: 10000, ferro: 4200, favore: 70 }, { legno: 23000, oro: 15500, pietra: 13000, ferro: 5500, favore: 90 }];
@@ -1574,7 +1574,7 @@ function save() { S.last = Date.now(); const j = JSON.stringify(S); CLOUD.mem = 
 function load() { try { const j = localStorage.getItem(SAVE_KEY) || (CLOUD.mem && CLOUD.mem[SAVE_KEY]); if (j) { const s = JSON.parse(j); if (s && s.v === 1) return s; } } catch (e) { } return null; }
 function bLvlCap() { if (S && S.creative) return 4; return S.mastio <= 8 ? Math.min(4, 1 + Math.floor(S.mastio / 2)) : Math.min(8, 4 + Math.ceil((S.mastio - 8) / 2)); }
 function caps() {
-  const c = { cibo: 500 + 400 * S.mastio, legno: 600 + 450 * S.mastio, oro: 400 + 350 * S.mastio, pietra: 300 + 300 * S.mastio, ferro: 250 + 200 * S.mastio, pelli: 60 + 40 * S.mastio, favore: 999 };
+  const c = { cibo: 800 + 550 * S.mastio, legno: 600 + 450 * S.mastio, oro: 400 + 350 * S.mastio, pietra: 300 + 300 * S.mastio, ferro: 250 + 200 * S.mastio, pelli: 60 + 40 * S.mastio, favore: 999 };
   for (const b of S.buildings) { const d = BDEF[b.t]; if (d.store && !b.end) for (const r in d.store) c[r] += d.store[r] * b.lvl; }
   return c;
 }
@@ -1601,7 +1601,7 @@ const MAX_BUILDERS = 2;
 // ===== BILANCIAMENTO DEL RITMO (tempo reale) =====
 // sessione tipo 20-30 min; giornata 2-3 sessioni. Era I ≈ giorno 1-2, Era II ≈ giorni 3-6, Era III ≈ settimana 2, Era IV ≈ settimane 3-4.
 const PACE = () => (SET.pace === 'rapido' ? 0.1 : 1);
-const MASTIO_T = [0, 1, 3, 6, 10, 20, 30, 45, 60, 90, 120, 180, 240, 360, 480, 720]; // minuti per salire da L a L+1
+const MASTIO_T = [0, 1, 6, 12, 15, 20, 30, 45, 60, 90, 120, 180, 240, 360, 480, 720]; // minuti per salire da L a L+1
 const UP_T = [0, 0, 1, 3, 8, 20, 40, 75, 120]; // minuti per portare un edificio al livello n (× peso dell'edificio)
 const maxBuilders = () => 2 + (S && S.mastio >= 5 ? 1 : 0) + (S && S.mastio >= 9 ? 1 : 0);
 const buildSecs = d => Math.round(d.t * 6 * PACE());
@@ -2678,7 +2678,7 @@ function endBattle() {
     else { const k = Math.min(0.35, BT.pct / 100 * 0.6); for (const r of ['cibo', 'legno', 'oro']) { stolen[r] = Math.floor(S.res[r] * k); S.res[r] -= stolen[r]; } html = `<h3>I predoni fuggono col bottino</h3><p class="sub">Distruzione ${BT.pct}% — predoni abbattuti ${BT.killed}/${BT.raiders}</p><div class="row"><b>Rubato:</b> ${Object.keys(stolen).map(k => `${ICO(k)} ${stolen[k]}`).join('  ')}</div>`; }
     const pl = BT.beasts.lupo * 1 + BT.beasts.orso * 3; if (pl) { const gp = addRes('pelli', pl); html += `<div class="row"><b>Bestie abbattute:</b> 🐺 ${BT.beasts.lupo} · 🐻 ${BT.beasts.orso} → 🧥 +${gp} Pelli</div>`; }
     html += `<div class="row"><b>Difensori caduti:</b> ${Object.keys(dead).map(k => `${UDEF[k].n} ×${dead[k]}`).join(', ') || 'nessuno'}</div>${cureLine}<p class="lore">Le mura vengono rattoppate all'alba. Il prossimo buio arriverà.</p>`;
-    S.nightIn = DF().night * seasonRaidMul();
+    S.nightIn = DF().night * seasonRaidMul() * (S.mastio <= 4 ? 1.4 : 1);
   }
   save();
   setTimeout(() => { openSheet('Esito', `<div class="result">${html}<button class="btn big" onclick="backToVillage()">Torna al feudo</button></div>`, 'result'); }, 900);
@@ -3374,7 +3374,7 @@ function openHelp() {
 // ---------- missioni ----------
 const built = t => S.buildings.filter(b => b.t === t && !(b.end && b.toLvl === 1)).length;
 // ================= DIARIO DEL RITMO: misura quanto dura davvero ogni pezzo del gioco =================
-const PACE_TARGET = { 2: 0.2, 3: 0.4, 4: 0.75, 5: 1.5, 6: 2.5, 7: 3.5, 8: 5, 9: 7, 10: 9, 11: 11.5, 12: 14, 13: 17, 14: 21, 15: 25, 16: 30 }; // ore di gioco attivo previste
+const PACE_TARGET = { 2: 0.05, 3: 0.3, 4: 0.6, 5: 1.5, 6: 2.5, 7: 3.5, 8: 5, 9: 7, 10: 9, 11: 11.5, 12: 14, 13: 17, 14: 21, 15: 25, 16: 30 }; // ore di gioco attivo previste
 function diary() { if (!S.diary) S.diary = { t0: now(), play: 0, sess: 1, lastSeen: now(), lvl: { 1: [0, now()] }, ch: {}, waste: {}, raids: 0, events: 0, hourly: [] }; return S.diary; }
 function diaryTick(dt) {
   if (!S || S.creative || S.sandbox || MODE === 'title') return; const D = diary();
@@ -4052,7 +4052,7 @@ function frame(t) {
     if (MODE === 'village' && !S.creative) S.nightIn = Math.max(0, (S.nightIn == null ? 600 : S.nightIn) - dt);
     if (MODE === 'village' && !placing) { S.natIn = (S.natIn == null ? 240 : S.natIn) - dt; if (S.natIn <= 0) { S.natIn = 240; if (S.buildings.filter(b => b.nat).length < 80 && spawnNature(1)) { const sel = SC.sel && SC.sel.ref; SC = buildVillage(); if (sel) SC.sel = SC.B.find(b => b.ref === sel) || null; } } }
     if (MODE === 'village' && S.nightIn <= 0 && $('#sheet').classList.contains('hidden') && !placing) {
-      S.nightIn = DF().night * seasonRaidMul(); { const rv = realms().filter(r => Math.abs(r.lvl - S.mastio) <= 2); const who = rv.length && Math.random() < 0.5 ? rv[(Math.random() * rv.length) | 0] : null; toast(who ? `🌙 Cala la notte: i predoni di ${who.user} ${who.ic} attaccano!` : '🌙 Cala la notte. Le campane della torre…'); } setTimeout(() => { if (MODE === 'village') startRaid(); }, 2500);
+      S.nightIn = DF().night * seasonRaidMul() * (S.mastio <= 4 ? 1.4 : 1); { const rv = realms().filter(r => Math.abs(r.lvl - S.mastio) <= 2); const who = rv.length && Math.random() < 0.5 ? rv[(Math.random() * rv.length) | 0] : null; toast(who ? `🌙 Cala la notte: i predoni di ${who.user} ${who.ic} attaccano!` : '🌙 Cala la notte. Le campane della torre…'); } setTimeout(() => { if (MODE === 'village') startRaid(); }, 2500);
     }
   }
   if (SC) { render(SC, dt); updateWxWidget(); memoTick(dt); tutTick(); } else { ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.fillStyle = '#1c150e'; ctx.fillRect(0, 0, cv.width, cv.height); }
