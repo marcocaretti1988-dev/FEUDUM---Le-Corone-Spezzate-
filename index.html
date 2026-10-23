@@ -616,8 +616,8 @@ function g3init() {
   return true;
 }
 // ---- caricamento a pezzi dei modelli 3D: si scarica solo ciò che serve, il resto con calma ----
-const M3D_FILES = new Set(["abete3d", "accademia", "armeria", "balista", "balista_b", "balista_c", "bottino", "cancello", "capanno", "casa", "caserma", "castello", "cava", "chiesa", "falegnameria", "falo", "fattoria", "fucina", "generale", "granaio", "infermeria", "mercato", "miniera", "monastero", "municipio", "mura", "olmo3d", "palizzata", "poligono", "quercia3d", "spoglio3d", "stalla", "taverna", "tenda", "tesoreria", "torre", "torrepietra", "tronco3d"]);
-const M3D_ALIAS = { granaio: 'stalla', mastio: 'castello', tronco: 'tronco3d', cripta: 'monastero' };
+const M3D_FILES = new Set(["abete3d", "accademia", "armeria", "balista", "balista_b", "balista_c", "bottino", "cancello", "capanno", "casa", "caserma", "castello", "cava", "chiesa", "falegnameria", "falo", "fattoria", "fucina", "generale", "granaio", "infermeria", "mercato", "miniera", "monastero", "municipio", "mura", "olmo3d", "palizzata", "poligono", "quercia3d", "spoglio3d", "stalla", "taverna", "tenda", "tesoreria", "torre", "torrepietra", "tronco3d", "cripta"]);
+const M3D_ALIAS = { granaio: 'stalla', mastio: 'castello', tronco: 'tronco3d' };
 const L3 = { state: {}, q: [], active: 0, max: 3, prefetch: [] };
 function need3d(k, low) {
   k = M3D_ALIAS[k] && !M3D_FILES.has(k) ? M3D_ALIAS[k] : k; if (!M3D_FILES.has(k) || L3.state[k]) return; L3.state[k] = 'q';
@@ -2105,7 +2105,7 @@ function plotCache(w, h) { return cached(`plot${w}x${h}${TEX_OK ? "t" : ""}`, w,
   const o0 = isoP(-m, -m), ex = isoP(1, 0), ey = isoP(0, 1), oz = isoP(0, 0);
   c.save(); c.transform((ex[0] - oz[0]) / T, (ex[1] - oz[1]) / T, (ey[0] - oz[0]) / T, (ey[1] - oz[1]) / T, o0[0], o0[1]); c.drawImage(tv, 0, 0); c.restore();
 }); }
-const H3FREE = { torrepietra: 1, torre: 1, mura: 1, palizzata: 1, cancello: 1, balista: 1 };
+const H3FREE = { cripta: 1, torrepietra: 1, torre: 1, mura: 1, palizzata: 1, cancello: 1, balista: 1 };
 function drawBuilding(c, sc, b) {
   const vr0 = vRect(b); const [wx, wy] = WR(vr0[0], vr0[1]);
   if (b.hitT > 0) { c.save(); c.translate((Math.random() - .5) * 2, 0); }
