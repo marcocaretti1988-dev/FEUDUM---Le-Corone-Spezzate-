@@ -3702,8 +3702,9 @@ function heroCard(k) { const h = BT.heroes.find(h => h.k === k); if (!h) return;
 // conferma dentro al gioco (i popup del browser sono bloccati nella pagina pubblicata)
 let ASK = null;
 function askYes(msg, fn, yes) { ASK = fn; let el = $('#askd'); if (!el) { el = document.createElement('div'); el.id = 'askd'; document.body.appendChild(el); }
-  el.innerHTML = `<div class="ab"><p>${msg}</p><div class="aa"><button class="btn ghost" onclick="askClose()">Annulla</button><button class="btn" onclick="askOk()">${yes || 'Conferma'}</button></div></div>`; el.classList.remove('hidden'); }
-function askClose() { const el = $('#askd'); if (el) el.classList.add('hidden'); ASK = null; }
+  el.innerHTML = `<div class="ab"><p>${msg}</p><div class="aa"><button class="btn ghost" onclick="askClose()">Annulla</button><button class="btn" onclick="askOk()">${yes || 'Conferma'}</button></div></div>`; el.classList.remove('hidden'); document.body.classList.add('asking');
+  el.querySelectorAll('button').forEach((b, i) => b.addEventListener('touchend', ev => { ev.preventDefault(); i === 0 ? askClose() : askOk(); }, { passive: false })); }
+function askClose() { const el = $('#askd'); if (el) el.classList.add('hidden'); document.body.classList.remove('asking'); ASK = null; }
 function askOk() { const f = ASK; askClose(); if (f) f(); }
 function newCampaign() { askYes('Ricominciare la campagna da capo?<br><small>Il salvataggio attuale verrà cancellato.</small>', () => { closeSheet(); closeFolk(); try { localStorage.removeItem(SAVE_KEY); } catch (e) { } if (CLOUD.mem) delete CLOUD.mem[SAVE_KEY]; CLOUD.lastS = null; beginGame(true); cloudPush(true); toast('⚔ Nuova campagna iniziata'); }, 'Ricomincia'); }
 function saveCode() { const s = load(); if (!s) { toast('Nessuna partita da esportare'); return; } const code = 'FEUDUM1:' + btoa(unescape(encodeURIComponent(JSON.stringify(s)))); try { navigator.clipboard.writeText(code).then(() => toast('📋 Codice della partita copiato: incollalo in Note per conservarlo'), () => prompt('Copia questo codice:', code)); } catch (e) { prompt('Copia questo codice:', code); } }
@@ -3714,8 +3715,9 @@ function showTitle() {
   const tb = (cls, on, ic, lb, sub, dis) => `<button class="btn tb ${cls}" ${dis ? 'disabled' : `onclick="${on}"`}><i class="bi">${ic}</i><span class="bl">${lb}</span>${sub ? `<small>${sub}</small>` : ''}</button>`;
   const sv = load(); const when = sv && sv.last ? new Date(sv.last).toLocaleString('it-IT', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : '';
   const cs = !window.claude ? '💾 Salvataggio su questo dispositivo · usa 📋 Copia codice partita per spostarlo' : CLOUD.ready ? '☁ Salvataggio nel cloud del tuo account: attivo' : '⚠ Salvataggio solo su questo browser' + (CLOUD.why ? ' · motivo: ' + CLOUD.why : ' · controllo del cloud in corso…') + '<br><button class="btn ghost" style="margin-top:5px;font-size:12px;padding:6px 12px" onclick="cloudAsk()">☁ Attiva salvataggio cloud</button>';
-  $('#tbtns').innerHTML = tb('big k-new', sv ? 'newCampaign()' : 'beginGame(true)', '⚔', 'Inizia Campagna', 'una nuova Marca da conquistare')
-    + tb('big cont' + (sv ? '' : ' dis'), 'beginGame(false)', '📜', 'Continua Campagna', sv ? `Mastio ${sv.mastio} · ${ERA(sv.mastio).n} · salvata ${when}` : (CLOUD.ready ? 'nessun salvataggio sul tuo account' : 'nessun salvataggio su questo dispositivo'), !sv)
+  const bNew = tb('big k-new', sv ? 'newCampaign()' : 'beginGame(true)', '⚔', sv ? 'Nuova Campagna' : 'Inizia Campagna', sv ? 'ricomincia da capo (cancella il salvataggio)' : 'una nuova Marca da conquistare');
+  const bCont = tb('big cont' + (sv ? '' : ' dis'), 'beginGame(false)', '📜', 'Continua Campagna', sv ? `Mastio ${sv.mastio} · ${ERA(sv.mastio).n} · salvata ${when}` : (CLOUD.ready ? 'nessun salvataggio sul tuo account' : 'nessun salvataggio su questo dispositivo'), !sv);
+  $('#tbtns').innerHTML = (sv ? bCont + bNew : bNew + bCont)
     + `<div class="savex">${sv ? '<button class="btn ghost" onclick="saveCode()">📋 Copia codice partita</button>' : ''}<button class="btn ghost" onclick="openImport()">📥 Importa partita</button></div>`
     + `<div class="cloudst">${cs}</div>`
     + tb('k-max', 'pickEra()', '🏰', 'Città al massimo', "scegli l'era, tutto sbloccato")

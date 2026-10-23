@@ -509,7 +509,7 @@ html[data-theme=araldica] .tset .btn{clip-path:polygon(0 0,100% 0,100% 62%,50% 1
 html[data-theme=araldica] .tset .btn small{color:#e8b923!important}
 html[data-theme=araldica] .tset .btn:nth-child(2){background:#b3201f}html[data-theme=araldica] .tset .btn:nth-child(3){background:#1d4aa0}
 html[data-theme=araldica] #tbtns .savex .btn{border-radius:0}
-#title{overflow-y:auto;-webkit-overflow-scrolling:touch}#title .tbox{margin:auto;flex-shrink:0}
+#title{overflow-y:auto;touch-action:pan-y}#title .tbox{margin:auto;flex-shrink:0}
 html[data-theme=pergamena] .tbox{margin:30px auto}
 html[data-theme=pergamena] #tbtns .tb{flex-direction:row;flex-wrap:wrap;justify-content:center;column-gap:6px;padding:9px 16px}html[data-theme=pergamena] #tbtns .tb small{flex-basis:100%}
 html[data-theme=araldica] #tbtns .tb .bi{color:#111}html[data-theme=araldica] #tbtns .tb.k-rlm .bi{color:#e8b923}
@@ -546,6 +546,8 @@ html[data-theme=miniatura] #tbtns .tb .bl{font-size:17px;letter-spacing:.02em}
 #res .chip{padding-top:4px!important}
 .cc .ico,.costs .ico,.btn small .ico{width:1.4em;height:1.4em;vertical-align:-.38em}
 @media(min-width:700px){#res .chip .ic{height:auto!important}#res .chip .ic .ico{width:28px!important;height:28px!important}}
+#askd{touch-action:manipulation;-webkit-user-select:none}#askd .btn{touch-action:manipulation;cursor:pointer;min-height:46px}
+body.asking #title,body.asking #sheet,body.asking #hud{pointer-events:none}
 </style>
 </head>
 <body>
