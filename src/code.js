@@ -135,7 +135,7 @@ function g3init() {
   return true;
 }
 // ---- caricamento a pezzi dei modelli 3D: si scarica solo ciò che serve, il resto con calma ----
-const M3D_FILES = new Set(["insegna", "lampione", "pozzogrande", "staccionata", "steccato", "cavallofrisia", "cassa", "anfora", "cassafieno", "botte", "cassaortaggi", "fontanella", "stenditoio", "mucchiosassi", "felce", "segnavia", "gonfalone", "rovinamuro", "arco", "colonna", "rovine", "lastricato", "muretto", "rastrelliera", "carriola", "pozzo", "carretto", "croce", "lanterna", "abete3d", "accademia", "armeria", "balista", "balista_b", "balista_c", "bottino", "cancello", "capanno", "casa", "caserma", "castello", "cava", "chiesa", "falegnameria", "falo", "fattoria", "fucina", "generale", "granaio", "infermeria", "mercato", "miniera", "monastero", "municipio", "mura", "olmo3d", "palizzata", "poligono", "quercia3d", "spoglio3d", "stalla", "taverna", "tenda", "tesoreria", "torre", "torrepietra", "tronco3d", "cripta"]);
+const M3D_FILES = new Set(["catapulta3d", "ariete3d", "insegna", "lampione", "pozzogrande", "staccionata", "steccato", "cavallofrisia", "cassa", "anfora", "cassafieno", "botte", "cassaortaggi", "fontanella", "stenditoio", "mucchiosassi", "felce", "segnavia", "gonfalone", "rovinamuro", "arco", "colonna", "rovine", "lastricato", "muretto", "rastrelliera", "carriola", "pozzo", "carretto", "croce", "lanterna", "abete3d", "accademia", "armeria", "balista", "balista_b", "balista_c", "bottino", "cancello", "capanno", "casa", "caserma", "castello", "cava", "chiesa", "falegnameria", "falo", "fattoria", "fucina", "generale", "granaio", "infermeria", "mercato", "miniera", "monastero", "municipio", "mura", "olmo3d", "palizzata", "poligono", "quercia3d", "spoglio3d", "stalla", "taverna", "tenda", "tesoreria", "torre", "torrepietra", "tronco3d", "cripta"]);
 const M3D_ALIAS = { granaio: 'stalla', mastio: 'castello', tronco: 'tronco3d' };
 const L3 = { state: {}, q: [], active: 0, max: 3, prefetch: [] };
 function need3d(k, low) {
@@ -1928,7 +1928,7 @@ function drawUnit(c, sc, u) { drawUnit0(c, sc, u); if (u.vis) drawVisitorMark(c,
 function drawUnit0(c, sc, u) {
   const [wx, wy] = W(u.x, u.y); if (u.k === 'carro') { if (!u.dead) drawCart(c, u, wx, wy); return; }
   if (u.climb) drawLadder(c, u);
-  if (UDEF[u.k] && UDEF[u.k].siege) { if (u.dead) { const a = Math.max(0, 1 - u.deadT / 3); if (a <= 0) return; c.globalAlpha = a; } u.wph = (u.wph || 0) + (u.moving ? 0.08 : 0); const fire = u.atkT > 0 ? 1 - u.atkT / 0.6 : 0; drawSiegeAt(c, UDEF[u.k].siege === 'ram' ? 'ariete' : 'catapulta', wx, wy, u.flip, u.wph, fire > 0 && fire < 1 ? fire : 0); c.globalAlpha = 1; if (!u.dead && u.hp < u.maxhp) hpBar(c, wx, wy - 50, 34, u.hp / u.maxhp, '#7ccf6a'); return; }
+  if (UDEF[u.k] && UDEF[u.k].siege) { if (u.dead) { const a = Math.max(0, 1 - u.deadT / 3); if (a <= 0) return; c.globalAlpha = a; } u.wph = (u.wph || 0) + (u.moving ? 0.08 : 0); const fire = u.atkT > 0 ? 1 - u.atkT / 0.6 : 0; const mk = UDEF[u.k].siege === 'ram' ? 'ariete3d' : 'catapulta3d'; if (!G3.models[mk]) need3d(mk); if (G3.models[mk] && G3.models[mk].ready) { const yaw = (u.face === 'B' ? (u.flip ? 2.4 : 3.9) : (u.flip ? 0.75 : -0.75)) + (UDEF[u.k].siege === 'ram' ? Math.PI / 2 : 0); const yq = Math.round(yaw / 0.3927) * 0.3927; const mm = G3.models[mk].m, hp = Math.round((mk === 'ariete3d' ? 1.35 : 1.5) * mm.size[1] * ISO_H / Math.max(mm.size[0], mm.size[2])); const sp = g3sprite(mk, hp, yq, 0); const jolt = fire > 0 && fire < 1 ? Math.sin(fire * Math.PI) * (mk === 'ariete3d' ? 4 : 2.5) : 0; if (sp) c.drawImage(sp.cv, wx + sp.x0 + jolt * (u.flip ? -1 : 1), wy + sp.y0 - (mk === 'catapulta3d' ? jolt : 0), sp.w, sp.h); if (fire > 0.3 && fire < 0.5 && mk === 'catapulta3d') { c.fillStyle = 'rgba(200,190,170,0.5)'; c.beginPath(); c.arc(wx, wy - 40, 8, 0, 7); c.fill(); } } else drawSiegeAt(c, UDEF[u.k].siege === 'ram' ? 'ariete' : 'catapulta', wx, wy, u.flip, u.wph, fire > 0 && fire < 1 ? fire : 0); c.globalAlpha = 1; if (!u.dead && u.hp < u.maxhp) hpBar(c, wx, wy - 50, 34, u.hp / u.maxhp, '#7ccf6a'); return; }
   if (u.d.beast) { if (!BATL_OK || !BFR[u.k]) return; const fight = !u.dead && u.atkT > 0.32 - u.d.cd; const [f, w, h] = animFrame(u.k, u.moving && !u.dead && !fight, u.phase * 1.4, fight ? 'atk' : null, fight ? (0.32 - u.atkT) / (u.d.cd / 4) : 0);
     let a = 1, rot = 0; if (u.dead) { a = Math.max(0, 1 - Math.max(0, u.deadT - 4) / 3); if (a <= 0) return; rot = Math.min(1, u.deadT / 0.4) * 1.4; }
     u.phase += (u.moving ? 1 : 0.15) * (1 / 60) * 6; const bob = u.moving && !u.dead ? Math.abs(Math.sin(u.phase * 2)) * 0.8 : 0; const lunge = 0;
@@ -2238,7 +2238,7 @@ function genRealmSiege(tg) {
 // ---------- battle flow ----------
 let BT = null; // battle meta
 function startAttack(i) {
-  const tg = S.targets[i]; if (!tg) return;
+  const tg = S.targets[i]; if (!tg) return; if ((S.army.ariete || 0) + (S.army.catapulta || 0)) { need3d('ariete3d'); need3d('catapulta3d'); }
   const total = Object.values(S.army).reduce((a, b) => a + b, 0); const heroes = heroList();
   if (!total && !heroes.length) { toast('Non hai truppe! Addestra prima un esercito.'); return; }
   closeSheet(); sfx('horn'); tensionStart('attack');
@@ -2327,7 +2327,7 @@ function drawSiegeAt(c, k, x, y, flip, ph, fire) {
   c.restore();
 }
 const SIEGE_TH = {};
-function siegeThumb(k) { if (SIEGE_TH[k]) return SIEGE_TH[k]; const cv = document.createElement('canvas'); cv.width = cv.height = 108; const c = cv.getContext('2d'); c.scale(1.6, 1.6); drawSiegeAt(c, k, 34, 58, false, 0, 0); return SIEGE_TH[k] = cv.toDataURL(); }
+function siegeThumb(k) { if (SIEGE_TH[k]) return SIEGE_TH[k]; const mk = k === 'ariete' ? 'ariete3d' : 'catapulta3d'; if (!G3.models[mk]) need3d(mk); if (G3.models[mk] && G3.models[mk].ready) { const mm = G3.models[mk].m; const sp = g3sprite(mk, Math.round(1.4 * mm.size[1] * ISO_H / Math.max(mm.size[0], mm.size[2])), k === 'ariete' ? 0.8 : -0.75, 0); if (sp) { const cv = document.createElement('canvas'); cv.width = cv.height = 108; const c = cv.getContext('2d'); const sc = Math.min(100 / sp.w, 100 / sp.h); c.drawImage(sp.cv, (108 - sp.w * sc) / 2, 104 - sp.h * sc, sp.w * sc, sp.h * sc); return SIEGE_TH[k] = cv.toDataURL(); } } const cv = document.createElement('canvas'); cv.width = cv.height = 108; const c = cv.getContext('2d'); c.scale(1.6, 1.6); drawSiegeAt(c, k, 34, 58, false, 0, 0); return cv.toDataURL(); }
 // scale: i fanti bloccati da un muro piantano una scala e lo scavalcano
 function tryClimb(sc, u, dt) {
   if (!u.pl || u.side !== 'A' || u.d.cav || u.d.ranged || u.d.siege || u.hero || !u.wall || !BDEF[u.wall.t].wall) { u.clT = 0; return false; }
