@@ -3078,7 +3078,7 @@ function openMenu(tab) {
     <button class="btn" onclick="closeSheet();toMenu()">🏠 Menu principale</button></div>`;
   openSheet(ICO('gear') + ' Menu', `<div class="mtabs">${tabs.map(([k, i, n]) => `<button class="${k === tab ? 'on' : ''}" onclick="openMenu('${k}')">${ICO(i)}<span>${n}</span></button>`).join('')}</div><div class="aud mbody">${body}</div>`, 'menu');
 }
-function openSheet(title, html, key) { if (typeof closeFolk === 'function' && $('#fcard')) closeFolk(); const s = $('#sheet'); s.dataset.p = key || ''; $('#sheet-t').innerHTML = title; $('#sheet-b').innerHTML = html; s.classList.remove('hidden'); }
+function openSheet(title, html, key) { setTimeout(() => { try { if (MODE === 'village') tutTick(); } catch (e) { } }, 0); if (typeof closeFolk === 'function' && $('#fcard')) closeFolk(); const s = $('#sheet'); s.dataset.p = key || ''; $('#sheet-t').innerHTML = title; $('#sheet-b').innerHTML = html; s.classList.remove('hidden'); }
 function closeSheet() { const s = $('#sheet'); s.classList.add('hidden'); s.dataset.p = ''; if (SC && MODE === 'village' && !placing) { SC.sel = null; SC.selN = null; SC.selA = null; SC.selU = null; } }
 function refreshSheet() { const p = $('#sheet').dataset.p; if (!p) return; if (p === 'army') openArmy(); else if (p === 'build') openBuild(); else if (p.startsWith('b:')) { const r = S.buildings.find(b => b.id === +p.slice(2)); if (r) openBuildingInfo(r); } }
 const CHIM3 = { casa: [0.62, 0.1], taverna: [0.6, 0.08], fucina: [0.7, 0.08], fattoria: [0.4, 0.12], armeria: [0.65, 0.08], infermeria: [0.6, 0.1], capanna: [0.6, 0.12] };
