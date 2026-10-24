@@ -3764,7 +3764,7 @@ const CRONACHE = [
 ];
 const storyImg = i => `ui/story_${i}.webp`;
 function storyPanel(p, n, i, last) {
-  return `<div class="stimg"><img src="${storyImg(p.img || 6)}" alt="" onerror="this.remove()"><div class="stph"><span>${p.ic || '📜'}</span></div></div>
+  return `<div class="stimg"><img src="${storyImg(p.img || 6)}" alt="" onload="this.nextElementSibling&&this.nextElementSibling.remove()" onerror="this.remove()"><div class="stph"><span>${p.ic || '📜'}</span></div></div>
     <div class="sttx"><div class="stn">${n}</div><h2>${p.t}</h2><p>${p.x}</p></div>
     <div class="stnav">${Array.from({ length: n.total || 1 }, (_, k) => `<i class="${k === i ? 'on' : ''}"></i>`).join('')}</div>
     <div class="sthint">${last ? (p.sub === 'Prologo' ? 'Tocca per cominciare' : 'Tocca per chiudere') : 'Tocca per continuare'}</div>`;
