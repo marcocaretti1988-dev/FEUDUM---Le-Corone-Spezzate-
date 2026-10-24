@@ -1092,7 +1092,7 @@ let FEST_T = 240, FEST_MT = 0;
 function festTick(dt) {
   if (!S || S.creative || MODE !== 'village' || !SC) return;
   if (S.fest && now() > S.fest.end) { S.fest = null; }
-  if (S.fest) { FEST_MT = (FEST_MT || 0) - dt; if (FEST_MT <= 0) { FEST_MT = 7; sfx('festa'); } }
+  if (S.fest) { FEST_MT = (FEST_MT || 0) - dt; if (FEST_MT <= 0) { FEST_MT = 9.1; sfx('festa'); } }
   if (famine()) { if (!S.famineWarned) { S.famineWarned = 1; toast('🍂 Carestia! Il granaio è vuoto: le case si spengono e il popolo è malcontento (-10% produzione)'); sfx('bell'); } } else S.famineWarned = 0;
   FEST_T -= dt; if (FEST_T > 0 || S.fest) return; FEST_T = 420 + Math.random() * 300;
   if (umore() < 70 || !PATHC.plaza || (S.nightIn != null && S.nightIn < 120)) return;
@@ -1100,7 +1100,7 @@ function festTick(dt) {
 }
 function festStart() {
   const [px, py] = PATHC.plaza || [MCX, MCX]; S.fest = { end: now() + 80000, x: px + 1.2, y: py + 1.4 };
-  addRes('favore', 1); toast('🎉 Festa in piazza! Il popolo è felice e balla attorno al falò: +1 👑 Favore'); sfx('festa'); FEST_MT = 7; festFX();
+  addRes('favore', 1); toast('🎉 Festa in piazza! Il popolo è felice e balla attorno al falò: +1 👑 Favore'); sfx('festa'); FEST_MT = 9.1; festFX();
   for (const u of SC.U) if (u.ai === workerAI || u.kid) { u.st = 'rest'; u.wt = Math.random() * 2; }
 }
 function festFX() { if (!S.fest || !SC) return; if (SC.FX.some(f => f.k === 'festa')) return; SC.FX.push({ k: 'festa', x: S.fest.x, y: S.fest.y, t: 0, dur: Math.max(1, (S.fest.end - now()) / 1000), draw: drawFesta }); }
@@ -1358,7 +1358,7 @@ if (SET.mvol == null) SET.mvol = 0.45; if (SET.fvol == null) SET.fvol = 0.8; if 
 const MUS = { el: null, src: null, g: null, duck: false, get on() { return SET.music !== false; } };
 let FXG = null;
 function fxOut(a) { if (!FXG) { FXG = a.createGain(); FXG.connect(a.destination); } FXG.gain.value = SET.mute ? 0 : SET.fvol; return FXG; }
-function musicApply() { const mv = SET.mute || MUS.duck ? 0 : SET.mvol; if (MUS.g) MUS.g.gain.value = mv; else if (MUS.el) MUS.el.volume = mv; if (FXG) FXG.gain.value = SET.mute ? 0 : SET.fvol; if (TENS.g) TENS.g.gain.value = SET.mute || !MUS.on ? 0 : SET.mvol * 0.9; }
+function musicApply() { const mv = SET.mute || MUS.duck ? 0 : SET.mvol; try { if (RAIDM.el) RAIDM.el.volume = SET.mute ? 0 : Math.min(1, SET.mvol * 1.1); } catch (e) { } if (MUS.g) MUS.g.gain.value = mv; else if (MUS.el) MUS.el.volume = mv; if (FXG) FXG.gain.value = SET.mute ? 0 : SET.fvol; if (TENS.g) TENS.g.gain.value = SET.mute || !MUS.on ? 0 : SET.mvol * 0.9; }
 function musicStart() {
   if (!MUS.on || SET.mute || document.hidden || MUS.duck) return;
   if (!MUS.el) { MUS.el = new Audio('music/feudum.mp3'); MUS.el.loop = true; MUS.el.preload = 'auto'; const a = ac(); if (a) { try { MUS.src = a.createMediaElementSource(MUS.el); MUS.g = a.createGain(); MUS.src.connect(MUS.g).connect(a.destination); } catch (e) { MUS.g = null; } } musicApply(); }
@@ -1390,8 +1390,8 @@ function tensionStart(kind) {
   const a = ac(); if (!a) return; tensionStop(true);
   MUS.duck = true; if (MUS.g && MUS.el) { const t = a.currentTime; MUS.g.gain.cancelScheduledValues(t); MUS.g.gain.setValueAtTime(MUS.g.gain.value, t); MUS.g.gain.linearRampToValueAtTime(0, t + 1.2); setTimeout(() => { if (MUS.duck) musicStop(); }, 1300); } else musicStop();
   if (!MUS.on || SET.mute) { TENS.kind = kind; return; }
-  TENS.kind = kind; TENS.g = a.createGain(); TENS.g.gain.value = 0; TENS.g.connect(a.destination);
-  const t0 = a.currentTime; TENS.g.gain.linearRampToValueAtTime(SET.mvol * 0.9, t0 + 1.5);
+  TENS.kind = kind; TENS.g = a.createGain(); TENS.g.connect(a.destination);
+  const t0 = a.currentTime; TENS.g.gain.setValueAtTime(0.0001, t0); TENS.g.gain.linearRampToValueAtTime(SET.mvol * 0.9, t0 + 1.5);
   if (raidTrack(a)) return; // razzie e assedi: colonna sonora "Ombre delle Terre Feudali
   TENS.bus = a.createDynamicsCompressor(); TENS.bus.threshold.value = -18; TENS.bus.ratio.value = 4; TENS.bus.connect(TENS.g);
   TENS.nextT = t0 + 0.15; TENS.step = 0;
@@ -1402,9 +1402,9 @@ const RAIDM = { el: null, src: null, bad: false };
 function raidTrack(a) {
   if (RAIDM.bad) return false;
   try {
-    if (!RAIDM.el) { RAIDM.el = new Audio('music/raid.mp3'); RAIDM.el.loop = true; RAIDM.el.preload = 'auto'; RAIDM.el.addEventListener('error', () => { RAIDM.bad = true; if (TENS.kind && !TENS.iv) { TENS.nextT = AC.currentTime + 0.1; TENS.step = 0; TENS.iv = setInterval(tensionSched, 40); } }); RAIDM.src = a.createMediaElementSource(RAIDM.el); }
-    try { RAIDM.src.disconnect(); } catch (e) { } RAIDM.src.connect(TENS.g);
-    RAIDM.el.currentTime = 0; const p = RAIDM.el.play(); if (p && p.catch) p.catch(() => { }); return true;
+    if (!RAIDM.el) { RAIDM.el = new Audio('music/raid.mp3'); RAIDM.el.loop = true; RAIDM.el.preload = 'auto'; RAIDM.el.addEventListener('error', () => { RAIDM.bad = true; if (TENS.kind && !TENS.iv) { TENS.nextT = AC.currentTime + 0.1; TENS.step = 0; TENS.iv = setInterval(tensionSched, 40); } }); }
+    // riproduzione diretta (affidabile su iPhone, dove il passaggio dentro WebAudio a volte resta muto)
+    RAIDM.el.volume = Math.min(1, SET.mvol * 1.1); RAIDM.el.currentTime = 0; const p = RAIDM.el.play(); if (p && p.catch) p.catch(() => { RAIDM.bad = true; if (TENS.kind && !TENS.iv) { TENS.nextT = AC.currentTime + 0.1; TENS.step = 0; TENS.iv = setInterval(tensionSched, 40); } }); return true;
   } catch (e) { RAIDM.bad = true; return false; }
 }
 function tensionStop(now) {
@@ -1444,17 +1444,44 @@ function tensionStep(a, t, st, s16, raid, late) {
 }
 let AC = null;
 function ac() { if (!AC) { try { AC = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { } } if (AC && AC.state === 'suspended') AC.resume(); return AC; }
+// ---- musica della festa: un saltarello medievale (flauto, cornamusa con bordone, tamburello) ----
+function festaMusic(a, OUT) {
+  const t0 = a.currentTime + 0.05, beat = 0.19; // crome in 6/8, tempo vivace
+  const bus = a.createGain(); bus.gain.value = 0.9; bus.connect(OUT);
+  const mt = n => 440 * Math.pow(2, (n - 69) / 12);
+  // melodia in Re dorico: 4 battute ripetute con variazione (nota midi, durata in crome)
+  const mel = [[74, 1], [76, 1], [77, 1], [79, 2], [77, 1], [76, 2], [74, 1], [72, 2], [74, 1],
+               [74, 1], [76, 1], [77, 1], [79, 1], [81, 1], [79, 1], [77, 2], [76, 1], [74, 3],
+               [81, 1], [79, 1], [77, 1], [79, 2], [77, 1], [76, 1], [77, 1], [76, 1], [74, 2], [72, 1],
+               [74, 1], [76, 1], [77, 1], [76, 1], [74, 1], [72, 1], [74, 3], [74, 3]];
+  let t = t0;
+  for (const [n, d] of mel) { const o = a.createOscillator(), g = a.createGain(), v = a.createOscillator(), vg = a.createGain(); o.type = 'triangle'; o.frequency.value = mt(n);
+    v.frequency.value = 5.5; vg.gain.value = mt(n) * 0.006; v.connect(vg).connect(o.frequency); // vibrato del flauto
+    const dur = d * beat; g.gain.setValueAtTime(0.0001, t); g.gain.linearRampToValueAtTime(0.11, t + 0.02); g.gain.setValueAtTime(0.09, t + dur * 0.7); g.gain.linearRampToValueAtTime(0.0001, t + dur * 0.98);
+    o.connect(g).connect(bus); o.start(t); v.start(t); o.stop(t + dur); v.stop(t + dur); t += dur; }
+  const end = t;
+  // cornamusa: bordone Re-La filtrato
+  const lp = a.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 900; const dg = a.createGain(); dg.gain.setValueAtTime(0.0001, t0); dg.gain.linearRampToValueAtTime(0.045, t0 + 0.3); dg.gain.setValueAtTime(0.045, end - 0.3); dg.gain.linearRampToValueAtTime(0.0001, end); lp.connect(dg).connect(bus);
+  for (const n of [50, 57, 62]) { const o = a.createOscillator(); o.type = 'sawtooth'; o.frequency.value = mt(n); o.detune.value = (n % 3) * 3; o.connect(lp); o.start(t0); o.stop(end); }
+  // tamburo (battere) e tamburello (sonagli) in 6/8: BUM . cik BUM . cik
+  const noiseBuf = a.createBuffer(1, a.sampleRate * 0.2, a.sampleRate), nd = noiseBuf.getChannelData(0); for (let i = 0; i < nd.length; i++) nd[i] = Math.random() * 2 - 1;
+  for (let k = 0, tt = t0; tt < end - 0.05; k++, tt += beat) { const pos = k % 6;
+    if (pos === 0 || pos === 3) { const o = a.createOscillator(), g = a.createGain(); o.type = 'sine'; o.frequency.setValueAtTime(pos === 0 ? 130 : 110, tt); o.frequency.exponentialRampToValueAtTime(55, tt + 0.15); g.gain.setValueAtTime(0.22, tt); g.gain.exponentialRampToValueAtTime(0.001, tt + 0.22); o.connect(g).connect(bus); o.start(tt); o.stop(tt + 0.25); }
+    if (pos === 2 || pos === 5 || (pos === 4 && k % 12 > 6)) { const src = a.createBufferSource(), f = a.createBiquadFilter(), g = a.createGain(); src.buffer = noiseBuf; f.type = 'highpass'; f.frequency.value = 6500; g.gain.setValueAtTime(0.09, tt); g.gain.exponentialRampToValueAtTime(0.001, tt + 0.12); src.connect(f).connect(g).connect(bus); src.start(tt); src.stop(tt + 0.15); } }
+  return end - t0;
+}
 function sfx(kind) {
   if (SET.mute || SET.fvol <= 0) return; const a = ac(); if (!a) return; const t = a.currentTime; const OUT = fxOut(a);
   const noise = (dur, f, q, vol, type) => { const b = a.createBuffer(1, a.sampleRate * dur, a.sampleRate), d = b.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / d.length); const s = a.createBufferSource(); s.buffer = b; const fl = a.createBiquadFilter(); fl.type = type || 'bandpass'; fl.frequency.value = f; fl.Q.value = q; const g = a.createGain(); g.gain.value = vol; s.connect(fl).connect(g).connect(OUT); s.start(t); };
   const tone = (f, dur, vol, type, f2) => { const o = a.createOscillator(); o.type = type || 'sine'; o.frequency.setValueAtTime(f, t); if (f2) o.frequency.exponentialRampToValueAtTime(f2, t + dur); const g = a.createGain(); g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(0.001, t + dur); o.connect(g).connect(OUT); o.start(t); o.stop(t + dur); };
-  if (kind === 'ram') { tone(70, 0.35, 0.22, 'sine', 38); noise(0.25, 180, 0.8, 0.16, 'lowpass'); setTimeout(() => noise(0.12, 900, 1.5, 0.05), 60); }
+  if (kind === 'win') { [[523, 0], [659, 140], [784, 280], [1046, 430]].forEach(([f, d]) => setTimeout(() => { const o = a.createOscillator(), g = a.createGain(), t0 = a.currentTime; o.type = 'triangle'; o.frequency.value = f; g.gain.setValueAtTime(0.0001, t0); g.gain.linearRampToValueAtTime(0.13, t0 + 0.02); g.gain.exponentialRampToValueAtTime(0.001, t0 + (d === 430 ? 1.0 : 0.3)); o.connect(g).connect(OUT); o.start(t0); o.stop(t0 + 1.1); }, d)); }
+  else if (kind === 'ram') { tone(70, 0.35, 0.22, 'sine', 38); noise(0.25, 180, 0.8, 0.16, 'lowpass'); setTimeout(() => noise(0.12, 900, 1.5, 0.05), 60); }
   else if (kind === 'launch') { tone(220, 0.25, 0.05, 'sawtooth', 90); noise(0.45, 700, 0.6, 0.07); setTimeout(() => tone(55, 0.2, 0.12, 'sine', 35), 80); }
   else if (kind === 'boulder') { tone(60, 0.5, 0.25, 'sine', 30); noise(0.6, 250, 0.6, 0.18, 'lowpass'); setTimeout(() => noise(0.3, 1400, 1, 0.05), 90); }
   else if (kind === 'ladder') { for (let i = 0; i < 3; i++) setTimeout(() => { tone(380 + i * 40, 0.06, 0.035, 'triangle'); noise(0.05, 1800, 2, 0.025); }, i * 140); }
   else if (kind === 'bow') { tone(180, 0.18, 0.06, 'triangle', 420); noise(0.15, 2600, 2, 0.04); }
-  else if (kind === 'step') { noise(0.05, 600, 1.2, 0.025, 'lowpass'); }
-  else if (kind === 'festa') { const N = [523, 659, 784, 659, 698, 880, 784, 659, 587, 523, 587, 659]; N.forEach((f, i) => setTimeout(() => { const o = a.createOscillator(), g = a.createGain(), t0 = a.currentTime; o.type = 'triangle'; o.frequency.value = f; g.gain.setValueAtTime(0.0001, t0); g.gain.linearRampToValueAtTime(0.06, t0 + 0.02); g.gain.exponentialRampToValueAtTime(0.001, t0 + 0.24); o.connect(g).connect(OUT); o.start(t0); o.stop(t0 + 0.26); if (i % 4 === 0) noise(0.06, 200, 1, 0.08, 'lowpass'); }, i * 210)); }
+  else if (kind === 'step') { noise(0.07, 1100, 1.4, 0.11); tone(110, 0.05, 0.06, 'sine', 70); }
+  else if (kind === 'festa') { festaMusic(a, OUT); }
   else if (kind === 'arrow') noise(0.12, 2400, 2, 0.05);
   else if (kind === 'hit') { noise(0.08, 500, 1, 0.08); }
   else if (kind === 'bolt') { tone(140, 0.15, 0.08, 'triangle', 60); noise(0.1, 1200, 1, 0.06); }
@@ -1462,8 +1489,8 @@ function sfx(kind) {
   else if (kind === 'build') { tone(660, 0.07, 0.05, 'square'); setTimeout(() => sfx('tock'), 120); }
   else if (kind === 'tock') tone(520, 0.06, 0.05, 'square');
   else if (kind === 'coin') { tone(1300, 0.08, 0.05, 'triangle'); setTimeout(() => tone(1760, 0.1, 0.04, 'triangle'), 70); }
-  else if (kind === 'bell') { [220, 440, 554, 660].forEach((f, i) => tone(f, 2.2, 0.05 / (i + 1))); }
-  else if (kind === 'horn') { tone(196, 0.9, 0.07, 'sawtooth', 185); }
+  else if (kind === 'bell') { for (const st of [0, 0.9]) setTimeout(() => { [[523, 0.11], [1046, 0.06], [1318, 0.045], [1568, 0.03], [262, 0.05]].forEach(([f, v]) => tone(f, 2.4, v, 'sine')); noise(0.03, 3000, 2, 0.05); }, st * 1000); }
+  else if (kind === 'horn') { tone(233, 1.0, 0.12, 'sawtooth', 220); tone(349, 1.0, 0.06, 'sawtooth', 330); tone(466, 0.9, 0.05, 'triangle', 440); }
   else if (kind === 'deploy') noise(0.06, 900, 1, 0.04);
   else if (kind === 'ult') { tone(330, 0.6, 0.06, 'triangle', 660); }
   else if (kind === 'click') tone(880, 0.04, 0.03, 'triangle');
