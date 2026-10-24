@@ -555,10 +555,10 @@ body.asking #title,body.asking #sheet,body.asking #hud{pointer-events:none}
 #story{position:fixed;inset:0;z-index:95;background:#0c0805;display:flex;align-items:center;justify-content:center;cursor:pointer;-webkit-user-select:none;user-select:none;touch-action:manipulation}
 #story .stbox{width:100%;max-width:520px;height:100%;display:flex;flex-direction:column;opacity:0;transition:opacity .8s}
 #story .stbox.in{opacity:1}
-#story .stimg{position:relative;flex:1 1 55%;min-height:0;overflow:hidden;background:radial-gradient(ellipse at 50% 35%,#7a5a2a,#2a1a0c 70%)}
-#story .stimg img{position:absolute;left:50%;top:54%;width:min(86vw,62vh,440px);height:auto;transform:translate(-50%,-50%);z-index:3;filter:drop-shadow(0 12px 30px rgba(0,0,0,.75));animation:stzoom 1.4s ease-out both}
-@keyframes stzoom{from{opacity:0;transform:translate(-50%,-46%) scale(.94)}to{opacity:1;transform:translate(-50%,-50%) scale(1)}}
-#story .stimg:after{content:"";position:absolute;inset:0;z-index:2;background:linear-gradient(180deg,rgba(12,8,5,.15),transparent 30%,transparent 60%,#0c0805)}
+#story .stimg{position:relative;flex:1 1 55%;min-height:0;overflow:hidden;display:flex;align-items:center;justify-content:center;padding:calc(var(--sat) + 62px) 18px 8px;box-sizing:border-box;background:radial-gradient(ellipse at 50% 45%,#5a3f1c,#120c07 72%)}
+#story .stimg img{position:relative;display:block;max-width:min(100%,440px);max-height:100%;width:auto;height:auto;aspect-ratio:1;object-fit:contain;z-index:3;filter:drop-shadow(0 12px 30px rgba(0,0,0,.75));opacity:0}#story .stimg img.ok{animation:stzoom 1s ease-out both}
+@keyframes stzoom{from{opacity:0;transform:translateY(10px) scale(.95)}to{opacity:1;transform:none}}
+#story .stimg:after{content:"";position:absolute;inset:0;z-index:1;background:linear-gradient(180deg,rgba(12,8,5,.15),transparent 30%,transparent 60%,#0c0805)}
 #story .stph{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:96px;filter:drop-shadow(0 6px 16px rgba(0,0,0,.6));opacity:.85}
 #story .sttx{flex:0 0 auto;padding:6px 26px 4px;color:#f1e2bf;text-align:center}
 #story .stn{font-family:Cinzel,serif;letter-spacing:.3em;font-size:11px;color:#c99a2e;text-transform:uppercase}

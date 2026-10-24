@@ -3772,13 +3772,15 @@ const CRONACHE = [
 ];
 const storyImg = i => `ui/story_${i}.webp`;
 function storyPanel(p, n, i, last) {
-  return `<div class="stimg"><img src="${storyImg(p.img || 6)}" alt="" onload="this.nextElementSibling&&this.nextElementSibling.remove()" onerror="this.remove()"><div class="stph"><span>${p.ic || '📜'}</span></div></div>
+  return `<div class="stimg"><img src="${storyImg(p.img || 6)}" alt="" onload="this.classList.add('ok');this.nextElementSibling&&this.nextElementSibling.remove()" onerror="this.remove()"><div class="stph"><span>${p.ic || '📜'}</span></div></div>
     <div class="sttx"><div class="stn">${n}</div><h2>${p.t}</h2><p>${p.x}</p></div>
     <div class="stnav">${Array.from({ length: n.total || 1 }, (_, k) => `<i class="${k === i ? 'on' : ''}"></i>`).join('')}</div>
     <div class="sthint">${last ? (p.sub === 'Prologo' ? 'Tocca per cominciare' : 'Tocca per chiudere') : 'Tocca per continuare'}</div>`;
 }
 let STORY = null;
-function storyOpen(pages, onEnd) { STORY = { pages, i: 0, onEnd }; let el = $('#story'); if (!el) { el = document.createElement('div'); el.id = 'story'; el.innerHTML = '<button class="stskip" onclick="event.stopPropagation();storyEnd()">Salta ›</button><div class="stbox"></div>'; el.addEventListener('click', storyNext); document.body.appendChild(el); } el.classList.remove('hidden'); storyShow(); try { musicStart(); } catch (e) { } }
+const STORY_IMG = {}; function storyPreload(pages) { return Promise.all(pages.map(p => { const src = storyImg(p.img || 6); if (STORY_IMG[src]) return STORY_IMG[src]; const im = new Image(); im.src = src; return STORY_IMG[src] = (im.decode ? im.decode() : new Promise(r => { im.onload = r; })).catch(() => { }); })); }
+function storyOpen(pages, onEnd) { storyPreload(pages).then(() => storyOpen0(pages, onEnd)); }
+function storyOpen0(pages, onEnd) { STORY = { pages, i: 0, onEnd }; let el = $('#story'); if (!el) { el = document.createElement('div'); el.id = 'story'; el.innerHTML = '<button class="stskip" onclick="event.stopPropagation();storyEnd()">Salta ›</button><div class="stbox"></div>'; el.addEventListener('click', storyNext); document.body.appendChild(el); } el.classList.remove('hidden'); storyShow(); try { musicStart(); } catch (e) { } }
 function storyShow() { const el = $('#story'), p = STORY.pages[STORY.i]; const n = { total: STORY.pages.length, toString() { return '' } }; const box = el.querySelector('.stbox'); box.classList.remove('in'); box.innerHTML = storyPanel(p, Object.assign(n, { toString: () => p.sub || '' }), STORY.i, STORY.i === STORY.pages.length - 1); void box.offsetWidth; box.classList.add('in'); }
 function storyNext() { if (!STORY) return; if (STORY.i < STORY.pages.length - 1) { STORY.i++; sfx('click'); storyShow(); } else storyEnd(); }
 function storyEnd() { const el = $('#story'); if (el) el.classList.add('hidden'); const f = STORY && STORY.onEnd; STORY = null; if (f) f(); }
@@ -3957,6 +3959,6 @@ g3init(); ATL.src = ATLAS_SRC; BATL.src = BATLAS_SRC; EATL.src = EATLAS_SRC;
 // title backdrop: show an enemy-ish village behind title
 function titleScene() { const tg = { d: 7, seed: 777, name: '', where: '' }; SC = genEnemy(tg); SC.U = []; SC.mode = 'title'; centerCam(MCX, MCX); cam.z = Math.max(0.7, Math.min(1.2, VW / 1000)); cam.y += VH * 0.3 / cam.z; }
 titleScene();
-showTitle(); setTimeout(prologueMaybe, 400);
+showTitle(); if (!SET.storySeen) storyPreload(PROLOGO); setTimeout(prologueMaybe, 400);
 requestAnimationFrame(frame);
 
