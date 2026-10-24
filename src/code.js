@@ -1832,7 +1832,10 @@ function render(sc, dt) {
       if (sc.selA === o) { c.strokeStyle = 'rgba(255,230,140,0.95)'; c.lineWidth = 2; c.beginPath(); c.ellipse(wx, wy, w * 0.45, w * 0.16, 0, 0, 7); c.stroke(); }
       c.save(); c.translate(wx, wy - bob); if (o.fl) c.scale(-1, 1); if (dk) { c.globalAlpha = Math.max(0, 1 - (o.dying - 0.6)); c.rotate(dk * Math.PI / 2 * 0.9); } 
       c.drawImage(f.img || BATL, f[0], f[1], f[2], f[3], -w / 2, -h + 2, w, h); c.restore(); c.globalAlpha = 1; } }
-    else if (kind === 4) { c.globalAlpha = 0.65; const fake = { t: o.t, x: o.x, y: o.y, w: o.w, h: o.h, lvl: 1, seed: 0, mask: 0 }; const sk = bSprite(fake) && bSpriteView(fake); if (sk && BATL_OK) { const f = BFR[sk], r = bSpriteRect(fake); c.drawImage(BATL, f[0], f[1], f[2], f[3], r[0], r[1], r[2], r[3]); } else { const e = bCache(fake); const vr = vRect(fake); const [wx, wy] = WR(vr[0], vr[1]); c.drawImage(e.cv, wx - e.ox, wy - e.oy, e.w, e.h); } c.globalAlpha = 1; }
+    else if (kind === 4) { // anteprima di piazzamento: lo stesso modello che verrà costruito
+      let fb = o._fb; if (!fb || fb.t !== o.t) fb = o._fb = { t: o.t, x: o.x, y: o.y, w: o.w, h: o.h, lvl: 1, seed: 0, mask: 0, id: -7, side: 'D', hp: 1, maxhp: 1, aim: {}, ghost: true, ref: { rot: o.rot || 0 } };
+      fb.x = o.x; fb.y = o.y; const mk = o.t === 'mastio' ? 'castello' : o.t; if (!G3.models[mk]) need3d(mk);
+      c.globalAlpha = 0.7; if ((G3.models[mk] && G3.models[mk].ready) || PAINT[o.t] || (bSprite(fb) && BATL_OK)) drawBuilding(c, sc, fb); else { poly(c, [W(o.x, o.y), W(o.x + o.w, o.y), W(o.x + o.w, o.y + o.h), W(o.x, o.y + o.h)], 'rgba(255,240,200,0.25)', 'rgba(255,240,200,0.8)', 1.5); const [cx, cy] = W(o.x + o.w / 2, o.y + o.h / 2); c.font = '22px serif'; c.textAlign = 'center'; c.fillText(BDEF[o.t].icon || '?', cx, cy - 8); c.textAlign = 'start'; } c.globalAlpha = 1; }
   }
   drawWorks(c, sc);
   // projectiles
@@ -1928,7 +1931,7 @@ function drawBuilding(c, sc, b) {
     if (b.t !== 'mastio' && !H3FREE[b.t] && b.w >= 2) { const mm = G3.models[k3].m, hNow = mm.size[1] * fit3 / Math.max(mm.size[0], mm.size[2]), hMax = 0.75 * b.w + 0.3; if (hNow > hMax) fit3 *= hMax / hNow; }
     const dark = (b.t === 'casa' || b.t === 'taverna') && sc.mode === 'village' && famine(); if (dark) c.filter = 'brightness(0.6) saturate(0.5)';
     g3draw(c, b, k3, fit3, yaw); c.globalAlpha = ga; if (dark) c.filter = 'none';
-    if (CHIM3[b.t] && b.r3d && !b.dead && sc.mode !== 'title' && !(dark)) { b.chimT = (b.chimT || 0) - 1 / 60; if (b.chimT <= 0) { b.chimT = 0.45 + Math.random() * 0.6; const [cxp, cyp] = CHIM3[b.t]; const r = b.r3d; sc.FX.push({ k: 'chim', x0: r[0] + r[2] * cxp, y0: r[1] + r[3] * cyp, t: 0, dur: 2.8, r: 3 + Math.random() * 2.5, dx: 5 + Math.random() * 7 }); } }
+    if (CHIM3[b.t] && b.r3d && !b.dead && !b.ghost && sc.mode !== 'title' && !(dark)) { b.chimT = (b.chimT || 0) - 1 / 60; if (b.chimT <= 0) { b.chimT = 0.45 + Math.random() * 0.6; const [cxp, cyp] = CHIM3[b.t]; const r = b.r3d; sc.FX.push({ k: 'chim', x0: r[0] + r[2] * cxp, y0: r[1] + r[3] * cyp, t: 0, dur: 2.8, r: 3 + Math.random() * 2.5, dx: 5 + Math.random() * 7 }); } }
   } else if (sk && BATL_OK && BFR[sk]) {
     if (BDEF[b.t].decor) { const [cx, cy] = W(b.x + b.w / 2, b.y + b.h / 2); c.fillStyle = 'rgba(0,0,0,0.22)'; c.beginPath(); c.ellipse(cx, cy, (b.w + b.h) * 12, (b.w + b.h) * 6, 0, 0, 7); c.fill(); }
     else { const p = plotCache(b.w, b.h); c.drawImage(p.cv, wx - p.ox, wy - p.oy, p.w, p.h); }
