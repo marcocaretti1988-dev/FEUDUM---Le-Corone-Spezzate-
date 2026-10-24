@@ -3004,7 +3004,7 @@ function openMenu(tab) {
   else if (tab === 'diff') body = `<div class="dif">${diffCards(`openMenu('diff')`)}</div>`;
   else body = `<div class="mlist">
     <button class="btn ghost" onclick="openHelp()">${ICO('scroll')} Come si gioca · missioni</button>
-    ${S && !S.creative && !S.sandbox ? `<button class="btn ghost" onclick="closeSheet();tutStart()">🕯️ Rifai la guida passo passo</button><button class="btn ghost" onclick="openArms()">🛡️ Stemma della casata</button>` : ''}
+    ${S && !S.creative && !S.sandbox ? `<button class="btn ghost" onclick="openCronache()">📜 Cronache della Marca</button><button class="btn ghost" onclick="closeSheet();tutStart()">🕯️ Rifai la guida passo passo</button><button class="btn ghost" onclick="openArms()">🛡️ Stemma della casata</button>` : ''}
     <button class="btn ghost" onclick="save();saveCode()">📋 Copia codice partita<small>salvalo in Note: con Importa la riprendi ovunque</small></button>
     <button class="btn ghost" onclick="save();cloudPush(true);toast(CLOUD.ready ? '💾 Partita salvata anche nel cloud' : '💾 Partita salvata su questo browser')">💾 Salva ora</button>
     ${S && !S.creative && !S.sandbox ? `<button class="btn ghost" onclick="openDiary()">📈 Diario del ritmo<small>quanto dura davvero ogni traguardo</small></button>` : ''}
@@ -3737,12 +3737,52 @@ function questMigrate() { if (S.qv === 2) return; S.qv = 2; let i = 0; while (i 
 let CH_IDLE = 0;
 function chapterTick(dt) {
   if (!S || S.creative || S.sandbox || MODE !== 'village' || placing || !$('#sheet').classList.contains('hidden')) { CH_IDLE = 0; return; } CH_IDLE += dt || 0; if (CH_IDLE < 1.2) return;
-  const q = QUESTS[S.mq]; if (!q) return; if ((S.chSeen == null ? -1 : S.chSeen) < q.ch) { S.chSeen = q.ch; openChapter(q.ch); }
+  const q = QUESTS[S.mq]; if (!q) return; if ((S.chSeen == null ? -1 : S.chSeen) < q.ch) { S.chSeen = q.ch; if (q.ch > 0) { openCronaca(q.ch); STORY.onEnd = () => openChapter(q.ch); } else openChapter(q.ch); }
 }
 function openChapter(i) {
   const C = CHAPTERS[i]; const qs = QUESTS.filter(q => q.ch === i);
   openSheet(`📜 Capitolo ${C.n}`, `<div class="chap"><div class="chn">Capitolo ${C.n}</div><h3>${C.t}</h3><p class="chx">${C.x}</p><div class="chq"><b>Obiettivi</b>${qs.map(q => `<div>◇ ${q.t}${q.how ? ` <small>(${q.how})</small>` : ''}</div>`).join('')}</div><div class="chr">Ricompensa del capitolo: ${Object.keys(C.r).map(k => ICO(k) + ' ' + C.r[k]).join(' ')}</div><div class="acts"><button class="btn big" onclick="closeSheet()">Comincia</button></div></div>`, 'chapter');
 }
+// ================= STORIA: prologo alla prima apertura e Cronache rileggibili =================
+const PROLOGO = [
+  { img: 1, ic: '👑', t: 'Anno del Signore 1254', x: 'L\'ultimo degli Svevi è morto lontano, in terra di Puglia. Con lui si è spenta la stirpe che teneva insieme l\'Impero.<br><br>La corona d\'oro di Svevia, dicono, si è spezzata la notte stessa della sua morte.' },
+  { img: 2, ic: '🗺️', t: 'La Marca Orientale', x: 'Lungo il Danubio i vassalli non obbediscono più a nessuno. Conti superbi, baroni avidi, abati potenti e cavalieri rinnegati si contendono valli, guadi e villaggi.<br><br>Ogni signore costruisce mura. Nessuno si fida del vicino.' },
+  { img: 3, ic: '🛡️', t: 'L\'ultimo di un casato', x: 'Tu sei il figlio minore di un piccolo casato caduto in disgrazia. Tuo padre è morto in un\'imboscata, i tuoi fratelli in battaglia.<br><br>Ti resta un nome, uno stemma sbiadito e un mastio di legno marcio ai confini della Marca.' },
+  { img: 4, ic: '✉️', t: 'Il sigillo infranto', x: 'Una notte un cavaliere senza insegne ti consegna una lettera e sparisce nel buio. Il sigillo di ceralacca è spezzato a metà, come la corona.<br><br>Dentro, poche parole: <i>«Reclama ciò che è tuo.»</i><br><br>Nessuno sa chi l\'abbia scritta.' },
+  { img: 5, ic: '🌅', t: 'L\'alba sul borgo', x: 'All\'alba raggiungi il villaggio. Una manciata di contadini ti guarda in silenzio, tra case di paglia e una palizzata che cade a pezzi.<br><br>Il vecchio Siniscalco ti aspetta davanti al mastio.<br><br><i>«Mio signore, il feudo è vostro. Da dove cominciamo?»</i>' },
+];
+// una pagina di cronaca per ogni capitolo: si sblocca quando il capitolo comincia
+const CRONACHE = [
+  'Il mastio cigola a ogni folata di vento e i contadini hanno più fame che speranza. Il Siniscalco ti mostra i campi incolti, la taverna chiusa, la palizzata marcita.<br><br>«Prima di ogni corona, mio signore, servono pane, tetti e uomini.»<br><br>Quella notte, al lume di una candela, rileggi la lettera. Sul bordo del sigillo spezzato noti un segno che non avevi visto: mezza aquila nera.',
+  'La voce del nuovo signore corre lungo il Danubio, e con lei arrivano i predoni. Le prime notti di fuoco ti insegnano che un feudo senza fabbri e senza guaritrici non sopravvive all\'inverno.<br><br>Tra i briganti uccisi trovi un uomo con lo stesso segno della lettera tatuato sul polso: mezza aquila nera. Qualcuno, nella Marca, conosce il tuo nome meglio di te.',
+  'Cinque signori si spartiscono le valli intorno al tuo borgo. Il Conte Ottokar ti riceve con disprezzo, il Barone Ulrich conta le tue monete, l\'Abate di Melk ti benedice e ti osserva.<br><br>Ognuno, a modo suo, ti chiede della lettera. Nessuno ammette di averla scritta. Ma l\'Abate, quando vede il sigillo, impallidisce.',
+  'Il vento del nord porta neve, fame e lupi. Nelle lunghe notti d\'inverno Fratello Tomas ti racconta una storia: prima di morire, l\'ultimo Svevo avrebbe affidato i frammenti della corona a sei famiglie fedeli, perché nessun usurpatore potesse mai indossarla.<br><br>«La vostra famiglia, mio signore, era una di quelle sei.»',
+  'Il legno lascia il posto alla pietra: il mastio diventa un castello e i signori della Marca smettono di ridere. Le carovane passano dalle tue terre, i vassalli giurano fedeltà.<br><br>Una dama arriva al castello con una scorta di cavalieri: Lady Isolde. Al collo porta un pendente d\'oro a forma di mezza aquila.',
+  'Lady Isolde confessa: è stata lei a scrivere la lettera. Suo padre custodiva un frammento della corona, ed è morto per difenderlo. Il Margravio di Steyr sta radunando gli altri pezzi con la spada e con l\'inganno.<br><br>«Chi riunirà i frammenti potrà reclamare l\'Impero. Ho scelto voi, perché siete l\'unico a cui non importava della corona.»',
+  'Mura concentriche, torri e baliste: la tua rocca è la più temuta del Danubio. Tre frammenti sono nelle tue mani, due in quelle del Margravio.<br><br>Ma un trono si regge sulla fedeltà dei vassalli, non sulle pietre. Il Margravio lo sa, e compra i tuoi alleati uno a uno.',
+  'Tutta la Marca guarda a te. Nella cappella del castello i frammenti della corona di Svevia giacciono su un cuscino di velluto, in attesa dell\'ultimo pezzo.<br><br>Resta un passo: unire ogni feudo sotto il tuo stendardo e alzare il mastio fino al cielo. Allora la corona spezzata tornerà intera, e le campane suoneranno il tuo nome.',
+];
+const storyImg = i => `ui/story_${i}.webp`;
+function storyPanel(p, n, i, last) {
+  return `<div class="stimg"><img src="${storyImg(p.img || 6)}" alt="" onerror="this.remove()"><div class="stph"><span>${p.ic || '📜'}</span></div></div>
+    <div class="sttx"><div class="stn">${n}</div><h2>${p.t}</h2><p>${p.x}</p></div>
+    <div class="stnav">${Array.from({ length: n.total || 1 }, (_, k) => `<i class="${k === i ? 'on' : ''}"></i>`).join('')}</div>
+    <div class="sthint">${last ? (p.sub === 'Prologo' ? 'Tocca per cominciare' : 'Tocca per chiudere') : 'Tocca per continuare'}</div>`;
+}
+let STORY = null;
+function storyOpen(pages, onEnd) { STORY = { pages, i: 0, onEnd }; let el = $('#story'); if (!el) { el = document.createElement('div'); el.id = 'story'; el.innerHTML = '<button class="stskip" onclick="event.stopPropagation();storyEnd()">Salta ›</button><div class="stbox"></div>'; el.addEventListener('click', storyNext); document.body.appendChild(el); } el.classList.remove('hidden'); storyShow(); try { musicStart(); } catch (e) { } }
+function storyShow() { const el = $('#story'), p = STORY.pages[STORY.i]; const n = { total: STORY.pages.length, toString() { return '' } }; const box = el.querySelector('.stbox'); box.classList.remove('in'); box.innerHTML = storyPanel(p, Object.assign(n, { toString: () => p.sub || '' }), STORY.i, STORY.i === STORY.pages.length - 1); void box.offsetWidth; box.classList.add('in'); }
+function storyNext() { if (!STORY) return; if (STORY.i < STORY.pages.length - 1) { STORY.i++; sfx('click'); storyShow(); } else storyEnd(); }
+function storyEnd() { const el = $('#story'); if (el) el.classList.add('hidden'); const f = STORY && STORY.onEnd; STORY = null; if (f) f(); }
+function prologueMaybe() { if (SET.storySeen) return; SET.storySeen = 1; saveSet(); storyOpen(PROLOGO.map(p => Object.assign({ sub: 'Prologo' }, p))); }
+function curChapter() { if (!S) return -1; const q = QUESTS[Math.min(S.mq, QUESTS.length - 1)]; return S.mq >= QUESTS.length ? CHAPTERS.length - 1 : (q ? q.ch : 0); }
+function openCronache() {
+  const cur = S && !S.sandbox && !S.creative ? curChapter() : -1;
+  const row = (ok, ic, t, sub, on) => `<button class="crow ${ok ? '' : 'lock'}" ${ok ? `onclick="${on}"` : ''}><span class="cic">${ok ? ic : '🔒'}</span><span class="ctx"><b>${t}</b><small>${sub}</small></span></button>`;
+  openSheet('📜 Cronache della Marca', `<p class="desc"><i>Le pagine del cronista del tuo casato. Ogni capitolo della campagna ne aggiunge una nuova.</i></p><div class="cron">${row(true, '👑', 'Prologo', 'La corona spezzata e la lettera', 'closeSheet();storyOpen(PROLOGO.map(p=>Object.assign({sub:\'Prologo\'},p)))')}
+    ${CHAPTERS.map((C, i) => row(i <= cur, '📖', `Capitolo ${C.n} · ${C.t}`, i <= cur ? (i < cur ? 'Concluso' : 'In corso') : 'Sigillato: si apre andando avanti nella campagna', `closeSheet();openCronaca(${i})`)).join('')}</div>`, 'cron');
+}
+function openCronaca(i) { const C = CHAPTERS[i]; storyOpen([{ img: 6, ic: '📖', sub: `Capitolo ${C.n}`, t: C.t, x: CRONACHE[i] || C.x }]); }
 function campaignTick(dt) { diploTick(dt); seasonTick(dt); eventTick(dt); chapterTick(dt); diaryTick(dt); forecastTick(); }
 function questHTML() {
   const q = QUESTS[S.mq]; if (!q) return '<span class="qt">📜 La Marca è tua. Tutte le missioni compiute.</span>';
@@ -3829,7 +3869,8 @@ function showTitle() {
     + `<div class="cloudst">${cs}</div>`
     + tb('k-max', 'pickEra()', '🏰', 'Città al massimo', "scegli l'era, tutto sbloccato")
     + tb('k-cre', 'pickCreative()', '🧱', 'Modalità Creativa', 'tutto sbloccato, risorse infinite')
-    + tb('ghost k-rlm', 'openRealms(1)', '🌍', 'Altri Regni', 'classifica e cronache dei signori della Marca');
+    + tb('ghost k-rlm', 'openRealms(1)', '🌍', 'Altri Regni', 'classifica e cronache dei signori della Marca')
+    + tb('ghost k-cron', 'openCronache()', '📜', 'Cronache', 'rileggi la storia della Marca');
 }
 function pickCreative() {
   SAVE_KEY = 'feudum_creativo'; const has = !!load(); SAVE_KEY = 'feudum_proto_v1';
@@ -3908,6 +3949,6 @@ g3init(); ATL.src = ATLAS_SRC; BATL.src = BATLAS_SRC; EATL.src = EATLAS_SRC;
 // title backdrop: show an enemy-ish village behind title
 function titleScene() { const tg = { d: 7, seed: 777, name: '', where: '' }; SC = genEnemy(tg); SC.U = []; SC.mode = 'title'; centerCam(MCX, MCX); cam.z = Math.max(0.7, Math.min(1.2, VW / 1000)); cam.y += VH * 0.3 / cam.z; }
 titleScene();
-showTitle();
+showTitle(); setTimeout(prologueMaybe, 400);
 requestAnimationFrame(frame);
 
