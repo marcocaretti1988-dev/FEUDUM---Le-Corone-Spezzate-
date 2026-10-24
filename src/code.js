@@ -3782,7 +3782,7 @@ function openCronache() {
   openSheet('📜 Cronache della Marca', `<p class="desc"><i>Le pagine del cronista del tuo casato. Ogni capitolo della campagna ne aggiunge una nuova.</i></p><div class="cron">${row(true, '👑', 'Prologo', 'La corona spezzata e la lettera', 'closeSheet();storyOpen(PROLOGO.map(p=>Object.assign({sub:\'Prologo\'},p)))')}
     ${CHAPTERS.map((C, i) => row(i <= cur, '📖', `Capitolo ${C.n} · ${C.t}`, i <= cur ? (i < cur ? 'Concluso' : 'In corso') : 'Sigillato: si apre andando avanti nella campagna', `closeSheet();openCronaca(${i})`)).join('')}</div>`, 'cron');
 }
-function openCronaca(i) { const C = CHAPTERS[i]; storyOpen([{ img: 6, ic: '📖', sub: `Capitolo ${C.n}`, t: C.t, x: CRONACHE[i] || C.x }]); }
+function openCronaca(i) { const C = CHAPTERS[i]; storyOpen([{ img: i === 2 || i === 3 ? 7 : 6, ic: '📖', sub: `Capitolo ${C.n}`, t: C.t, x: CRONACHE[i] || C.x }]); }
 function campaignTick(dt) { diploTick(dt); seasonTick(dt); eventTick(dt); chapterTick(dt); diaryTick(dt); forecastTick(); }
 function questHTML() {
   const q = QUESTS[S.mq]; if (!q) return '<span class="qt">📜 La Marca è tua. Tutte le missioni compiute.</span>';
