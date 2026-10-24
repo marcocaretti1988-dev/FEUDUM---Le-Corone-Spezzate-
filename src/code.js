@@ -655,13 +655,18 @@ function paintWall(c, mask, stone, s) {
   }
 }
 function paintRubble(c, w, h, s) {
-  const R = rng(s);
-  poly(c, [isoP(0.1, 0.1), isoP(w - 0.1, 0.1), isoP(w - 0.1, h - 0.1), isoP(0.1, h - 0.1)], 'rgba(30,24,18,0.55)');
-  for (let i = 0; i < 18 * w * h / 4 + 4; i++) {
-    const u = 0.2 + R() * (w - 0.4), v = 0.2 + R() * (h - 0.4); const [x, y] = isoP(u, v, R() * 4);
-    if (R() < 0.5) { c.fillStyle = shade('#8a8278', 0.7 + R() * 0.5); c.beginPath(); c.ellipse(x, y, 2 + R() * 3, 1.5 + R() * 2, 0, 0, 7); c.fill(); }
-    else { c.save(); c.translate(x, y); c.rotate(R() * 3); c.fillStyle = shade('#5e3f22', 0.6 + R() * 0.5); c.fillRect(-6, -1, 12, 2.4); c.restore(); }
-  }
+  const R = rng(s), cx = w / 2, cy = h / 2;
+  // terra bruciata dai bordi irregolari e sfumati
+  for (let i = 0; i < 26 * w * h / 4 + 10; i++) { const a = R() * 6.283, d = Math.sqrt(R()) * 0.5; const u = cx + Math.cos(a) * d * w * 0.95, v = cy + Math.sin(a) * d * h * 0.95; const [x, y] = isoP(u, v); const r = (6 + R() * 10) * Math.sqrt(w * h) / 2; const g = c.createRadialGradient(x, y, 0, x, y, r); g.addColorStop(0, `rgba(${30 + R() * 20 | 0},${22 + R() * 14 | 0},${14 + R() * 8 | 0},${0.16 + R() * 0.12})`); g.addColorStop(1, 'rgba(30,22,14,0)'); c.fillStyle = g; c.beginPath(); c.ellipse(x, y, r, r * 0.55, 0, 0, 7); c.fill(); }
+  const stone = (x, y, r) => { const n = 5 + (R() * 3 | 0), pts = []; for (let k = 0; k < n; k++) { const a = k / n * 6.283 + R() * 0.5, rr = r * (0.7 + R() * 0.45); pts.push([x + Math.cos(a) * rr, y + Math.sin(a) * rr * 0.62]); } const base = 0.62 + R() * 0.45; poly(c, pts, shade('#9a9184', base), 'rgba(30,24,18,0.55)', 0.7); c.fillStyle = shade('#c8c0b2', base, 0.55); c.beginPath(); c.ellipse(x - r * 0.25, y - r * 0.2, r * 0.38, r * 0.2, -0.3, 0, 7); c.fill(); };
+  const beam = (x, y, L, ang, burnt) => { c.save(); c.translate(x, y); c.rotate(ang); const col = burnt ? '#2e2016' : shade('#6b4a2a', 0.8 + R() * 0.3); c.fillStyle = 'rgba(0,0,0,0.25)'; c.fillRect(-L / 2 + 1, 0.6, L, 3.4); c.fillStyle = col; c.fillRect(-L / 2, -1.6, L, 3.4); c.fillStyle = burnt ? 'rgba(255,120,40,0.35)' : 'rgba(255,230,180,0.25)'; c.fillRect(-L / 2, -1.6, L, 1); c.fillStyle = '#1a120b'; c.fillRect(L / 2 - 2.5, -1.6, 2.5, 3.4); c.restore(); };
+  // 2-4 cumuli di macerie
+  const piles = 2 + (R() * 2 | 0) + (w > 2 ? 1 : 0);
+  for (let p = 0; p < piles; p++) { const pu = 0.35 + R() * (w - 0.7), pv = 0.35 + R() * (h - 0.7); const big = 0.6 + R() * 0.6;
+    for (let i = 0; i < 4; i++) { const [x, y] = isoP(pu + (R() - .5) * 0.6, pv + (R() - .5) * 0.6); beam(x, y - R() * 4, 14 + R() * 14, R() * 3.14, R() < 0.6); }
+    for (let i = 0; i < 9 * big; i++) { const a = R() * 6.283, d = R() * 0.45 * big; const [x, y] = isoP(pu + Math.cos(a) * d, pv + Math.sin(a) * d, (0.45 * big - d) * 14); stone(x, y, 2.2 + R() * 3.4 * big); } }
+  // pietre e schegge sparse
+  for (let i = 0; i < 10 * w * h / 4 + 4; i++) { const [x, y] = isoP(0.15 + R() * (w - 0.3), 0.15 + R() * (h - 0.3)); if (R() < 0.7) stone(x, y, 1.2 + R() * 1.8); else beam(x, y, 6 + R() * 6, R() * 3.14, true); }
 }
 // caches
 // ================= DECORAZIONI: disegni procedurali (sostituibili con modelli Meshy dello stesso nome) =================
@@ -1487,7 +1492,7 @@ function bCache(b) {
   const top = b.t === 'mastio' ? 230 : b.t === 'monastero' ? 130 : b.t === 'torre' ? 110 : 90;
   const fn = PAINT[b.t] || PAINT.capanno; return cached(`${b.t}_${b.lvl}_${b.seed % 3}${b.t === 'stendardo' ? JSON.stringify(ARMS()) : ''}`, b.w, b.h, top, c => fn(c, b.lvl, 11 + b.seed % 3 * 7));
 }
-function rubbleCache(b) { return cached(`rub${b.w}x${b.h}`, b.w, b.h, 20, c => paintRubble(c, b.w, b.h, b.w * 13)); }
+function rubbleCache(b) { const v = ((b.x * 7 + b.y * 13) >>> 0) % 3; return cached(`rub${b.w}x${b.h}_${v}`, b.w, b.h, 30, c => paintRubble(c, b.w, b.h, b.w * 13 + v * 101)); }
 
 // ---------- units ----------
 function mkUnit(k, side, x, y, hero) {
