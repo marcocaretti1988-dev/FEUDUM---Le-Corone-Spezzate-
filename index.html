@@ -386,7 +386,7 @@ html[data-theme=pietra] .dcard,html[data-theme=pietra] .chap .chq{background:rgb
 .rnews{display:flex;flex-direction:column;gap:5px}.rnw{display:flex;align-items:center;gap:7px;font-size:12px}.rnw span:nth-child(2){flex:1}.rnw small{opacity:.6;font-size:10.5px;white-space:nowrap}
 .rdet .rhd{display:flex;align-items:center;gap:12px;margin-bottom:8px}.rdet .rhd div{display:flex;flex-direction:column}.rdet .rhd b{font-family:var(--fh);font-size:16px}.rdet .rhd small{font-size:12px;opacity:.8}
 html[data-theme=pietra] .rrow{background:rgba(255,255,255,.05)}
-#sheet[data-p=realms],#sheet[data-p=realm],#sheet[data-p=imp],#sheet[data-p=cron],#sheet[data-p=mood],#sheet[data-p=arms]{z-index:60}
+#sheet[data-p=realms],#sheet[data-p=realm],#sheet[data-p=imp],#sheet[data-p=cron],#sheet[data-p=bk],#sheet[data-p=mood],#sheet[data-p=arms]{z-index:60}
 
 /* ---- visita, diario, memoria diplomatica ---- */
 #vbar{position:fixed;left:8px;right:8px;top:calc(var(--sat) + 8px);z-index:20;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 10px;border-radius:14px;background:linear-gradient(180deg,rgba(243,230,196,.97),rgba(220,198,150,.97));border:2px solid #5c3a25;box-shadow:0 6px 18px rgba(0,0,0,.5)}
@@ -533,21 +533,21 @@ html[data-theme=miniatura] #tbtns .tb .bl{font-size:17px;letter-spacing:.02em}
 #hud-bot .hb.img .i{display:block;width:100%;max-width:66px;aspect-ratio:1;background-size:contain;background-repeat:no-repeat;background-position:center;filter:drop-shadow(0 3px 4px rgba(0,0,0,.6));position:relative}
 #hud-bot .hb.img:active{transform:translateY(2px)}
 #hud-bot .hb.img .i .ico{position:absolute;left:22%;top:20%;width:56%;height:56%;filter:drop-shadow(0 2px 2px rgba(0,0,0,.7))}
-#hud-bot .k-esercito .i{background-image:url(ui/hb_esercito.webp?v=ee4794f981)}#hud-bot .k-esercito:active .i{background-image:url(ui/hb_esercito_p.webp?v=ee4794f981)}
-#hud-bot .k-attacca .i{background-image:url(ui/hb_attacca.webp?v=ee4794f981)}#hud-bot .k-attacca:active .i{background-image:url(ui/hb_attacca_p.webp?v=ee4794f981)}
-#hud-bot .k-menu .i{background-image:url(ui/hb_menu.webp?v=ee4794f981)}#hud-bot .k-menu:active .i{background-image:url(ui/hb_menu_p.webp?v=ee4794f981)}
-#hud-bot .k-mastio .i{background-image:url(ui/hb_mastio.webp?v=ee4794f981)}#hud-bot .k-mastio:active .i{background-image:url(ui/hb_mastio_p.webp?v=ee4794f981)}
-#hud-bot .k-costruisci .i{background-image:url(ui/hb_costruisci.webp?v=ee4794f981)}#hud-bot .k-costruisci:active .i{background-image:url(ui/hb_costruisci_p.webp?v=ee4794f981)}
+#hud-bot .k-esercito .i{background-image:url(ui/hb_esercito.webp?v=f684a309cd)}#hud-bot .k-esercito:active .i{background-image:url(ui/hb_esercito_p.webp?v=f684a309cd)}
+#hud-bot .k-attacca .i{background-image:url(ui/hb_attacca.webp?v=f684a309cd)}#hud-bot .k-attacca:active .i{background-image:url(ui/hb_attacca_p.webp?v=f684a309cd)}
+#hud-bot .k-menu .i{background-image:url(ui/hb_menu.webp?v=f684a309cd)}#hud-bot .k-menu:active .i{background-image:url(ui/hb_menu_p.webp?v=f684a309cd)}
+#hud-bot .k-mastio .i{background-image:url(ui/hb_mastio.webp?v=f684a309cd)}#hud-bot .k-mastio:active .i{background-image:url(ui/hb_mastio_p.webp?v=f684a309cd)}
+#hud-bot .k-costruisci .i{background-image:url(ui/hb_costruisci.webp?v=f684a309cd)}#hud-bot .k-costruisci:active .i{background-image:url(ui/hb_costruisci_p.webp?v=f684a309cd)}
 #hud-bot .hb.img.dis .i,#hud-bot .hb.img:disabled .i{filter:grayscale(1) brightness(.8)}
 #hud-bot{gap:4px!important;padding-left:6px!important;padding-right:6px!important}
 /* ===== icone dipinte delle risorse ===== */
-.ico.ico-cibo{background-image:url(ui/rs_cibo.webp?v=ee4794f981)!important;background-size:cover!important;border-radius:22%}#res .chip:active .ico-cibo{background-image:url(ui/rs_cibo_p.webp?v=ee4794f981)!important}
-.ico.ico-legno{background-image:url(ui/rs_legno.webp?v=ee4794f981)!important;background-size:cover!important;border-radius:22%}#res .chip:active .ico-legno{background-image:url(ui/rs_legno_p.webp?v=ee4794f981)!important}
-.ico.ico-oro{background-image:url(ui/rs_oro.webp?v=ee4794f981)!important;background-size:cover!important;border-radius:22%}#res .chip:active .ico-oro{background-image:url(ui/rs_oro_p.webp?v=ee4794f981)!important}
-.ico.ico-pietra{background-image:url(ui/rs_pietra.webp?v=ee4794f981)!important;background-size:cover!important;border-radius:22%}#res .chip:active .ico-pietra{background-image:url(ui/rs_pietra_p.webp?v=ee4794f981)!important}
-.ico.ico-ferro{background-image:url(ui/rs_ferro.webp?v=ee4794f981)!important;background-size:cover!important;border-radius:22%}#res .chip:active .ico-ferro{background-image:url(ui/rs_ferro_p.webp?v=ee4794f981)!important}
-.ico.ico-pelli{background-image:url(ui/rs_pelli.webp?v=ee4794f981)!important;background-size:cover!important;border-radius:22%}#res .chip:active .ico-pelli{background-image:url(ui/rs_pelli_p.webp?v=ee4794f981)!important}
-.ico.ico-favore{background-image:url(ui/rs_favore.webp?v=ee4794f981)!important;background-size:cover!important;border-radius:22%}#res .chip:active .ico-favore{background-image:url(ui/rs_favore_p.webp?v=ee4794f981)!important}
+.ico.ico-cibo{background-image:url(ui/rs_cibo.webp?v=f684a309cd)!important;background-size:cover!important;border-radius:22%}#res .chip:active .ico-cibo{background-image:url(ui/rs_cibo_p.webp?v=f684a309cd)!important}
+.ico.ico-legno{background-image:url(ui/rs_legno.webp?v=f684a309cd)!important;background-size:cover!important;border-radius:22%}#res .chip:active .ico-legno{background-image:url(ui/rs_legno_p.webp?v=f684a309cd)!important}
+.ico.ico-oro{background-image:url(ui/rs_oro.webp?v=f684a309cd)!important;background-size:cover!important;border-radius:22%}#res .chip:active .ico-oro{background-image:url(ui/rs_oro_p.webp?v=f684a309cd)!important}
+.ico.ico-pietra{background-image:url(ui/rs_pietra.webp?v=f684a309cd)!important;background-size:cover!important;border-radius:22%}#res .chip:active .ico-pietra{background-image:url(ui/rs_pietra_p.webp?v=f684a309cd)!important}
+.ico.ico-ferro{background-image:url(ui/rs_ferro.webp?v=f684a309cd)!important;background-size:cover!important;border-radius:22%}#res .chip:active .ico-ferro{background-image:url(ui/rs_ferro_p.webp?v=f684a309cd)!important}
+.ico.ico-pelli{background-image:url(ui/rs_pelli.webp?v=f684a309cd)!important;background-size:cover!important;border-radius:22%}#res .chip:active .ico-pelli{background-image:url(ui/rs_pelli_p.webp?v=f684a309cd)!important}
+.ico.ico-favore{background-image:url(ui/rs_favore.webp?v=f684a309cd)!important;background-size:cover!important;border-radius:22%}#res .chip:active .ico-favore{background-image:url(ui/rs_favore_p.webp?v=f684a309cd)!important}
 #res .chip .ic{height:34px!important}#res .chip .ic .ico{width:34px!important;height:34px!important;filter:drop-shadow(0 2px 2px rgba(0,0,0,.6))}
 #res .chip{padding-top:4px!important}
 .cc .ico,.costs .ico,.btn small .ico{width:1.4em;height:1.4em;vertical-align:-.38em}
@@ -579,6 +579,9 @@ body.asking #title,body.asking #sheet,body.asking #hud{pointer-events:none}
 .crow .cic{font-size:22px;width:30px;text-align:center}.crow .ctx{display:flex;flex-direction:column}.crow b{font-family:var(--fh);font-size:13.5px}.crow small{font-size:11.5px;opacity:.75}.crow.lock{opacity:.55;filter:grayscale(.6)}
 #tutb.mini{top:calc(var(--sat) + 8px);bottom:auto;z-index:62;padding:6px 10px;align-items:center;max-width:340px}#tutb.mini .tav{width:30px;height:30px;font-size:18px}#tutb.mini b{font-size:13px;margin:0}
 #tutb:not(.mini){bottom:calc(var(--sab) + 108px)}
+.crown{margin:6px 0 10px;padding:9px 12px;border-radius:10px;background:linear-gradient(180deg,rgba(201,162,39,.22),rgba(201,162,39,.08));border:1px solid rgba(201,162,39,.6);text-align:center}.crown b{font-family:var(--fh)}.crown small{display:block;font-size:11.5px;opacity:.85;margin-top:3px}
+.cfr{display:flex;gap:6px;justify-content:center;margin:5px 0 2px}.cfr span{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.18);color:rgba(0,0,0,.35);font-size:14px}.cfr span.on{background:radial-gradient(circle at 35% 30%,#ffe8a0,#c99a2e);color:#7a1414;box-shadow:0 0 8px rgba(255,210,100,.7)}
+.tcard.crownt{border-color:#c99a2e!important;box-shadow:0 0 0 2px rgba(201,162,39,.35),0 4px 12px rgba(0,0,0,.25);background:linear-gradient(180deg,#fff6d8,#f2deaa)!important}
 </style>
 </head>
 <body>
@@ -772,7 +775,7 @@ function need3d(k, low) {
 function pump3d() {
   while (L3.active < L3.max && (L3.q.length || (L3.prefetch.length && L3.active < 1))) {
     const k = L3.q.length ? L3.q.shift() : L3.prefetch.shift(); if (L3.state[k] !== 'q') continue; L3.state[k] = 'l'; L3.active++;
-    const sc = document.createElement('script'); sc.src = 'm3d_' + k + '.js?v=ee4794f981'; sc.async = true;
+    const sc = document.createElement('script'); sc.src = 'm3d_' + k + '.js?v=f684a309cd'; sc.async = true;
     sc.onload = () => { L3.state[k] = 'ok'; L3.active--; if (G3.gl && M3D[k]) { if (!G3.models[k]) g3load(k, M3D[k]); for (const a in M3D_ALIAS) if (M3D_ALIAS[a] === k && !G3.models[a] && a !== 'mastio') G3.models[a] = G3.models[k]; delete M3D[k]; } pump3d(); };
     sc.onerror = () => { L3.state[k] = 'err'; L3.active--; pump3d(); };
     document.head.appendChild(sc);
@@ -798,7 +801,7 @@ function g3load(k, m) {
 // draws model k for building b into ctx c (world-screen coords). fit = footprint tiles the model should span
 // due passate: prima l'ombra portata a terra (piatta, senza profondità), poi il modello sopra
 function g3passes(gl, o) {
-  gl.uniform1f(G3.u.Sh, 1); gl.uniform1f(G3.u.ShF, 1); gl.disable(gl.DEPTH_TEST); gl.depthMask(false); gl.drawElements(gl.TRIANGLES, o.count, gl.UNSIGNED_SHORT, 0);
+  if (QQ().sh) { gl.uniform1f(G3.u.Sh, 1); gl.uniform1f(G3.u.ShF, 1); gl.disable(gl.DEPTH_TEST); gl.depthMask(false); gl.drawElements(gl.TRIANGLES, o.count, gl.UNSIGNED_SHORT, 0); }
   gl.uniform1f(G3.u.Sh, 0); gl.uniform1f(G3.u.ShF, 0); gl.enable(gl.DEPTH_TEST); gl.depthMask(true); gl.drawElements(gl.TRIANGLES, o.count, gl.UNSIGNED_SHORT, 0);
 }
 function g3draw(c, b, k, fit, yaw) {
@@ -819,7 +822,7 @@ function g3draw(c, b, k, fit, yaw) {
     const sgx = gx + SHX * h, sgy = gy + SHY * h, SX = (sgx - sgy) * 32, SY = (sgx + sgy) * 16; x0 = Math.min(x0, SX); x1 = Math.max(x1, SX); y0s = Math.min(y0s, SY); y1 = Math.max(y1, SY);
   }
   x0 -= 4; y0s -= 4; x1 += 4; y1 += 4; const rw = x1 - x0, rh = y1 - y0s;
-  const res = Math.min(2.5, cam.z * DPR * 1.15); const key = ANG.toFixed(4) + '|' + res.toFixed(2) + '|' + k + '|' + (yaw || 0).toFixed(3);
+  const res = Math.min(2.5, cam.z * DPR * 1.15); const key = ANG.toFixed(4) + '|' + res.toFixed(2) + '|' + k + '|' + (yaw || 0).toFixed(3) + QQ().sh;
   if (b.c3k === key && b.c3cv) { c.drawImage(b.c3cv, x0, y0s, rw, rh); b.r3d = [x0, y0s, rw, rh]; return true; } const W = Math.min(2048, Math.ceil(rw * res)), H = Math.min(2048, Math.ceil(rh * res));
   if (G3.cv.width !== W || G3.cv.height !== H) { G3.cv.width = W; G3.cv.height = H; }
   gl.viewport(0, 0, W, H); gl.clearColor(0, 0, 0, 0); gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
@@ -1715,10 +1718,11 @@ const umore = () => lifeCache().um;
 const umoreWord = v => v >= 75 ? ['😄', 'Festoso'] : v >= 55 ? ['🙂', 'Contento'] : v >= 35 ? ['😐', 'Inquieto'] : ['😠', 'Malcontento'];
 const umoreMult = () => { if (!S || S.creative) return 1; const v = umore(); return v >= 75 ? 1.05 : v < 35 ? 0.9 : 1; };
 const famine = () => !!(S && !S.creative && MODE === 'village' && (S.res.cibo || 0) < 1);
-let FEST_T = 240;
+let FEST_T = 240, FEST_MT = 0;
 function festTick(dt) {
   if (!S || S.creative || MODE !== 'village' || !SC) return;
   if (S.fest && now() > S.fest.end) { S.fest = null; }
+  if (S.fest) { FEST_MT = (FEST_MT || 0) - dt; if (FEST_MT <= 0) { FEST_MT = 7; sfx('festa'); } }
   if (famine()) { if (!S.famineWarned) { S.famineWarned = 1; toast('🍂 Carestia! Il granaio è vuoto: le case si spengono e il popolo è malcontento (-10% produzione)'); sfx('bell'); } } else S.famineWarned = 0;
   FEST_T -= dt; if (FEST_T > 0 || S.fest) return; FEST_T = 420 + Math.random() * 300;
   if (umore() < 70 || !PATHC.plaza || (S.nightIn != null && S.nightIn < 120)) return;
@@ -1726,7 +1730,7 @@ function festTick(dt) {
 }
 function festStart() {
   const [px, py] = PATHC.plaza || [MCX, MCX]; S.fest = { end: now() + 80000, x: px + 1.2, y: py + 1.4 };
-  addRes('favore', 1); toast('🎉 Festa in piazza! Il popolo è felice e balla attorno al falò: +1 👑 Favore'); sfx('win'); festFX();
+  addRes('favore', 1); toast('🎉 Festa in piazza! Il popolo è felice e balla attorno al falò: +1 👑 Favore'); sfx('festa'); FEST_MT = 7; festFX();
   for (const u of SC.U) if (u.ai === workerAI || u.kid) { u.st = 'rest'; u.wt = Math.random() * 2; }
 }
 function festFX() { if (!S.fest || !SC) return; if (SC.FX.some(f => f.k === 'festa')) return; SC.FX.push({ k: 'festa', x: S.fest.x, y: S.fest.y, t: 0, dur: Math.max(1, (S.fest.end - now()) / 1000), draw: drawFesta }); }
@@ -1827,7 +1831,17 @@ function cloudPush(now_) {
   CLOUD.t = t; CLOUD.pend = false; const s = JSON.stringify(S); if (s === CLOUD.lastS) return; CLOUD.lastS = s;
   cloudDoc(SAVE_KEY).set({ s, t: S.last || t, m: S.mastio || 1 }).then(() => { CLOUD.last = Date.now(); }).catch(e => { CLOUD.err++; CLOUD.lastS = null; });
 }
-function save() { S.last = Date.now(); const j = JSON.stringify(S); CLOUD.mem = CLOUD.mem || {}; CLOUD.mem[SAVE_KEY] = j; try { localStorage.setItem(SAVE_KEY, j); } catch (e) { } cloudPush(false); }
+function save() { S.last = Date.now(); const j = JSON.stringify(S); CLOUD.mem = CLOUD.mem || {}; CLOUD.mem[SAVE_KEY] = j; try { localStorage.setItem(SAVE_KEY, j); } catch (e) { } backupTick(j); cloudPush(false); }
+// ---- copie di sicurezza: ultima ora, ieri, l'altro ieri (+ quella fatta prima di una nuova campagna) ----
+const BK_SLOTS = { h: 'Un\'ora fa circa', d1: 'Ieri', d2: 'L\'altro ieri', nuova: 'Prima di «Nuova Campagna»' };
+function bkMeta() { try { return JSON.parse(localStorage.getItem('feudum_bk_' + SAVE_KEY) || '{}'); } catch (e) { return {}; } }
+function bkPut(slot, j, meta) { try { localStorage.setItem(SAVE_KEY + '_bk_' + slot, j); const s = JSON.parse(j); meta[slot] = { t: Date.now(), m: s.mastio, ch: s.mq }; localStorage.setItem('feudum_bk_' + SAVE_KEY, JSON.stringify(meta)); } catch (e) { } }
+function backupTick(j) { if (!S || S.sandbox || S.creative) return; const M = bkMeta(), t = Date.now(); const day = x => new Date(x).toDateString();
+  if (!M.h || t - M.h.t > 3600000) bkPut('h', j, M);
+  if (!M.d1 || day(M.d1.t) !== day(t)) { if (M.d1) { try { const old = localStorage.getItem(SAVE_KEY + '_bk_d1'); if (old) bkPut('d2', old, M); M.d2 && (M.d2.t = M.d1.t); localStorage.setItem('feudum_bk_' + SAVE_KEY, JSON.stringify(M)); } catch (e) { } } bkPut('d1', j, M); } }
+function openBackups(fromTitle) { const M = bkMeta(); const rows = Object.keys(BK_SLOTS).filter(k => M[k]).map(k => { const m = M[k]; const w = new Date(m.t).toLocaleString('it-IT', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }); return `<div class="row" style="display:flex;align-items:center;gap:8px;justify-content:space-between"><div><b>${BK_SLOTS[k]}</b><br><small>Mastio ${m.m || 1} · salvata ${w}</small></div><button class="btn" onclick="restoreBk('${k}',${fromTitle ? 1 : 0})">Ripristina</button></div>`; }).join('');
+  openSheet('🛟 Copie di sicurezza', `<p class="desc">Il gioco conserva da solo alcune copie della tua campagna. Se qualcosa va storto puoi tornare a una di queste.</p>${rows || '<p class="desc"><i>Nessuna copia ancora: si creano mentre giochi.</i></p>'}`, 'bk'); }
+function restoreBk(k, fromTitle) { askYes(`Tornare alla copia «${BK_SLOTS[k]}»?<br><small>La partita attuale viene sostituita (ne tengo comunque una copia).</small>`, () => { try { const j = localStorage.getItem(SAVE_KEY + '_bk_' + k); if (!j) { toast('Copia non trovata'); return; } const cur = localStorage.getItem(SAVE_KEY); if (cur) bkPut('nuova', cur, bkMeta()); localStorage.setItem(SAVE_KEY, j); CLOUD.mem = CLOUD.mem || {}; CLOUD.mem[SAVE_KEY] = j; closeSheet(); toast('🛟 Copia ripristinata'); beginGame(false); } catch (e) { toast('Ripristino non riuscito'); } }, 'Ripristina'); }
 function load() { try { const j = localStorage.getItem(SAVE_KEY) || (CLOUD.mem && CLOUD.mem[SAVE_KEY]); if (j) { const s = JSON.parse(j); if (s && s.v === 1) return s; } } catch (e) { } return null; }
 function bLvlCap() { if (S && S.creative) return 4; return S.mastio <= 8 ? Math.min(4, 1 + Math.floor(S.mastio / 2)) : Math.min(8, 4 + Math.ceil((S.mastio - 8) / 2)); }
 function caps() {
@@ -2060,7 +2074,14 @@ function sfx(kind) {
   if (SET.mute || SET.fvol <= 0) return; const a = ac(); if (!a) return; const t = a.currentTime; const OUT = fxOut(a);
   const noise = (dur, f, q, vol, type) => { const b = a.createBuffer(1, a.sampleRate * dur, a.sampleRate), d = b.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / d.length); const s = a.createBufferSource(); s.buffer = b; const fl = a.createBiquadFilter(); fl.type = type || 'bandpass'; fl.frequency.value = f; fl.Q.value = q; const g = a.createGain(); g.gain.value = vol; s.connect(fl).connect(g).connect(OUT); s.start(t); };
   const tone = (f, dur, vol, type, f2) => { const o = a.createOscillator(); o.type = type || 'sine'; o.frequency.setValueAtTime(f, t); if (f2) o.frequency.exponentialRampToValueAtTime(f2, t + dur); const g = a.createGain(); g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(0.001, t + dur); o.connect(g).connect(OUT); o.start(t); o.stop(t + dur); };
-  if (kind === 'arrow') noise(0.12, 2400, 2, 0.05);
+  if (kind === 'ram') { tone(70, 0.35, 0.22, 'sine', 38); noise(0.25, 180, 0.8, 0.16, 'lowpass'); setTimeout(() => noise(0.12, 900, 1.5, 0.05), 60); }
+  else if (kind === 'launch') { tone(220, 0.25, 0.05, 'sawtooth', 90); noise(0.45, 700, 0.6, 0.07); setTimeout(() => tone(55, 0.2, 0.12, 'sine', 35), 80); }
+  else if (kind === 'boulder') { tone(60, 0.5, 0.25, 'sine', 30); noise(0.6, 250, 0.6, 0.18, 'lowpass'); setTimeout(() => noise(0.3, 1400, 1, 0.05), 90); }
+  else if (kind === 'ladder') { for (let i = 0; i < 3; i++) setTimeout(() => { tone(380 + i * 40, 0.06, 0.035, 'triangle'); noise(0.05, 1800, 2, 0.025); }, i * 140); }
+  else if (kind === 'bow') { tone(180, 0.18, 0.06, 'triangle', 420); noise(0.15, 2600, 2, 0.04); }
+  else if (kind === 'step') { noise(0.05, 600, 1.2, 0.025, 'lowpass'); }
+  else if (kind === 'festa') { const N = [523, 659, 784, 659, 698, 880, 784, 659, 587, 523, 587, 659]; N.forEach((f, i) => setTimeout(() => { const o = a.createOscillator(), g = a.createGain(), t0 = a.currentTime; o.type = 'triangle'; o.frequency.value = f; g.gain.setValueAtTime(0.0001, t0); g.gain.linearRampToValueAtTime(0.06, t0 + 0.02); g.gain.exponentialRampToValueAtTime(0.001, t0 + 0.24); o.connect(g).connect(OUT); o.start(t0); o.stop(t0 + 0.26); if (i % 4 === 0) noise(0.06, 200, 1, 0.08, 'lowpass'); }, i * 210)); }
+  else if (kind === 'arrow') noise(0.12, 2400, 2, 0.05);
   else if (kind === 'hit') { noise(0.08, 500, 1, 0.08); }
   else if (kind === 'bolt') { tone(140, 0.15, 0.08, 'triangle', 60); noise(0.1, 1200, 1, 0.06); }
   else if (kind === 'crash') { noise(0.5, 300, 0.7, 0.14, 'lowpass'); }
@@ -2210,6 +2231,7 @@ function attack(sc, u, t) {
   const [tx, ty] = tPos(t); setFace(u, tx - u.x, ty - u.y);
   if (u.cd > 0) return;
   u.cd = u.d.cd * (u.slow > 0 ? 1.3 : 1); u.atkT = 0.32;
+  if (u.d.siege === 'ram') sfx('ram'); else if (u.d.siege === 'cat') sfx('launch');
   let dmg = u.d.dmg * (u.dm || 1) * (u.gb > 0 ? 1.4 : 1) * (u.ga > 0 ? 1.1 : 1); if (u.pl && sc.arms) dmg *= sc.arms; if (u.pl && u.d.ranged && u.rm) dmg *= u.rm;
   if (u.d.fury && u.hp < u.maxhp * 0.3) { dmg *= 2; if (Math.random() < 0.3) floatText(sc, u.x, u.y, 'FURIA!', '#f55', 0.7); }
   if (u.d.charge && !u.charged) { dmg *= 2; u.charged = true; floatText(sc, u.x, u.y, 'Carica!', '#fd6', 0.8); }
@@ -2307,7 +2329,7 @@ function updateScene(sc, dt) {
   // projectiles
   for (const p of sc.P) {
     p.t += dt; if (!p.tgt.dead) { const [tx, ty] = tPos(p.tgt); p.tx = tx; p.ty = ty; }
-    if (p.t >= p.dur) { p.done = true; if (!p.tgt.dead) dealDamage(sc, p.tgt, p.dmg, p.src, p.type); if (p.type === 'stone') { for (const o of sc.U) if (!o.dead && p.src && o.side !== p.src.side && Math.hypot(o.x - p.tx, o.y - p.ty) < 1.6) dealDamage(sc, o, p.dmg * 0.35, p.src, 'stone'); for (let i = 0; i < 5; i++) puff(sc, p.tx + (Math.random() - .5), p.ty + (Math.random() - .5), 8, '#8a7a60'); shake(3); sfx('crash'); } }
+    if (p.t >= p.dur) { p.done = true; if (!p.tgt.dead) dealDamage(sc, p.tgt, p.dmg, p.src, p.type); if (p.type === 'stone') { for (const o of sc.U) if (!o.dead && p.src && o.side !== p.src.side && Math.hypot(o.x - p.tx, o.y - p.ty) < 1.6) dealDamage(sc, o, p.dmg * 0.35, p.src, 'stone'); for (let i = 0; i < 5; i++) puff(sc, p.tx + (Math.random() - .5), p.ty + (Math.random() - .5), 8, '#8a7a60'); shake(3); sfx('boulder'); } }
   }
   sc.P = sc.P.filter(p => !p.done);
   // smoke from damaged buildings
@@ -2387,7 +2409,7 @@ function render(sc, dt) {
   const L = [];
   for (const b of sc.B) if (!b.dead) { const vr = vRect(b); const [wx, wy] = WR(vr[0], vr[1]); if (vis(wx, wy + 40)) L.push([BDEF[b.t].moat || BDEF[b.t].flat ? -1e6 + vr[0] + vr[1] : vr[0] + vr[1] + (b.w + b.h) / 2 - (BDEF[b.t].wall ? 0.0 : 0.02), 0, b]); }
   for (const u of sc.U) { const [wx, wy] = W(u.x, u.y); const p = rotP(u.x, u.y); if (vis(wx, wy)) L.push([u.dead ? p[0] + p[1] - 1.2 : p[0] + p[1], 1, u]); }
-  for (const t of sc.trees) { const [wx, wy] = W(t.x, t.y); if (vis(wx, wy)) { const gi = sc.grid[(t.y | 0) * N + (t.x | 0)]; if (gi >= 0 && sc.B[gi] && !sc.B[gi].dead && !BDEF[sc.B[gi].t].decor) continue; const p = rotP(t.x, t.y); L.push([p[0] + p[1], 2, t]); } }
+  for (const t of sc.trees) { const [wx, wy] = W(t.x, t.y); if (vis(wx, wy)) { const gi = sc.grid[(t.y | 0) * N + (t.x | 0)]; if (gi >= 0 && sc.B[gi] && !sc.B[gi].dead && !BDEF[sc.B[gi].t].decor) continue; const tq = QQ().tr; if (tq < 1 && Math.hypot(t.x - MCX, t.y - MCX) > 26 && ((((t.x * 73) | 0) ^ ((t.y * 151) | 0)) & 1023) / 1024 > tq) continue; const p = rotP(t.x, t.y); L.push([p[0] + p[1], 2, t]); } }
   for (const r of sc.rocks) { const [wx, wy] = W(r.x, r.y); if (vis(wx, wy)) { const p = rotP(r.x, r.y); L.push([p[0] + p[1] - 0.3, 3, r]); } }
   if (sc.mode === 'village' && S && S.fauna) for (const a of S.fauna) { const [wx, wy] = W(a.x, a.y); if (vis(wx, wy)) { const p = rotP(a.x, a.y); L.push([p[0] + p[1], 5, a]); } }
   const bans = (sc.mode === 'village' || sc.mode === 'raid') && PATHC.banners && sc.pathG === PATHC.grid ? PATHC.banners : sc.props || []; for (const l of bans) { const [wx, wy] = W(l.x, l.y); if (vis(wx, wy)) { const p = rotP(l.x, l.y); L.push([p[0] + p[1], 9, l]); } }
@@ -2589,7 +2611,11 @@ function drawUnit0(c, sc, u) {
 // ================= GAME: village, battles, input, UI =================
 const cv = document.getElementById('cv'), ctx = cv.getContext('2d');
 let DPR = 1, VW = 0, VH = 0;
-function resize() { DPR = Math.min(2, window.devicePixelRatio || 1); VW = innerWidth; VH = innerHeight; cv.width = Math.round(VW * DPR); cv.height = Math.round(VH * DPR); cv.style.width = VW + 'px'; cv.style.height = VH + 'px'; }
+// ---- qualità grafica ----
+const QUAL = { alta: { n: 'Alta', d: 'Tutto attivo: ombre, foreste piene, luci, nitidezza massima.', dpr: 2, sh: 1, tr: 1, fx: 1, fps: 60 }, media: { n: 'Media', d: 'Bilanciata per iPhone: un po\' meno nitidezza, foreste più leggere.', dpr: 1.5, sh: 1, tr: 0.7, fx: 0.7, fps: 60 }, bassa: { n: 'Bassa', d: 'Batteria e fluidità prima di tutto: niente ombre, meno alberi ed effetti, 30 fotogrammi al secondo.', dpr: 1, sh: 0, tr: 0.45, fx: 0.4, fps: 30 } };
+const QQ = () => QUAL[SET.q] || QUAL[(innerWidth < 700 ? 'media' : 'alta')];
+function setQual(k) { SET.q = k; saveSet(); resize(); for (const k2 in G3S) delete G3S[k2]; if (SC) for (const b of SC.B) { b.c3k = null; } toast('🖥️ Qualità grafica: ' + QUAL[k].n); openMenu('look'); }
+function resize() { DPR = Math.min(QQ().dpr, window.devicePixelRatio || 1); VW = innerWidth; VH = innerHeight; cv.width = Math.round(VW * DPR); cv.height = Math.round(VH * DPR); cv.style.width = VW + 'px'; cv.style.height = VH + 'px'; }
 const $ = s => document.querySelector(s);
 const now = () => Date.now();
 let GROUND_V = null, GROUND_E = null, GROUND_R = null;
@@ -2877,7 +2903,7 @@ function startAttack(i) {
   const total = Object.values(S.army).reduce((a, b) => a + b, 0); const heroes = heroList();
   if (!total && !heroes.length) { toast('Non hai truppe! Addestra prima un esercito.'); return; }
   closeSheet(); sfx('horn'); tensionStart('attack');
-  closeFolk(); SC = tg.rid != null ? genRealmSiege(tg) : genEnemy(tg); MODE = 'attack'; buildZone(SC); SC.arms = armsMult();
+  closeFolk(); SC = tg.rid != null ? genRealmSiege(tg) : genEnemy(tg); if (tg.boss) bossSetup(SC); MODE = 'attack'; buildZone(SC); SC.arms = armsMult(); if (tg.boss) setTimeout(() => toast('👑 Il Margravio di Steyr in persona difende la fortezza'), 1500);
   BT = { tg, idx: i, avail: { ...S.army }, used: {}, heroes: heroes.map(k => ({ k, u: null })), timer: 210, started: false, lootGot: {}, mastioDown: false, ended: false };
   SC.onBDead = b => { for (const k in b.loot) { BT.lootGot[k] = (BT.lootGot[k] || 0) + b.loot[k]; } if (b.t === 'mastio') BT.mastioDown = true; buildZone(SC); const [x, y] = [b.x + b.w / 2, b.y + b.h / 2]; const s = Object.entries(b.loot).filter(e => e[1] > 0).map(e => `+${e[1]}${RICON[e[0]]}`).join(' '); if (s) floatText(SC, x, y, s, '#ffe9a6', 1.6); };
   SC.onRevive = u => { if (!u.hero) BT.used[u.k] = BT.used[u.k]; };
@@ -2970,7 +2996,7 @@ function tryClimb(sc, u, dt) {
   u.clT = (u.clT || 0) + dt; if (u.clT < 3.5) return false;
   const w = u.wall, dx = w.x + 0.5 - u.x, dy = w.y + 0.5 - u.y, l = Math.hypot(dx, dy) || 1; const tx = w.x + 0.5 + dx / l * 1.0, ty = w.y + 0.5 + dy / l * 1.0;
   if (!inMap(Math.floor(tx), Math.floor(ty)) || bAt(sc, Math.floor(tx), Math.floor(ty)) || isWater(sc, Math.floor(tx), Math.floor(ty))) { u.clT = 0; return false; }
-  u.climb = { t: 0, to: [tx, ty], w: [w.x + 0.5, w.y + 0.5] }; sfx('tock'); return true;
+  u.climb = { t: 0, to: [tx, ty], w: [w.x + 0.5, w.y + 0.5] }; sfx('ladder'); return true;
 }
 function drawLadder(c, u) { if (!u.climb) return; const [ax, ay] = W(u.x, u.y), [bx, by] = W(u.climb.w[0], u.climb.w[1]); const top = by - 34; c.strokeStyle = '#7a5230'; c.lineWidth = 2; for (const o of [-4, 4]) { c.beginPath(); c.moveTo(ax + o, ay); c.lineTo(bx + o * 0.6, top); c.stroke(); } c.lineWidth = 1.4; for (let i = 1; i < 6; i++) { const k = i / 6, x = ax + (bx - ax) * k, y = ay + (top - ay) * k; c.beginPath(); c.moveTo(x - 4 + 1.6 * k, y); c.lineTo(x + 4 - 1.6 * k, y); c.stroke(); } }
 // sortita: se l'assedio ristagna i difensori escono dal castello
@@ -3017,7 +3043,7 @@ function endBattle() {
     html = `<div class="stars">${'★'.repeat(st)}<span>${'★'.repeat(3 - st)}</span></div><h3>${st ? 'Vittoria!' : 'Sconfitta'}</h3><p class="sub">${BT.tg.name} — distruzione ${BT.pct}%</p>
       <div class="row"><b>Bottino:</b> ${Object.keys(got).filter(k => got[k] > 0).map(k => `${ICO(k)} ${got[k]}`).join('  ') || 'nessuno'}</div>
       <div class="row"><b>Caduti:</b> ${Object.keys(dead).map(k => `${UDEF[k].n} ×${dead[k]}`).join(', ') || 'nessuno'}</div>
-      ${cureLine}<p class="lore">${st >= 2 ? '«Le campane della Marca suonano il tuo nome.»' : st ? '«Un passo in più verso la Corona.»' : '«Il fango ha inghiottito il tuo stendardo. Ritorna più forte.»'}</p>`;
+      ${fragReward(st)}${cureLine}<p class="lore">${st >= 2 ? '«Le campane della Marca suonano il tuo nome.»' : st ? '«Un passo in più verso la Corona.»' : '«Il fango ha inghiottito il tuo stendardo. Ritorna più forte.»'}</p>`;
   } else {
     const won = (!SC.U.some(u => !u.dead && u.side === 'A') && BT.spawnLeft <= 0) || BT.pct < 10;
     let stolen = {};
@@ -3031,7 +3057,7 @@ function endBattle() {
   save();
   setTimeout(() => { openSheet('Esito', `<div class="result">${html}<button class="btn big" onclick="backToVillage()">Torna al feudo</button></div>`, 'result'); }, 900);
 }
-function backToVillage() { if (TENS.kind) tensionStop(); else if (MUS.duck) { MUS.duck = false; musicStart(); musicApply(); } closeSheet(); BT = null; MODE = 'village'; SC = buildVillage(); $('#bhud').classList.add('hidden'); $('#hud').classList.remove('hidden'); centerCam(MCX, MCX); cam.z = VW < 600 ? 1.05 : Math.max(0.7, Math.min(1.25, VW / 900)); updateHUD(); save(); }
+function backToVillage() { setTimeout(() => { if (S && S.fragStory != null) fragStoryShow(); }, 600); if (TENS.kind) tensionStop(); else if (MUS.duck) { MUS.duck = false; musicStart(); musicApply(); } closeSheet(); BT = null; MODE = 'village'; SC = buildVillage(); $('#bhud').classList.add('hidden'); $('#hud').classList.remove('hidden'); centerCam(MCX, MCX); cam.z = VW < 600 ? 1.05 : Math.max(0.7, Math.min(1.25, VW / 900)); updateHUD(); save(); }
 function retreat() { if (BT && !BT.ended) { if (MODE === 'raid') { BT.timer = 0; } else endBattle(); } }
 
 // ---------- camera & input ----------
@@ -3360,7 +3386,7 @@ function drawWeather(c, sc, dt) {
   if (on.rain) { c.fillStyle = `rgba(20,30,48,${(k === 'temporale' ? 0.28 : 0.16) * I})`; c.fillRect(0, 0, W0, H0); }
   if (on.snow) { c.fillStyle = `rgba(225,235,250,${0.1 * I})`; c.fillRect(0, 0, W0, H0); }
   // pioggia
-  const nR = on.rain ? Math.round((k === 'temporale' ? 320 : 200) * I * Math.min(1.4, W0 * H0 / (1200 * 800 * D * D) + 0.4)) : 0;
+  const nR = on.rain ? Math.round(QQ().fx * (k === 'temporale' ? 320 : 200) * I * Math.min(1.4, W0 * H0 / (1200 * 800 * D * D) + 0.4)) : 0;
   while (WX.drops.length < nR) WX.drops.push({ x: Math.random() * W0, y: Math.random() * H0, l: (14 + Math.random() * 14) * D, v: (650 + Math.random() * 350) * D });
   if (WX.drops.length > nR) WX.drops.length = nR;
   if (nR) { c.strokeStyle = 'rgba(200,218,240,0.55)'; c.lineWidth = 1.1 * D; c.beginPath(); const sl = wx * 0.9;
@@ -3508,10 +3534,10 @@ function hunterAI(sc, u, dt) {
     u.st = 'back'; u.path = astar(Math.floor(u.x), Math.floor(u.y), (x, y) => x === u.home[0] && y === u.home[1], villagerCost(sc), u.home[0], u.home[1], 6000); u.pi = 0; return; }
   const d = Math.hypot(a.x - u.x, a.y - u.y); if (u.hLead) a.hpos = [u.x, u.y];
   if (u.hLead && d < 3.2) { u.moving = false; setFace(u, a.x - u.x, a.y - u.y); u.aim = (u.aim || 0) + dt; a.tx = a.x; a.ty = a.y; a.wt = 2;
-    if (u.aim > 0.9) { shoot(sc, u.x, u.y, 26, { x: a.x, y: a.y, dead: true }, 0, 'arrow', u); u.resT = 0.45; u.aim = -99; } if (u.resT > 0) { u.resT -= dt; if (u.resT <= 0) huntResolve(a.id); } return; }
+    if (u.aim > 0.9) { sfx('bow'); shoot(sc, u.x, u.y, 26, { x: a.x, y: a.y, dead: true }, 0, 'arrow', u); u.resT = 0.45; u.aim = -99; } if (u.resT > 0) { u.resT -= dt; if (u.resT <= 0) huntResolve(a.id); } return; }
   if (!u.hLead) { const L = sc.U.find(o => o.hunter === u.hunter && o.hLead && !o.dead); if (L && Math.hypot(L.x - u.x, L.y - u.y) < 1.4) { u.moving = false; return; } }
   u.rp -= dt; if (u.rp <= 0 || !u.path || u.pi >= u.path.length) { u.rp = 3; const tx = Math.floor(a.x), ty = Math.floor(a.y); u.path = astar(Math.floor(u.x), Math.floor(u.y), (x, y) => Math.hypot(x + 0.5 - a.x, y + 0.5 - a.y) < 2.4, (x, y) => sc.water[y * N + x] ? Infinity : (bAt(sc, x, y) && !BDEF[bAt(sc, x, y).t].decor ? Infinity : (sc.pathG && sc.pathG[y * N + x] ? 1 : 1.6)), tx, ty, 6000); u.pi = 0; if (u.path && u.path.length > 1 && u.path[0][0] === Math.floor(u.x) && u.path[0][1] === Math.floor(u.y)) u.pi = 1; }
-  if (u.path) followPath(sc, u, dt);
+  if (u.path) { followPath(sc, u, dt); if (u.hLead) { u.stT = (u.stT || 0) - dt; if (u.stT <= 0) { u.stT = 0.42; const [px, py] = W(u.x, u.y); const sx = (px - cam.x) * cam.z + VW / 2, sy = (py - cam.y) * cam.z + VH / 2; if (sx > 0 && sx < VW && sy > 0 && sy < VH) sfx('step'); } } }
 }
 function huntResolve(id) {
   const a = S.fauna.find(f => f.id === id); if (!a || a.dying != null) return; const F = FAUNA[a.k];
@@ -3635,11 +3661,11 @@ function openMenu(tab) {
   const tabs = [['audio', 'sound', 'Audio'], ['look', 'scroll', 'Layout'], ['diff', 'army', 'Difficoltà'], ['game', 'castle', 'Partita']];
   let body = '';
   if (tab === 'audio') body = audioHTML(`openMenu('audio')`);
-  else if (tab === 'look') body = `<div class="lay">${layoutCards(`openMenu('look')`)}</div>`;
+  else if (tab === 'look') body = `<div class="lay">${layoutCards(`openMenu('look')`)}</div><h4 style="margin:12px 0 6px">🖥️ Qualità grafica</h4><div class="dif">${Object.keys(QUAL).map(k => `<button class="card ${QQ() === QUAL[k] ? 'on' : ''}" onclick="setQual('${k}')" style="text-align:left"><div class="cn">${QUAL[k].n}${QQ() === QUAL[k] ? ' ✓' : ''}</div><div class="cd">${QUAL[k].d}</div></button>`).join('')}</div>`;
   else if (tab === 'diff') body = `<div class="dif">${diffCards(`openMenu('diff')`)}</div>`;
   else body = `<div class="mlist">
     <button class="btn ghost" onclick="openHelp()">${ICO('scroll')} Come si gioca · missioni</button>
-    ${S && !S.creative && !S.sandbox ? `<button class="btn ghost" onclick="openCronache()">📜 Cronache della Marca</button><button class="btn ghost" onclick="closeSheet();tutStart()">🕯️ Rifai la guida passo passo</button><button class="btn ghost" onclick="openArms()">🛡️ Stemma della casata</button>` : ''}
+    ${S && !S.creative && !S.sandbox ? `<button class="btn ghost" onclick="openCronache()">📜 Cronache della Marca</button><button class="btn ghost" onclick="openBackups()">🛟 Copie di sicurezza</button><button class="btn ghost" onclick="closeSheet();tutStart()">🕯️ Rifai la guida passo passo</button><button class="btn ghost" onclick="openArms()">🛡️ Stemma della casata</button>` : ''}
     <button class="btn ghost" onclick="save();saveCode()">📋 Copia codice partita<small>salvalo in Note: con Importa la riprendi ovunque</small></button>
     <button class="btn ghost" onclick="save();cloudPush(true);toast(CLOUD.ready ? '💾 Partita salvata anche nel cloud' : '💾 Partita salvata su questo browser')">💾 Salva ora</button>
     ${S && !S.creative && !S.sandbox ? `<button class="btn ghost" onclick="openDiary()">📈 Diario del ritmo<small>quanto dura davvero ogni traguardo</small></button>` : ''}
@@ -3692,7 +3718,7 @@ function openBuild(tab) {
 }
 function openBuildingInfo(r) {
   const d = BDEF[r.t]; const why = canUp(r); const res = resOf(r);
-  let body = `<p class="desc">${d.desc}</p>${r.t === 'cripta' ? cryptHTML() : ''}<div class="stats">`;
+  let body = `<p class="desc">${d.desc}</p>${r.t === 'cripta' ? cryptHTML() : ''}${r.t === 'mastio' ? crownHTML() : ''}<div class="stats">`;
   body += `<span>Livello <b>${r.lvl}</b>${r.end ? ` → ${r.toLvl}` : ''}</span><span>Vita <b>${Math.round(d.hp * (1 + 0.35 * (r.lvl - 1)))}</b></span>`;
   if (res) body += `<span>${ICO(res)} <b>${rateOf(r) < 1 ? rateOf(r).toFixed(1) : Math.round(rateOf(r))}</b>/min</span><span>In deposito <b>${Math.floor(r.stock || 0)}</b>/${stockCap(r)}</span>`;
   if (d.store) body += `<span>Capienza ${Object.keys(d.store).map(k => ICO(k) + ' +' + d.store[k] * r.lvl).join(' ')}</span>`;
@@ -3755,11 +3781,40 @@ function openArmy() {
    <div class="ulist">${UNIT_ORDER.map(unitRow).join('')}</div><h4>Eroi</h4><div class="ulist">${hs}</div>`;
   openSheet(ICO('army') + ' Esercito', html, 'army');
 }
+// ================= LA CORONA DI SVEVIA: sei frammenti e l'assedio finale al Margravio =================
+const FRAGS = [
+  { name: 'Rocca di Hainburg', where: 'custodita dai Waldeck', x: 'Nella cappella diroccata di Hainburg, sotto l\'altare, trovi uno scrigno di piombo. Dentro, avvolto nel velluto, brilla il primo frammento della corona: una punta d\'oro con un rubino.<br><br>Sul coperchio è incisa mezza aquila nera.' },
+  { name: 'Torre di Melk Vecchia', where: 'dei monaci guerrieri', x: 'I monaci guerrieri difendevano la torre senza sapere cosa custodissero. Tra i reliquiari trovi il secondo frammento, nascosto nel braccio d\'argento di un santo.<br><br>L\'Abate di Melk, quando lo saprà, non dirà una parola.' },
+  { name: 'Castello di Dürnstein', where: 'nelle mani di un mercenario', x: 'Il capitano di ventura che teneva Dürnstein lo aveva comprato dal Margravio. Il terzo frammento era appeso al suo collo come un portafortuna.<br><br>Ora sai per certo che Steyr sta radunando i pezzi.' },
+  { name: 'Abbazia di Klosterneuburg', where: 'occupata dai briganti', x: 'I briganti avevano saccheggiato l\'abbazia, ma il quarto frammento era murato dietro una pietra con la mezza aquila. Lady Isolde ti aveva detto dove cercare.<br><br>«Mio padre lo nascose qui la notte in cui morì.»' },
+  { name: 'Burg Kreuzenstein', where: 'avamposto del Margravio', x: 'Kreuzenstein era l\'ultimo avamposto di Steyr. Nel forziere del castellano trovi il quinto frammento e una lettera del Margravio: «L\'ultimo pezzo resterà con me. Chi lo vuole, venga a prenderlo.»' },
+];
+const FRAG_BOSS = { name: 'Fortezza di Steyr', where: 'il Margravio · ultimo frammento', x: 'Le mura di Steyr crollano e il Margravio cade nel cortile, la spada spezzata accanto. Dal suo collo prendi l\'ultimo frammento.<br><br>Nella cappella del tuo castello i sei pezzi tornano a combaciare: la corona di Svevia è di nuovo intera.<br><br>Lady Isolde si inginocchia per prima. Poi, uno dopo l\'altro, tutti i signori della Marca.<br><br><i>«Lunga vita all\'Imperatore.»</i>' };
+const frags = () => (S && S.frag) || 0;
+function fragTarget() {
+  if (!S || S.sandbox || S.creative || !S.targets) return; if (S.targets.some(t => t.frag != null || t.boss)) return; const f = frags();
+  if (f < 5 && S.mastio >= 5) { const F = FRAGS[f]; S.targets.unshift({ d: Math.max(3, Math.min(10, S.mastio - 2 + f)), name: F.name, where: F.where, seed: (Math.random() * 1e9) | 0, frag: f }); }
+  else if (f >= 5 && S.mastio >= 10 && !S.crowned) S.targets.unshift({ d: 10, name: FRAG_BOSS.name, where: FRAG_BOSS.where, seed: 1255, boss: 1 });
+}
+function bossSetup(sc) { const m = sc.B.find(b => b.t === 'mastio'); if (!m) return; const ks = ['uomoarme', 'balestriere', 'picchiere', 'scudata', 'berserker'];
+  for (let i = 0; i < 10; i++) { const a = i / 10 * 6.283, x = m.x + m.w / 2 + Math.cos(a) * (m.w / 2 + 1.3), y = m.y + m.h / 2 + Math.sin(a) * (m.h / 2 + 1.3); if (bAt(sc, x | 0, y | 0) || isWater(sc, x | 0, y | 0)) continue; const u = mkUnit(ks[i % ks.length], 'D', x, y); u.guardR = 6; u.leash = 10; u.hp *= 1.3 * DF().ehp; u.maxhp *= 1.3 * DF().ehp; u.dm = DF().edmg; sc.U.push(u); }
+  const [fx, fy] = frontTile(sc, m); const g = mkUnit('cavpesante', 'D', fx + 0.5, fy + 0.5); g.boss = true; g.hp *= 5; g.maxhp *= 5; g.dm = 1.6; g.guardR = 8; g.leash = 12; sc.U.push(g);
+  m.hp *= 1.6; m.maxhp *= 1.6; }
+function fragReward(st) {
+  const tg = BT.tg; if (tg.frag == null && !tg.boss) return '';
+  if (tg.boss) { if (!BT.mastioDown) return '<div class="row"><b>👑 Il Margravio resiste:</b> abbatti il suo castello per prendere l\'ultimo frammento</div>'; S.frag = 6; S.crowned = 1; addRes('favore', 60); S.fragStory = 'boss'; return '<div class="row"><b>👑 La corona di Svevia è di nuovo intera!</b> +60 Favore Reale</div>'; }
+  if (!(BT.mastioDown || st >= 2)) return '<div class="row"><b>👑 Il frammento è ancora nel castello:</b> abbatti il mastio o conquista 2 stelle</div>';
+  S.frag = Math.max(frags(), tg.frag + 1); addRes('favore', 8); S.fragStory = tg.frag; return `<div class="row"><b>👑 Frammento della corona recuperato!</b> (${S.frag}/6) · +8 Favore Reale</div>`;
+}
+function fragStoryShow() { if (S.fragStory == null) return; const k = S.fragStory; S.fragStory = null; save();
+  if (k === 'boss') storyOpen([{ img: 1, ic: '👑', sub: 'Epilogo', t: 'La corona intera', x: FRAG_BOSS.x }]);
+  else storyOpen([{ img: 1, ic: '👑', sub: `Frammento ${k + 1} di 6`, t: FRAGS[k].name, x: FRAGS[k].x }]); }
+function crownHTML() { const f = frags(); if (!S || S.mastio < 5 && !f) return ''; return `<div class="crown"><b>👑 Cappella della Corona</b><div class="cfr">${Array.from({ length: 6 }, (_, i) => `<span class="${i < f ? 'on' : ''}">${i < f ? '✦' : '·'}</span>`).join('')}</div><small>${f >= 6 ? 'La corona di Svevia è intera. Sei l\'Imperatore della Marca.' : f >= 5 ? `5 frammenti su 6. L'ultimo è nella Fortezza di Steyr${S.mastio < 10 ? ' (Mastio 10 per assediarla)' : ': cercala nella Mappa'}.` : `${f} frammenti su 6. Cerca nella Mappa i castelli segnati con 👑.`}</small></div>`; }
 function openMap() {
-  refreshTargets(false);
+  refreshTargets(false); fragTarget();
   const total = Object.values(S.army).reduce((a, b) => a + b, 0);
   const html = `<p class="desc">La Marca Orientale, A.D. ${YEAR(S.mastio)}. Scegli chi depredare. Truppe pronte: <b>${total}</b>${heroList().length ? ' + ' + heroList().length + ' eroi' : ''}.</p>
-  <div class="tlist">${S.targets.map((t, i) => { const p = lootPool(t.d); return `<div class="tcard"><div class="tt"><b>${t.name}</b><span>${t.where}</span></div><div class="skull">${'💀'.repeat(Math.min(5, Math.ceil(t.d / 2)))} <small>difficoltà ${t.d}</small></div><div class="tl">Bottino stimato: 🌾${p.cibo} 🪵${p.legno} 🪙${p.oro}${p.pietra ? ' 🪨' + p.pietra : ''}</div><button class="btn" onclick="startAttack(${i})">⚔ Assedia</button></div>`; }).join('')}</div>
+  <div class="tlist">${S.targets.map((t, i) => { const p = lootPool(t.d); return `<div class="tcard${t.frag != null || t.boss ? ' crownt' : ''}"><div class="tt"><b>${t.frag != null || t.boss ? '👑 ' : ''}${t.name}</b><span>${t.where}${t.frag != null ? ` · frammento ${t.frag + 1} di 6` : ''}</span></div><div class="skull">${'💀'.repeat(Math.min(5, Math.ceil(t.d / 2)))} <small>difficoltà ${t.d}</small></div><div class="tl">Bottino stimato: 🌾${p.cibo} 🪵${p.legno} 🪙${p.oro}${p.pietra ? ' 🪨' + p.pietra : ''}</div><button class="btn" onclick="startAttack(${i})">⚔ Assedia</button></div>`; }).join('')}</div>
   <div class="maptabs three"><button class="btn ghost" onclick="openRealms()">🌍 Altri Regni<small>${realms().length} signori</small></button><button class="btn ghost" onclick="openDiplo()">🤝 Diplomazia<small>${feudi().filter(f => f.req).length ? '📜 ' + feudi().filter(f => f.req).length + ' richieste' : countSt('alleato') + ' alleati · ' + countSt('vassallo') + ' vassalli'}</small></button><button class="btn ghost" onclick="openMarket()">⚖ Mercato<small>${hasB('mercato') ? 'compra e vendi' : 'serve il Mercato'}</small></button></div><div class="acts"><button class="btn ghost" onclick="refreshTargets(true);openMap()">↻ Altri bersagli</button>${S.raids ? '<button class="btn ghost" onclick="startRaid()">🌙 Attendi la notte (difendi il feudo)</button>' : ''}</div>`;
   openSheet(ICO('map') + ' Mappa della Marca', html, 'map');
 }
@@ -4489,7 +4544,7 @@ function heroCard(k) { const h = BT.heroes.find(h => h.k === k); if (!h) return;
 // conferma dentro al gioco (i popup del browser sono bloccati nella pagina pubblicata)
 let ASK = null;
 // ---- aggiornamento automatico: se su GitHub c'è una versione nuova, ricarica scavalcando la cache ----
-const BUILD = 'ee4794f981';
+const BUILD = 'f684a309cd';
 function checkUpdate() { if (BUILD.startsWith('__') || !/github\.io$/.test(location.hostname)) return;
   fetch('version.txt?t=' + Date.now(), { cache: 'no-store' }).then(r => r.ok ? r.text() : '').then(v => { v = (v || '').trim(); if (!v || v === BUILD) return; let tried = ''; try { tried = sessionStorage.getItem('feudum_upd') || ''; } catch (e) { } if (tried === v) return; try { sessionStorage.setItem('feudum_upd', v); } catch (e) { }
     try { if (S && MODE !== 'title') save(); } catch (e) { } location.replace(location.pathname + '?v=' + v); }).catch(() => { }); }
@@ -4499,7 +4554,7 @@ function askYes(msg, fn, yes) { ASK = fn; let el = $('#askd'); if (!el) { el = d
   el.querySelectorAll('button').forEach((b, i) => b.addEventListener('touchend', ev => { ev.preventDefault(); i === 0 ? askClose() : askOk(); }, { passive: false })); }
 function askClose() { const el = $('#askd'); if (el) el.classList.add('hidden'); document.body.classList.remove('asking'); ASK = null; }
 function askOk() { const f = ASK; askClose(); if (f) f(); }
-function newCampaign() { askYes('Ricominciare la campagna da capo?<br><small>Il salvataggio attuale verrà cancellato.</small>', () => { closeSheet(); closeFolk(); try { localStorage.removeItem(SAVE_KEY); } catch (e) { } if (CLOUD.mem) delete CLOUD.mem[SAVE_KEY]; CLOUD.lastS = null; beginGame(true); cloudPush(true); toast('⚔ Nuova campagna iniziata'); }, 'Ricomincia'); }
+function newCampaign() { askYes('Ricominciare la campagna da capo?<br><small>Tengo una copia della partita attuale in «Copie di sicurezza».</small>', () => { closeSheet(); closeFolk(); try { const cur = localStorage.getItem(SAVE_KEY); if (cur) bkPut('nuova', cur, bkMeta()); localStorage.removeItem(SAVE_KEY); } catch (e) { } if (CLOUD.mem) delete CLOUD.mem[SAVE_KEY]; CLOUD.lastS = null; beginGame(true); cloudPush(true); toast('⚔ Nuova campagna iniziata'); }, 'Ricomincia'); }
 function saveCode() { const s = load(); if (!s) { toast('Nessuna partita da esportare'); return; } const code = 'FEUDUM1:' + btoa(unescape(encodeURIComponent(JSON.stringify(s)))); try { navigator.clipboard.writeText(code).then(() => toast('📋 Codice della partita copiato: incollalo in Note per conservarlo'), () => prompt('Copia questo codice:', code)); } catch (e) { prompt('Copia questo codice:', code); } }
 function openImport() { openSheet('📥 Importa partita', `<p class="desc">Incolla qui il codice della partita che avevi copiato (inizia con FEUDUM1:).</p><textarea id="impc" style="width:100%;height:120px;font-size:12px;border-radius:8px;padding:6px"></textarea><div class="acts"><button class="btn" onclick="doImport()">Carica partita</button><button class="btn ghost" onclick="closeSheet()">Annulla</button></div>`, 'imp'); }
 function doImport() { const v = ($('#impc').value || '').trim(); try { if (!v.startsWith('FEUDUM1:')) throw 0; const s = JSON.parse(decodeURIComponent(escape(atob(v.slice(8))))); if (!s || s.v !== 1) throw 0; SAVE_KEY = 'feudum_proto_v1'; CLOUD.mem = CLOUD.mem || {}; CLOUD.mem[SAVE_KEY] = JSON.stringify(s); try { localStorage.setItem(SAVE_KEY, JSON.stringify(s)); } catch (e) { } closeSheet(); beginGame(false); toast('📥 Partita caricata'); } catch (e) { toast('Codice non valido'); } }
@@ -4511,7 +4566,7 @@ function showTitle() {
   const bNew = tb('big k-new', sv ? 'newCampaign()' : 'beginGame(true)', '⚔', sv ? 'Nuova Campagna' : 'Inizia Campagna', sv ? 'ricomincia da capo (cancella il salvataggio)' : 'una nuova Marca da conquistare');
   const bCont = tb('big cont' + (sv ? '' : ' dis'), 'beginGame(false)', '📜', 'Continua Campagna', sv ? `Mastio ${sv.mastio} · ${ERA(sv.mastio).n} · salvata ${when}` : (CLOUD.ready ? 'nessun salvataggio sul tuo account' : 'nessun salvataggio su questo dispositivo'), !sv);
   $('#tbtns').innerHTML = (sv ? bCont + bNew : bNew + bCont)
-    + `<div class="savex">${sv ? '<button class="btn ghost" onclick="saveCode()">📋 Copia codice partita</button>' : ''}<button class="btn ghost" onclick="openImport()">📥 Importa partita</button></div>`
+    + `<div class="savex">${sv ? '<button class="btn ghost" onclick="saveCode()">📋 Copia codice partita</button>' : ''}<button class="btn ghost" onclick="openImport()">📥 Importa partita</button>${Object.keys(bkMeta()).length ? '<button class="btn ghost" onclick="openBackups(1)">🛟 Copie</button>' : ''}</div>`
     + `<div class="cloudst">${cs}</div>`
     + tb('k-max', 'pickEra()', '🏰', 'Città al massimo', "scegli l'era, tutto sbloccato")
     + tb('k-cre', 'pickCreative()', '🧱', 'Modalità Creativa', 'tutto sbloccato, risorse infinite')
@@ -4566,6 +4621,7 @@ function beginGame(fresh, preset) {
 // ---------- main loop ----------
 let lastT = performance.now(), hudT = 0;
 function frame(t) {
+  if (QQ().fps < 60 && t - lastT < 30) { requestAnimationFrame(frame); return; }
   const dt = Math.min(0.1, (t - lastT) / 1000); lastT = t;
   if (!S && MODE === 'visit' && SC) { rotTick(dt); updateScene(SC, dt); }
   if (S && MODE !== 'title') {
