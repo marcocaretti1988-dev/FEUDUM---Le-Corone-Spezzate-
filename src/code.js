@@ -1371,9 +1371,13 @@ function musicToggle() { SET.music = !MUS.on; audioRefresh(); }
 function toggleMute() { SET.mute = !SET.mute; audioRefresh(); if (!SET.mute) sfx('click'); }
 function updateSndBtn() { const b = $('#sndmute'); if (b) { b.textContent = SET.mute ? '🔇' : '🔊'; b.title = SET.mute ? 'Audio spento' : 'Audio attivo'; b.classList.toggle('off', !!SET.mute); } }
 function setVol(k, v) { SET[k] = Math.max(0, Math.min(1, v / 100)); if (SET.mute && v > 0) SET.mute = false; saveSet(); musicApply(); if (k === 'mvol' && SET.mvol > 0) musicStart(); updateSndBtn(); const o = $('#v_' + k); if (o) o.textContent = Math.round(v) + '%'; }
+// ---- prova dei suoni: ascolta musiche ed effetti senza giocare ----
+const SND_TEST = [['festa', '🎉', 'Musica della festa'], ['ram', '🐏', 'Ariete'], ['launch', '🪨', 'Catapulta: lancio'], ['boulder', '💥', 'Masso che cade'], ['ladder', '🪜', 'Scala sulle mura'], ['bow', '🏹', 'Arco del cacciatore'], ['step', '👣', 'Passi'], ['horn', '📯', 'Corno di battaglia'], ['bell', '🔔', 'Campana'], ['win', '🏆', 'Vittoria'], ['coin', '🪙', 'Monete'], ['build', '🔨', 'Costruzione'], ['crash', '🏚️', 'Crollo']];
+function sndTestHTML() { return `<div class="vbox"><div class="vh"><span>🎧 Prova i suoni</span></div><div class="sndt">${SND_TEST.map(([k, ic, n]) => `<button class="btn ghost" onclick="sndTest('${k}')">${ic} ${n}</button>`).join('')}<button class="btn ghost" onclick="sndTest('raidmus')">⚔ Musica di battaglia</button><button class="btn ghost" onclick="sndTest('stop')">⏹ Ferma</button></div></div>`; }
+function sndTest(k) { const a = ac(); if (a && a.state === 'suspended') a.resume(); if (k === 'stop') { if (TENS.kind) tensionStop(); return; } if (k === 'raidmus') { if (TENS.kind) tensionStop(true); tensionStart('raid'); toast('⚔ Musica di battaglia: tocca «Ferma» per tornare alla musica del villaggio'); return; } if (k === 'step') { for (let i = 0; i < 6; i++) setTimeout(() => sfx('step'), i * 420); return; } sfx(k); }
 function openAudio(back) {
   const re = `openAudio(${back ? `'${back}'` : ''})`;
-  openSheet('🔊 Audio', `<div class="aud">${audioHTML(re)}<div class="acts"><button class="btn" onclick="${back ? back : 'closeSheet()'}">✓ Fatto</button></div></div>`, 'audio');
+  openSheet('🔊 Audio', `<div class="aud">${audioHTML(re)}${sndTestHTML()}<div class="acts"><button class="btn" onclick="${back ? back : 'closeSheet()'}">✓ Fatto</button></div></div>`, 'audio');
 }
 ['pointerdown', 'keydown', 'touchend'].forEach(ev => document.addEventListener(ev, musicStart, { passive: true }));
 document.addEventListener('visibilitychange', () => { if (RAIDM.el) { if (document.hidden) RAIDM.el.pause(); else if (TENS.kind && !RAIDM.bad) RAIDM.el.play().catch(() => { }); } if (!MUS.el) return; if (document.hidden) MUS.el.pause(); else musicStart(); });
@@ -3030,7 +3034,7 @@ function openMenu(tab) {
   tab = tab || openMenu.tab || 'audio'; openMenu.tab = tab;
   const tabs = [['audio', 'sound', 'Audio'], ['look', 'scroll', 'Layout'], ['diff', 'army', 'Difficoltà'], ['game', 'castle', 'Partita']];
   let body = '';
-  if (tab === 'audio') body = audioHTML(`openMenu('audio')`);
+  if (tab === 'audio') body = audioHTML(`openMenu('audio')`) + sndTestHTML();
   else if (tab === 'look') body = `<div class="lay">${layoutCards(`openMenu('look')`)}</div><h4 style="margin:12px 0 6px">🖥️ Qualità grafica</h4><div class="dif">${Object.keys(QUAL).map(k => `<button class="card ${QQ() === QUAL[k] ? 'on' : ''}" onclick="setQual('${k}')" style="text-align:left"><div class="cn">${QUAL[k].n}${QQ() === QUAL[k] ? ' ✓' : ''}</div><div class="cd">${QUAL[k].d}</div></button>`).join('')}</div>`;
   else if (tab === 'diff') body = `<div class="dif">${diffCards(`openMenu('diff')`)}</div>`;
   else body = `<div class="mlist">
