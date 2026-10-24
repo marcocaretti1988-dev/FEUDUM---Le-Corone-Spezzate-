@@ -1508,12 +1508,15 @@ function distToB(x, y, b) { const cx = Math.max(b.x, Math.min(b.x + b.w, x)), cy
 function distTo(u, t) { return t.isB ? distToB(u.x, u.y, t) : Math.hypot(u.x - t.x, u.y - t.y); }
 function tPos(t) { return t.isB ? [t.x + t.w / 2, t.y + t.h / 2] : [t.x, t.y]; }
 function enemiesOf(side) { return side === 'A' ? 'D' : 'A'; }
-function nearestUnit(sc, u, side, maxD) { let best = null, bd = maxD; for (const o of sc.U) { if (o.dead || o.side !== side) continue; const d = Math.hypot(o.x - u.x, o.y - u.y); if (d < bd) { bd = d; best = o; } } return best; }
+function nearestUnit(sc, u, side, maxD) { if (u.pl && !u.hero) return spreadUnit(sc, u, side, maxD); return nearestUnit0(sc, u, side, maxD); }
+function spreadUnit(sc, u, side, maxD) { const load = new Map(); for (const o of sc.U) if (!o.dead && o.pl && o !== u && o.tgt && !o.tgt.isB) load.set(o.tgt, (load.get(o.tgt) || 0) + 1);
+  let best = null, bs = 1e9; for (const o of sc.U) { if (o.dead || o.side !== side) continue; const d = Math.hypot(o.x - u.x, o.y - u.y); if (d >= maxD) continue; const sc2 = d + (load.get(o) || 0) * (o.d && o.d.hp > 200 ? 0.9 : 1.8) + (o === u.tgt ? -1 : 0); if (sc2 < bs) { bs = sc2; best = o; } } return best; }
+function nearestUnit0(sc, u, side, maxD) { let best = null, bd = maxD; for (const o of sc.U) { if (o.dead || o.side !== side) continue; const d = Math.hypot(o.x - u.x, o.y - u.y); if (d < bd) { bd = d; best = o; } } return best; }
 function pickBuilding(sc, u) {
   let best = null, bd = 1e9; const towersFirst = u.pl && sc.order === 'towers';
   for (const b of sc.B) {
     if (b.dead || b.side === u.side) continue; const d = BDEF[b.t]; if (d.wall || d.decor) continue;
-    let dist = distToB(u.x, u.y, b);
+    let dist = distToB(u.x, u.y, b); if (u.pl) { let n = 0; for (const o of sc.U) if (!o.dead && o.pl && o !== u && o.tgt === b) n++; dist += n * (0.5 + 2.5 / Math.max(1, b.w * b.h)); }
     if (u.d.bld && !d.shoot) dist *= 0.9; if (towersFirst) dist *= d.shoot ? 0.25 : 3;
     if (dist < bd) { bd = dist; best = b; }
   }
@@ -1637,7 +1640,7 @@ function updateScene(sc, dt) {
       else {
         if (!t.isB && u.prt <= 0) repath(sc, u);
         if (!u.path || u.pi >= u.path.length) {
-          if (!t.isB) { const [tx, ty] = tPos(t); moveTo(sc, u, tx, ty, dt); }
+          if (!t.isB) { let [tx, ty] = tPos(t); if (u.pl && d > 1.6) { const a = (u.id * 2.39996) % 6.283, rr = Math.min(1.4, (d - 1) * 0.6); tx += Math.cos(a) * rr; ty += Math.sin(a) * rr; } moveTo(sc, u, tx, ty, dt); }
           else { if (u.prt <= 0) repath(sc, u); const [tx, ty] = tPos(t); moveTo(sc, u, tx, ty, dt); }
         } else {
           const [px, py] = u.path[u.pi];
@@ -1654,7 +1657,7 @@ function updateScene(sc, dt) {
   for (let i = 0; i < U.length; i++) {
     const a = U[i]; if (a.dead) continue;
     for (let j = i + 1; j < U.length; j++) {
-      const b = U[j]; if (b.dead) continue; const dx = b.x - a.x, dy = b.y - a.y, d2 = dx * dx + dy * dy, R = (a.d.cav || b.d.cav) ? 0.55 : 0.36;
+      const b = U[j]; if (b.dead) continue; const dx = b.x - a.x, dy = b.y - a.y, d2 = dx * dx + dy * dy, R = (a.d.cav || b.d.cav) ? 0.55 : (a.pl && b.pl ? 0.48 : 0.36);
       if (d2 < R * R && d2 > 1e-6) { const d = Math.sqrt(d2), p = (R - d) / d * 0.25; stepTo(sc, a, a.x - dx * p, a.y - dy * p); stepTo(sc, b, b.x + dx * p, b.y + dy * p); }
     }
   }
