@@ -3301,20 +3301,29 @@ function tutStart() { S.tut = 0; TUT_SHOWN = -1; }
 function tutSkip() { S.tut = -1; tutHide(); save(); toast('Guida chiusa: la trovi in Menu → Partita'); }
 function tutNext() { S.tut++; TUT_SHOWN = -1; sfx('click'); if (S.tut >= TUT.length) { S.tut = -1; tutHide(); } save(); }
 function tutHide() { const b = $('#tutb'), a = $('#tuta'); if (b) b.classList.add('hidden'); if (a) a.classList.add('hidden'); }
+// suggerimenti brevi quando la finestra giusta è aperta
+const TUT_MINI = { 2: { build: 'Scegli la Taverna nell\'elenco' }, 4: { army: 'Tocca «+1» sul Miliziano' } };
 function tutTick() {
   if (!tutActive() || MODE !== 'village') { tutHide(); return; }
   const st = TUT[S.tut]; if (st.skipIf && st.skipIf()) { tutNext(); return; }
   if (st.done && st.done()) { sfx('coin'); tutNext(); return; }
-  const sheetOpen = !$('#sheet').classList.contains('hidden') && $('#sheet').dataset.p !== 'memo' && $('#sheet').dataset.p !== 'build' && $('#sheet').dataset.p !== 'army';
   let b = $('#tutb'); if (!b) { b = document.createElement('div'); b.id = 'tutb'; document.body.appendChild(b); } let a = $('#tuta'); if (!a) { a = document.createElement('div'); a.id = 'tuta'; a.textContent = '👇'; document.body.appendChild(a); }
-  if (sheetOpen && !st.next && $('#sheet').dataset.p !== 'chapter') { b.classList.add('low'); } else b.classList.remove('low');
-  if ($('#sheet').dataset.p === 'chapter' || $('#sheet').dataset.p === 'event') { tutHide(); return; }
-  if (TUT_SHOWN !== S.tut) { TUT_SHOWN = S.tut; if (st.prep) st.prep(); b.innerHTML = `<div class="tav">🕯️</div><div class="ttx"><small>Guida · ${S.tut + 1}/${TUT.length}</small><b>${st.t}</b><p>${st.x}</p><div class="tbt">${st.next ? `<button class="btn" onclick="tutNext()">${st.next}</button>` : ''}<button class="btn ghost" onclick="tutSkip()">Salta guida</button></div></div>`; }
-  b.classList.remove('hidden'); b.classList.toggle('top', !!placing);
-  // freccia
+  const sp = !$('#sheet').classList.contains('hidden') ? $('#sheet').dataset.p : '';
+  const fcard = $('#fcard') && !$('#fcard').classList.contains('hidden'), ask = $('#askd') && !$('#askd').classList.contains('hidden'), story = $('#story') && !$('#story').classList.contains('hidden');
+  const mini = sp && TUT_MINI[S.tut] && TUT_MINI[S.tut][sp];
+  // con una finestra aperta la guida si fa da parte: niente sovrapposizioni
+  if (ask || story || fcard || (sp && !mini)) { tutHide(); TUT_SHOWN = -2; return; }
+  const key = mini ? 'm' + S.tut : S.tut;
+  if (TUT_SHOWN !== key) { if (TUT_SHOWN !== -2 && !mini && st.prep && TUT_SHOWN !== 'm' + S.tut) st.prep(); TUT_SHOWN = key;
+    b.className = mini ? 'mini' : '';
+    b.innerHTML = mini ? `<div class="tav">🕯️</div><div class="ttx"><small>Guida · ${S.tut + 1}/${TUT.length}</small><b>${mini}</b></div>`
+      : `<div class="tav">🕯️</div><div class="ttx"><small>Guida · ${S.tut + 1}/${TUT.length}</small><b>${st.t}</b><p>${st.x}</p><div class="tbt">${st.next ? `<button class="btn" onclick="tutNext()">${st.next}</button>` : ''}<button class="btn ghost" onclick="tutSkip()">Salta guida</button></div></div>`; }
+  b.classList.remove('hidden'); b.classList.toggle('top', !!placing && !mini);
+  // freccia: solo senza finestre aperte, e mai sotto la nuvoletta
   let pt = null;
-  if (st.el) { const e = st.el(); if (e && e.offsetParent !== null) { const r = e.getBoundingClientRect(); pt = [r.left + r.width / 2, r.top]; } }
-  else if (st.world) { const w = st.world(); if (w) { const [px, py] = W(w[0], w[1]); pt = [(px - cam.x) * cam.z + VW / 2, (py - cam.y) * cam.z + VH / 2 - w[2] * cam.z]; } }
+  if (!sp) { if (st.el) { const e = st.el(); if (e && e.offsetParent !== null) { const r = e.getBoundingClientRect(); pt = [r.left + r.width / 2, r.top]; } }
+    else if (st.world) { const w = st.world(); if (w) { const [px, py] = W(w[0], w[1]); pt = [(px - cam.x) * cam.z + VW / 2, (py - cam.y) * cam.z + VH / 2 - w[2] * cam.z]; } } }
+  const br = b.getBoundingClientRect(); if (pt && pt[1] - 46 < br.bottom && pt[1] > br.top - 10 && pt[0] > br.left && pt[0] < br.right && !(st.el && st.el() && st.el().closest && st.el().closest('#hud-bot'))) pt = null;
   if (pt && pt[0] > 0 && pt[0] < VW && pt[1] > 0 && pt[1] < VH) { a.style.left = (pt[0] - 18) + 'px'; a.style.top = (pt[1] - 46) + 'px'; a.classList.remove('hidden'); } else a.classList.add('hidden');
 }
 // ================= VITA NEL VILLAGGIO: giorno e notte, carovane, suoni d'ambiente =================
