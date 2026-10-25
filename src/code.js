@@ -3027,6 +3027,7 @@ function doUpgrade(id) {
   pay(c); if (resOf(r)) collect(r);
   if (t && !S.creative) { r.end = now() + t * 1000; r.dur = t * 1000; r.toLvl = r.lvl + 1; } else { r.lvl++; }
   sfx('build'); const sel = r; SC = buildVillage(); SC.sel = SC.B.find(b => b.ref === sel) || null; save(); updateHUD(); openBuildingInfo(r);
+  if (BLD_NAV && BLD_NAV.includes(r.id) && builders() < maxBuilders() && BLD_NAV.some(id => bldUpOk(S.buildings.find(b => b.id === id)))) setTimeout(() => { if ($('#sheet').dataset.p === 'b:' + r.id) bldGo(1); }, 650);
 }
 function upgradeAllWalls() {
   const ws = S.buildings.filter(b => b.t === 'muro' && b.lvl < 2); let n = 0;
@@ -3080,7 +3081,7 @@ function openMenu(tab) {
     <button class="btn" onclick="closeSheet();toMenu()">🏠 Menu principale</button></div>`;
   openSheet(ICO('gear') + ' Menu', `<div class="mtabs">${tabs.map(([k, i, n]) => `<button class="${k === tab ? 'on' : ''}" onclick="openMenu('${k}')">${ICO(i)}<span>${n}</span></button>`).join('')}</div><div class="aud mbody">${body}</div>`, 'menu');
 }
-function openSheet(title, html, key) { setTimeout(() => { try { if (MODE === 'village') tutTick(); } catch (e) { } }, 0); if (typeof closeFolk === 'function' && $('#fcard')) closeFolk(); const s = $('#sheet'); s.dataset.p = key || ''; $('#sheet-t').innerHTML = title; $('#sheet-b').innerHTML = html; s.classList.remove('hidden'); }
+function openSheet(title, html, key) { if (BLD_NAV && !(key && String(key).startsWith('b:') && BLD_NAV.includes(+String(key).slice(2)))) BLD_NAV = null; setTimeout(() => { try { if (MODE === 'village') tutTick(); } catch (e) { } }, 0); if (typeof closeFolk === 'function' && $('#fcard')) closeFolk(); const s = $('#sheet'); s.dataset.p = key || ''; $('#sheet-t').innerHTML = title; $('#sheet-b').innerHTML = html; s.classList.remove('hidden'); }
 function closeSheet() { const s = $('#sheet'); s.classList.add('hidden'); s.dataset.p = ''; if (SC && MODE === 'village' && !placing) { SC.sel = null; SC.selN = null; SC.selA = null; SC.selU = null; } }
 function refreshSheet() { const p = $('#sheet').dataset.p; if (!p) return; if (p === 'army') openArmy(); else if (p === 'build') openBuild(); else if (p.startsWith('b:')) { const r = S.buildings.find(b => b.id === +p.slice(2)); if (r) openBuildingInfo(r); } }
 const CHIM3 = { casa: [0.62, 0.1], taverna: [0.6, 0.08], fucina: [0.7, 0.08], fattoria: [0.4, 0.12], armeria: [0.65, 0.08], infermeria: [0.6, 0.1], capanna: [0.6, 0.12] };
@@ -3122,9 +3123,26 @@ function openBuild(tab) {
   }).join('')}</div>`;
   openSheet(ICO('build') + ' Costruisci', html, 'build');
 }
+// scorri tra gli edifici migliorabili (aperto dal Promemoria)
+var BLD_NAV = null;
+const bldUpOk = r => r && r.t !== 'mastio' && !BDEF[r.t].wall && !BDEF[r.t].decor && !r.nat && !canUp(r) && canPay(upCost(r));
+function bldUps() { return S.buildings.filter(bldUpOk).sort((a, b) => a.lvl - b.lvl || BDEF[a.t].n.localeCompare(BDEF[b.t].n)); }
+function bldFocus(r) { const [x, y] = W(r.x + (BDEF[r.t].w || 2) / 2, r.y + (BDEF[r.t].h || 2) / 2); cam.x = x; cam.y = y + 40; }
+function bldNav(id) { closeSheet(); let L = bldUps().map(r => r.id); if (!L.includes(id)) L.unshift(id); const i0 = L.indexOf(id); L = L.slice(i0).concat(L.slice(0, i0)); BLD_NAV = L.length > 1 ? L : null; const r = S.buildings.find(b => b.id === id); if (!r) return; bldFocus(r); SC.sel = SC.B.find(b => b.ref === r) || null; openBuildingInfo(r); }
+function bldGo(d) { if (!BLD_NAV) return; const cur = +($('#sheet').dataset.p || '').slice(2); let i = BLD_NAV.indexOf(cur); const n = BLD_NAV.length; const ok = BLD_NAV.filter(id => bldUpOk(S.buildings.find(b => b.id === id)));
+  for (let k = 0; k < n; k++) { i = (i + d + n) % n; const r = S.buildings.find(b => b.id === BLD_NAV[i]); if (r && (!ok.length || bldUpOk(r))) { sfx('click'); bldFocus(r); SC.sel = SC.B.find(b => b.ref === r) || null; openBuildingInfo(r); return; } } }
+function bldNavHTML(r) { if (!BLD_NAV || !BLD_NAV.includes(r.id)) return ''; const ok = BLD_NAV.filter(id => bldUpOk(S.buildings.find(b => b.id === id))).length, free = maxBuilders() - builders();
+  return `<div class="bnav"><button onclick="bldGo(-1)" aria-label="Precedente">‹</button><div><span>⬆ ${BLD_NAV.indexOf(r.id) + 1} di ${BLD_NAV.length} · <b>${ok}</b> migliorabili · 🔨 ${free > 0 ? free + ' mastr' + (free > 1 ? 'i' : 'o') + ' liber' + (free > 1 ? 'i' : 'o') : 'mastri tutti occupati'}</span>${ok && free > 0 ? `<button class="btn sm" onclick="bldUpAll()">⬆ Migliora tutti<small>${Math.min(ok, free)} ora</small></button>` : ''}</div><button class="${!bldUpOk(r) && ok && free > 0 ? 'go' : ''}" onclick="bldGo(1)" aria-label="Successivo">›</button></div>`; }
+function bldUpAll() { if (!BLD_NAV) return; let n = 0; const names = [];
+  for (const id of BLD_NAV.slice().sort((a, b) => (S.buildings.find(x => x.id === a) || {}).lvl - (S.buildings.find(x => x.id === b) || {}).lvl)) { const r = S.buildings.find(b => b.id === id); if (!bldUpOk(r)) continue; const t = upTime(r); if (t && builders() >= maxBuilders()) break;
+    pay(upCost(r)); if (resOf(r)) collect(r); if (t && !S.creative) { r.end = now() + t * 1000; r.dur = t * 1000; r.toLvl = r.lvl + 1; } else r.lvl++; n++; names.push(BDEF[r.t].n); }
+  if (!n) { toast('Niente da migliorare adesso'); return; } sfx('build'); SC = buildVillage(); save(); updateHUD();
+  const left = BLD_NAV.filter(id => bldUpOk(S.buildings.find(b => b.id === id))).length;
+  toast(`⬆ In miglioramento: ${names.join(', ')}${left ? ` · altri ${left} quando si liberano i mastri d'opera` : ''}`);
+  const cur = S.buildings.find(b => b.id === +($('#sheet').dataset.p || '').slice(2)); if (cur) openBuildingInfo(cur); }
 function openBuildingInfo(r) {
   const d = BDEF[r.t]; const why = canUp(r); const res = resOf(r);
-  let body = `<p class="desc">${d.desc}</p>${r.t === 'cripta' ? cryptHTML() : ''}${r.t === 'mastio' ? crownHTML() : ''}<div class="stats">`;
+  let body = `${bldNavHTML(r)}<p class="desc">${d.desc}</p>${r.t === 'cripta' ? cryptHTML() : ''}${r.t === 'mastio' ? crownHTML() : ''}<div class="stats">`;
   body += `<span>Livello <b>${r.lvl}</b>${r.end ? ` → ${r.toLvl}` : ''}</span><span>Vita <b>${Math.round(d.hp * (1 + 0.35 * (r.lvl - 1)))}</b></span>`;
   if (res) body += `<span>${ICO(res)} <b>${rateOf(r) < 1 ? rateOf(r).toFixed(1) : Math.round(rateOf(r))}</b>/min</span><span>In deposito <b>${Math.floor(r.stock || 0)}</b>/${stockCap(r)}</span>`;
   if (d.store) body += `<span>Capienza ${Object.keys(d.store).map(k => ICO(k) + ' +' + d.store[k] * r.lvl).join(' ')}</span>`;
@@ -3499,7 +3517,7 @@ function memoItems() {
   const free = maxBuilders() - builders(); if (free > 0) { const m = S.buildings.find(b => b.t === 'mastio'); const mc = m && !m.end && !canUp(m) ? upCost(m) : null; if (mc && canPay(mc)) add(1, '🏰', `Puoi alzare il Mastio al livello ${m.lvl + 1}`, 'Sblocca edifici, truppe e la prossima era', `closeSheet();openBuildingInfo(S.buildings.find(b=>b.t==='mastio'))`, 'Vai');
     else add(2, '🔨', `${free} mastr${free > 1 ? 'i' : 'o'} d'opera senza lavoro`, 'Costruisci o migliora un edificio', "closeSheet();openBuild()", 'Costruisci'); }
   // edifici migliorabili ora
-  if (free > 0) { const ups = S.buildings.filter(r => r.t !== 'mastio' && !BDEF[r.t].wall && !BDEF[r.t].decor && !r.nat && !canUp(r) && canPay(upCost(r))); if (ups.length) { const r = ups.sort((a, b) => a.lvl - b.lvl)[0]; add(2, '⬆', `${ups.length} edifici migliorabili`, `Per esempio ${BDEF[r.t].n} al livello ${r.lvl + 1}`, `closeSheet();openBuildingInfo(S.buildings.find(b=>b.id===${r.id}))`, 'Vai'); } }
+  if (free > 0) { const ups = S.buildings.filter(r => r.t !== 'mastio' && !BDEF[r.t].wall && !BDEF[r.t].decor && !r.nat && !canUp(r) && canPay(upCost(r))); if (ups.length) { const r = ups.sort((a, b) => a.lvl - b.lvl)[0]; add(2, '⬆', `${ups.length} edifici migliorabili`, `Per esempio ${BDEF[r.t].n} al livello ${r.lvl + 1}`, `bldNav(${r.id})`, 'Mostra'); } }
   // persone con punti da spendere
   const pts = []; for (const k in (S.vets || {})) for (const r of S.vets[k]) if (r.pts) pts.push(r); for (const k in (S.wrk || {})) if (S.wrk[k].pts) pts.push(S.wrk[k]); for (const k in (S.hrec || {})) if (S.hrec[k].pts) pts.push(S.hrec[k]);
   if (pts.length) add(1, '⭐', `${pts.length} ${pts.length > 1 ? 'persone hanno' : 'persona ha'} punti da spendere`, pts.slice(0, 3).map(r => r.nm).join(', ') + (pts.length > 3 ? '…' : ''), `memoFolk(${pts[0].id})`, 'Mostra');
@@ -3531,14 +3549,18 @@ function folkUnit(id) { if (!SC) return null; const u = SC.U.find(u => !u.dead &
   return null; }
 function folkFocus(u) { const [x, y] = W(u.x, u.y); cam.x = x; cam.y = y + 60; cam.z = Math.max(cam.z, 1.3); }
 function folkWithPts() { const L = []; for (const k in (S.vets || {})) for (const r of S.vets[k]) if (r.pts) L.push(r.id); for (const k in (S.wrk || {})) if (S.wrk[k].pts) L.push(S.wrk[k].id); for (const k in (S.hrec || {})) if (S.hrec[k].pts) L.push(S.hrec[k].id); return L.filter(folkUnit); }
-function memoFolk(id) { closeSheet(); const L = folkWithPts(); if (!L.includes(id)) L.unshift(id); const u = folkUnit(id) || L.map(folkUnit).find(Boolean);
+function memoFolk(id) { closeSheet(); let L = folkWithPts(); if (!L.includes(id)) L.unshift(id); const i0 = L.indexOf(id); L = L.slice(i0).concat(L.slice(0, i0)); const u = folkUnit(id) || L.map(folkUnit).find(Boolean);
   if (u) { FOLK_NAV = L.length > 1 ? L : null; folkFocus(u); openFolk(u); } else toast('Nessuno da migliorare in questo momento'); }
 function folkGo(d) { if (!FOLK_NAV || !SC || !SC.folkU) return; const cur = folkOf(SC.folkU).id; let i = FOLK_NAV.indexOf(cur); const n = FOLK_NAV.length;
   // salta chi ha già speso tutto, se qualcuno ha ancora punti
   const rest = FOLK_NAV.filter(id => { const u = folkUnit(id); return u && folkOf(u).pts; });
   for (let k = 0; k < n; k++) { i = (i + d + n) % n; const u = folkUnit(FOLK_NAV[i]); if (u && (!rest.length || folkOf(u).pts || rest.length === 1 && rest[0] === cur)) { sfx('click'); folkFocus(u); openFolk(u); return; } } }
 function folkNavHTML(rec) { if (!FOLK_NAV || !FOLK_NAV.includes(rec.id)) return ''; const left = FOLK_NAV.filter(id => { const u = folkUnit(id); return u && folkOf(u).pts; }).length;
-  return `<div class="fnav"><button onclick="folkGo(-1)" aria-label="Precedente">‹</button><span>${left ? `⭐ ${FOLK_NAV.indexOf(rec.id) + 1} di ${FOLK_NAV.length} · <b>${left}</b> con punti da spendere` : '✓ Tutti i punti sono stati spesi'}</span><button class="${!rec.pts && left ? 'go' : ''}" onclick="folkGo(1)" aria-label="Successivo">›</button></div>`; }
+  return `<div class="fnav"><button onclick="folkGo(-1)" aria-label="Precedente">‹</button><span>${left ? `⭐ ${FOLK_NAV.indexOf(rec.id) + 1} di ${FOLK_NAV.length} · <b>${left}</b> con punti da spendere` : '✓ Tutti i punti sono stati spesi'}</span><button class="${!rec.pts && left ? 'go' : ''}" onclick="folkGo(1)" aria-label="Successivo">›</button></div>${left ? `<button class="fall" onclick="folkSpendAll()">⭐ Migliora tutti <small>spende i punti di ${left} ${left > 1 ? 'persone' : 'persona'} in modo bilanciato</small></button>` : ''}`; }
+function spendRec(rec, sold) { const keys = sold ? ['str', 'vit', 'def'] : ['abi', 'spd']; const cap = 5 + Math.floor(rec.lvl / 3); let n = 0;
+  while (rec.pts > 0) { const k = keys.filter(k => (rec[k] || 0) < cap).sort((a, b) => (rec[a] || 0) - (rec[b] || 0))[0]; if (!k) break; rec[k] = (rec[k] || 0) + 1; rec.pts--; n++; } return n; }
+function folkSpendAll() { if (!FOLK_NAV) return; let pp = 0, ppl = 0; for (const id of FOLK_NAV) { const u = folkUnit(id); if (!u) continue; const rec = folkOf(u); if (!rec || !rec.pts) continue; const sold = !!UDEF[u.k] || !!(u.hero && HDEF[u.k]); const n = spendRec(rec, sold); if (n) { pp += n; ppl++; if (!sold && u.d && !u.fake && rec.spd) u.d.spd = 0.7 * (1 + 0.1 * rec.spd); } }
+  if (!pp) { toast('Nessun punto da spendere'); return; } sfx('coin'); save(); toast(`⭐ ${pp} punt${pp > 1 ? 'i' : 'o'} spes${pp > 1 ? 'i' : 'o'} su ${ppl} ${ppl > 1 ? 'persone' : 'persona'}`); if (SC && SC.folkU) openFolk(SC.folkU); }
 function openMemo() {
   const it = memoItems();
   openSheet('📜 Promemoria del Siniscalco', it.length ? `<p class="desc"><i>«Mio signore, ecco cosa attende la vostra attenzione.»</i></p><div class="memo">${it.map(x => `<div class="mi p${x.pri}"><span class="mic">${x.ic}</span><div class="mt"><b>${x.t}</b><small>${x.sub}</small></div>${x.act ? `<button class="btn ${x.pri <= 1 ? '' : 'ghost'}" onclick="${x.act}">${x.lbl}</button>` : ''}</div>`).join('')}</div>` : `<div class="memo0"><div>🕯️</div><p><i>«Tutto è in ordine, mio signore. Il feudo lavora per voi.»</i></p></div>`, 'memo');

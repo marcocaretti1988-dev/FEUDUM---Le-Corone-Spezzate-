@@ -333,7 +333,15 @@ html[data-theme=pietra] .folk .fs{background:rgba(255,255,255,.05)}
 #fcard .fnav b{color:#8f1d1d}
 #fcard .fnav button{flex:0 0 44px;height:34px;border-radius:9px;border:1px solid #1a0f08;background:linear-gradient(180deg,#3a2a1c,#22170e);color:#f5e6c4;font-size:22px;line-height:30px;padding:0}
 #fcard .fnav button.go{background:linear-gradient(180deg,#c0392b,#7a1414);animation:fnavp 1s ease-in-out infinite}
-@keyframes fnavp{50%{transform:scale(1.08)}}#fcard .ftr .no{color:#ff8a7a}
+@keyframes fnavp{50%{transform:scale(1.08)}}
+#fcard .fall{margin-top:6px;width:100%;padding:6px 8px;border-radius:9px;border:1px solid #7a4a10;background:linear-gradient(180deg,#e0a63a,#b45309);color:#fff8e6;font-family:var(--fh);font-weight:800;font-size:12.5px;line-height:1.15}
+#fcard .fall small{display:block;font-family:var(--fb);font-weight:400;font-size:10px;opacity:.9}
+.bnav{display:flex;align-items:center;gap:6px;margin:0 0 8px;padding:6px;border-radius:10px;background:rgba(0,0,0,.06);border:1px dashed rgba(0,0,0,.2)}
+.bnav>div{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;text-align:center;font-size:11.5px;line-height:1.2}
+.bnav b{color:#8f1d1d}
+.bnav>button{flex:0 0 44px;height:40px;border-radius:9px;border:1px solid #1a0f08;background:linear-gradient(180deg,#3a2a1c,#22170e);color:#f5e6c4;font-size:22px;padding:0}
+.bnav>button.go{background:linear-gradient(180deg,#c0392b,#7a1414);animation:fnavp 1s ease-in-out infinite}
+.bnav .btn.sm{margin:0}#fcard .ftr .no{color:#ff8a7a}
 @media(min-width:760px){#fcard{left:14px;bottom:100px}}
 html[data-theme=miniatura] #fcard{background:linear-gradient(180deg,#fbf6e6,#f0e4c2);border-color:#1f3a8a;box-shadow:0 8px 22px rgba(0,0,0,.5),inset 0 0 0 3px #fbf6e6,inset 0 0 0 4px #c99a2e}
 html[data-theme=miniatura] #fcard .flv{background:radial-gradient(circle at 35% 30%,#3557b5,#152459);border-color:#c99a2e}html[data-theme=miniatura] #fcard .ftr{background:linear-gradient(180deg,#22357c,#152459)}
@@ -539,21 +547,21 @@ html[data-theme=miniatura] #tbtns .tb .bl{font-size:17px;letter-spacing:.02em}
 #hud-bot .hb.img .i{display:block;width:100%;max-width:66px;aspect-ratio:1;background-size:contain;background-repeat:no-repeat;background-position:center;filter:drop-shadow(0 3px 4px rgba(0,0,0,.6));position:relative}
 #hud-bot .hb.img:active{transform:translateY(2px)}
 #hud-bot .hb.img .i .ico{position:absolute;left:22%;top:20%;width:56%;height:56%;filter:drop-shadow(0 2px 2px rgba(0,0,0,.7))}
-#hud-bot .k-esercito .i{background-image:url(ui/hb_esercito.webp?v=d059d04ecc)}#hud-bot .k-esercito:active .i{background-image:url(ui/hb_esercito_p.webp?v=d059d04ecc)}
-#hud-bot .k-attacca .i{background-image:url(ui/hb_attacca.webp?v=d059d04ecc)}#hud-bot .k-attacca:active .i{background-image:url(ui/hb_attacca_p.webp?v=d059d04ecc)}
-#hud-bot .k-menu .i{background-image:url(ui/hb_menu.webp?v=d059d04ecc)}#hud-bot .k-menu:active .i{background-image:url(ui/hb_menu_p.webp?v=d059d04ecc)}
-#hud-bot .k-mastio .i{background-image:url(ui/hb_mastio.webp?v=d059d04ecc)}#hud-bot .k-mastio:active .i{background-image:url(ui/hb_mastio_p.webp?v=d059d04ecc)}
-#hud-bot .k-costruisci .i{background-image:url(ui/hb_costruisci.webp?v=d059d04ecc)}#hud-bot .k-costruisci:active .i{background-image:url(ui/hb_costruisci_p.webp?v=d059d04ecc)}
+#hud-bot .k-esercito .i{background-image:url(ui/hb_esercito.webp?v=5376302c6e)}#hud-bot .k-esercito:active .i{background-image:url(ui/hb_esercito_p.webp?v=5376302c6e)}
+#hud-bot .k-attacca .i{background-image:url(ui/hb_attacca.webp?v=5376302c6e)}#hud-bot .k-attacca:active .i{background-image:url(ui/hb_attacca_p.webp?v=5376302c6e)}
+#hud-bot .k-menu .i{background-image:url(ui/hb_menu.webp?v=5376302c6e)}#hud-bot .k-menu:active .i{background-image:url(ui/hb_menu_p.webp?v=5376302c6e)}
+#hud-bot .k-mastio .i{background-image:url(ui/hb_mastio.webp?v=5376302c6e)}#hud-bot .k-mastio:active .i{background-image:url(ui/hb_mastio_p.webp?v=5376302c6e)}
+#hud-bot .k-costruisci .i{background-image:url(ui/hb_costruisci.webp?v=5376302c6e)}#hud-bot .k-costruisci:active .i{background-image:url(ui/hb_costruisci_p.webp?v=5376302c6e)}
 #hud-bot .hb.img.dis .i,#hud-bot .hb.img:disabled .i{filter:grayscale(1) brightness(.8)}
 #hud-bot{gap:4px!important;padding-left:6px!important;padding-right:6px!important}
 /* ===== icone dipinte delle risorse ===== */
-.ico.ico-cibo{background-image:url(ui/rs_cibo.webp?v=d059d04ecc)!important;background-size:cover!important;border-radius:22%}#res .chip:active .ico-cibo{background-image:url(ui/rs_cibo_p.webp?v=d059d04ecc)!important}
-.ico.ico-legno{background-image:url(ui/rs_legno.webp?v=d059d04ecc)!important;background-size:cover!important;border-radius:22%}#res .chip:active .ico-legno{background-image:url(ui/rs_legno_p.webp?v=d059d04ecc)!important}
-.ico.ico-oro{background-image:url(ui/rs_oro.webp?v=d059d04ecc)!important;background-size:cover!important;border-radius:22%}#res .chip:active .ico-oro{background-image:url(ui/rs_oro_p.webp?v=d059d04ecc)!important}
-.ico.ico-pietra{background-image:url(ui/rs_pietra.webp?v=d059d04ecc)!important;background-size:cover!important;border-radius:22%}#res .chip:active .ico-pietra{background-image:url(ui/rs_pietra_p.webp?v=d059d04ecc)!important}
-.ico.ico-ferro{background-image:url(ui/rs_ferro.webp?v=d059d04ecc)!important;background-size:cover!important;border-radius:22%}#res .chip:active .ico-ferro{background-image:url(ui/rs_ferro_p.webp?v=d059d04ecc)!important}
-.ico.ico-pelli{background-image:url(ui/rs_pelli.webp?v=d059d04ecc)!important;background-size:cover!important;border-radius:22%}#res .chip:active .ico-pelli{background-image:url(ui/rs_pelli_p.webp?v=d059d04ecc)!important}
-.ico.ico-favore{background-image:url(ui/rs_favore.webp?v=d059d04ecc)!important;background-size:cover!important;border-radius:22%}#res .chip:active .ico-favore{background-image:url(ui/rs_favore_p.webp?v=d059d04ecc)!important}
+.ico.ico-cibo{background-image:url(ui/rs_cibo.webp?v=5376302c6e)!important;background-size:cover!important;border-radius:22%}#res .chip:active .ico-cibo{background-image:url(ui/rs_cibo_p.webp?v=5376302c6e)!important}
+.ico.ico-legno{background-image:url(ui/rs_legno.webp?v=5376302c6e)!important;background-size:cover!important;border-radius:22%}#res .chip:active .ico-legno{background-image:url(ui/rs_legno_p.webp?v=5376302c6e)!important}
+.ico.ico-oro{background-image:url(ui/rs_oro.webp?v=5376302c6e)!important;background-size:cover!important;border-radius:22%}#res .chip:active .ico-oro{background-image:url(ui/rs_oro_p.webp?v=5376302c6e)!important}
+.ico.ico-pietra{background-image:url(ui/rs_pietra.webp?v=5376302c6e)!important;background-size:cover!important;border-radius:22%}#res .chip:active .ico-pietra{background-image:url(ui/rs_pietra_p.webp?v=5376302c6e)!important}
+.ico.ico-ferro{background-image:url(ui/rs_ferro.webp?v=5376302c6e)!important;background-size:cover!important;border-radius:22%}#res .chip:active .ico-ferro{background-image:url(ui/rs_ferro_p.webp?v=5376302c6e)!important}
+.ico.ico-pelli{background-image:url(ui/rs_pelli.webp?v=5376302c6e)!important;background-size:cover!important;border-radius:22%}#res .chip:active .ico-pelli{background-image:url(ui/rs_pelli_p.webp?v=5376302c6e)!important}
+.ico.ico-favore{background-image:url(ui/rs_favore.webp?v=5376302c6e)!important;background-size:cover!important;border-radius:22%}#res .chip:active .ico-favore{background-image:url(ui/rs_favore_p.webp?v=5376302c6e)!important}
 #res .chip .ic{height:34px!important}#res .chip .ic .ico{width:34px!important;height:34px!important;filter:drop-shadow(0 2px 2px rgba(0,0,0,.6))}
 #res .chip{padding-top:4px!important}
 .cc .ico,.costs .ico,.btn small .ico{width:1.4em;height:1.4em;vertical-align:-.38em}
@@ -782,7 +790,7 @@ function need3d(k, low) {
 function pump3d() {
   while (L3.active < L3.max && (L3.q.length || (L3.prefetch.length && L3.active < 1))) {
     const k = L3.q.length ? L3.q.shift() : L3.prefetch.shift(); if (L3.state[k] !== 'q') continue; L3.state[k] = 'l'; L3.active++;
-    const sc = document.createElement('script'); sc.src = 'm3d_' + k + '.js?v=d059d04ecc'; sc.async = true;
+    const sc = document.createElement('script'); sc.src = 'm3d_' + k + '.js?v=5376302c6e'; sc.async = true;
     sc.onload = () => { L3.state[k] = 'ok'; L3.active--; if (G3.gl && M3D[k]) { if (!G3.models[k]) g3load(k, M3D[k]); for (const a in M3D_ALIAS) if (M3D_ALIAS[a] === k && !G3.models[a] && a !== 'mastio') G3.models[a] = G3.models[k]; delete M3D[k]; } pump3d(); };
     sc.onerror = () => { L3.state[k] = 'err'; L3.active--; pump3d(); };
     document.head.appendChild(sc);
@@ -3664,6 +3672,7 @@ function doUpgrade(id) {
   pay(c); if (resOf(r)) collect(r);
   if (t && !S.creative) { r.end = now() + t * 1000; r.dur = t * 1000; r.toLvl = r.lvl + 1; } else { r.lvl++; }
   sfx('build'); const sel = r; SC = buildVillage(); SC.sel = SC.B.find(b => b.ref === sel) || null; save(); updateHUD(); openBuildingInfo(r);
+  if (BLD_NAV && BLD_NAV.includes(r.id) && builders() < maxBuilders() && BLD_NAV.some(id => bldUpOk(S.buildings.find(b => b.id === id)))) setTimeout(() => { if ($('#sheet').dataset.p === 'b:' + r.id) bldGo(1); }, 650);
 }
 function upgradeAllWalls() {
   const ws = S.buildings.filter(b => b.t === 'muro' && b.lvl < 2); let n = 0;
@@ -3717,7 +3726,7 @@ function openMenu(tab) {
     <button class="btn" onclick="closeSheet();toMenu()">🏠 Menu principale</button></div>`;
   openSheet(ICO('gear') + ' Menu', `<div class="mtabs">${tabs.map(([k, i, n]) => `<button class="${k === tab ? 'on' : ''}" onclick="openMenu('${k}')">${ICO(i)}<span>${n}</span></button>`).join('')}</div><div class="aud mbody">${body}</div>`, 'menu');
 }
-function openSheet(title, html, key) { setTimeout(() => { try { if (MODE === 'village') tutTick(); } catch (e) { } }, 0); if (typeof closeFolk === 'function' && $('#fcard')) closeFolk(); const s = $('#sheet'); s.dataset.p = key || ''; $('#sheet-t').innerHTML = title; $('#sheet-b').innerHTML = html; s.classList.remove('hidden'); }
+function openSheet(title, html, key) { if (BLD_NAV && !(key && String(key).startsWith('b:') && BLD_NAV.includes(+String(key).slice(2)))) BLD_NAV = null; setTimeout(() => { try { if (MODE === 'village') tutTick(); } catch (e) { } }, 0); if (typeof closeFolk === 'function' && $('#fcard')) closeFolk(); const s = $('#sheet'); s.dataset.p = key || ''; $('#sheet-t').innerHTML = title; $('#sheet-b').innerHTML = html; s.classList.remove('hidden'); }
 function closeSheet() { const s = $('#sheet'); s.classList.add('hidden'); s.dataset.p = ''; if (SC && MODE === 'village' && !placing) { SC.sel = null; SC.selN = null; SC.selA = null; SC.selU = null; } }
 function refreshSheet() { const p = $('#sheet').dataset.p; if (!p) return; if (p === 'army') openArmy(); else if (p === 'build') openBuild(); else if (p.startsWith('b:')) { const r = S.buildings.find(b => b.id === +p.slice(2)); if (r) openBuildingInfo(r); } }
 const CHIM3 = { casa: [0.62, 0.1], taverna: [0.6, 0.08], fucina: [0.7, 0.08], fattoria: [0.4, 0.12], armeria: [0.65, 0.08], infermeria: [0.6, 0.1], capanna: [0.6, 0.12] };
@@ -3759,9 +3768,26 @@ function openBuild(tab) {
   }).join('')}</div>`;
   openSheet(ICO('build') + ' Costruisci', html, 'build');
 }
+// scorri tra gli edifici migliorabili (aperto dal Promemoria)
+var BLD_NAV = null;
+const bldUpOk = r => r && r.t !== 'mastio' && !BDEF[r.t].wall && !BDEF[r.t].decor && !r.nat && !canUp(r) && canPay(upCost(r));
+function bldUps() { return S.buildings.filter(bldUpOk).sort((a, b) => a.lvl - b.lvl || BDEF[a.t].n.localeCompare(BDEF[b.t].n)); }
+function bldFocus(r) { const [x, y] = W(r.x + (BDEF[r.t].w || 2) / 2, r.y + (BDEF[r.t].h || 2) / 2); cam.x = x; cam.y = y + 40; }
+function bldNav(id) { closeSheet(); let L = bldUps().map(r => r.id); if (!L.includes(id)) L.unshift(id); const i0 = L.indexOf(id); L = L.slice(i0).concat(L.slice(0, i0)); BLD_NAV = L.length > 1 ? L : null; const r = S.buildings.find(b => b.id === id); if (!r) return; bldFocus(r); SC.sel = SC.B.find(b => b.ref === r) || null; openBuildingInfo(r); }
+function bldGo(d) { if (!BLD_NAV) return; const cur = +($('#sheet').dataset.p || '').slice(2); let i = BLD_NAV.indexOf(cur); const n = BLD_NAV.length; const ok = BLD_NAV.filter(id => bldUpOk(S.buildings.find(b => b.id === id)));
+  for (let k = 0; k < n; k++) { i = (i + d + n) % n; const r = S.buildings.find(b => b.id === BLD_NAV[i]); if (r && (!ok.length || bldUpOk(r))) { sfx('click'); bldFocus(r); SC.sel = SC.B.find(b => b.ref === r) || null; openBuildingInfo(r); return; } } }
+function bldNavHTML(r) { if (!BLD_NAV || !BLD_NAV.includes(r.id)) return ''; const ok = BLD_NAV.filter(id => bldUpOk(S.buildings.find(b => b.id === id))).length, free = maxBuilders() - builders();
+  return `<div class="bnav"><button onclick="bldGo(-1)" aria-label="Precedente">‹</button><div><span>⬆ ${BLD_NAV.indexOf(r.id) + 1} di ${BLD_NAV.length} · <b>${ok}</b> migliorabili · 🔨 ${free > 0 ? free + ' mastr' + (free > 1 ? 'i' : 'o') + ' liber' + (free > 1 ? 'i' : 'o') : 'mastri tutti occupati'}</span>${ok && free > 0 ? `<button class="btn sm" onclick="bldUpAll()">⬆ Migliora tutti<small>${Math.min(ok, free)} ora</small></button>` : ''}</div><button class="${!bldUpOk(r) && ok && free > 0 ? 'go' : ''}" onclick="bldGo(1)" aria-label="Successivo">›</button></div>`; }
+function bldUpAll() { if (!BLD_NAV) return; let n = 0; const names = [];
+  for (const id of BLD_NAV.slice().sort((a, b) => (S.buildings.find(x => x.id === a) || {}).lvl - (S.buildings.find(x => x.id === b) || {}).lvl)) { const r = S.buildings.find(b => b.id === id); if (!bldUpOk(r)) continue; const t = upTime(r); if (t && builders() >= maxBuilders()) break;
+    pay(upCost(r)); if (resOf(r)) collect(r); if (t && !S.creative) { r.end = now() + t * 1000; r.dur = t * 1000; r.toLvl = r.lvl + 1; } else r.lvl++; n++; names.push(BDEF[r.t].n); }
+  if (!n) { toast('Niente da migliorare adesso'); return; } sfx('build'); SC = buildVillage(); save(); updateHUD();
+  const left = BLD_NAV.filter(id => bldUpOk(S.buildings.find(b => b.id === id))).length;
+  toast(`⬆ In miglioramento: ${names.join(', ')}${left ? ` · altri ${left} quando si liberano i mastri d'opera` : ''}`);
+  const cur = S.buildings.find(b => b.id === +($('#sheet').dataset.p || '').slice(2)); if (cur) openBuildingInfo(cur); }
 function openBuildingInfo(r) {
   const d = BDEF[r.t]; const why = canUp(r); const res = resOf(r);
-  let body = `<p class="desc">${d.desc}</p>${r.t === 'cripta' ? cryptHTML() : ''}${r.t === 'mastio' ? crownHTML() : ''}<div class="stats">`;
+  let body = `${bldNavHTML(r)}<p class="desc">${d.desc}</p>${r.t === 'cripta' ? cryptHTML() : ''}${r.t === 'mastio' ? crownHTML() : ''}<div class="stats">`;
   body += `<span>Livello <b>${r.lvl}</b>${r.end ? ` → ${r.toLvl}` : ''}</span><span>Vita <b>${Math.round(d.hp * (1 + 0.35 * (r.lvl - 1)))}</b></span>`;
   if (res) body += `<span>${ICO(res)} <b>${rateOf(r) < 1 ? rateOf(r).toFixed(1) : Math.round(rateOf(r))}</b>/min</span><span>In deposito <b>${Math.floor(r.stock || 0)}</b>/${stockCap(r)}</span>`;
   if (d.store) body += `<span>Capienza ${Object.keys(d.store).map(k => ICO(k) + ' +' + d.store[k] * r.lvl).join(' ')}</span>`;
@@ -4136,7 +4162,7 @@ function memoItems() {
   const free = maxBuilders() - builders(); if (free > 0) { const m = S.buildings.find(b => b.t === 'mastio'); const mc = m && !m.end && !canUp(m) ? upCost(m) : null; if (mc && canPay(mc)) add(1, '🏰', `Puoi alzare il Mastio al livello ${m.lvl + 1}`, 'Sblocca edifici, truppe e la prossima era', `closeSheet();openBuildingInfo(S.buildings.find(b=>b.t==='mastio'))`, 'Vai');
     else add(2, '🔨', `${free} mastr${free > 1 ? 'i' : 'o'} d'opera senza lavoro`, 'Costruisci o migliora un edificio', "closeSheet();openBuild()", 'Costruisci'); }
   // edifici migliorabili ora
-  if (free > 0) { const ups = S.buildings.filter(r => r.t !== 'mastio' && !BDEF[r.t].wall && !BDEF[r.t].decor && !r.nat && !canUp(r) && canPay(upCost(r))); if (ups.length) { const r = ups.sort((a, b) => a.lvl - b.lvl)[0]; add(2, '⬆', `${ups.length} edifici migliorabili`, `Per esempio ${BDEF[r.t].n} al livello ${r.lvl + 1}`, `closeSheet();openBuildingInfo(S.buildings.find(b=>b.id===${r.id}))`, 'Vai'); } }
+  if (free > 0) { const ups = S.buildings.filter(r => r.t !== 'mastio' && !BDEF[r.t].wall && !BDEF[r.t].decor && !r.nat && !canUp(r) && canPay(upCost(r))); if (ups.length) { const r = ups.sort((a, b) => a.lvl - b.lvl)[0]; add(2, '⬆', `${ups.length} edifici migliorabili`, `Per esempio ${BDEF[r.t].n} al livello ${r.lvl + 1}`, `bldNav(${r.id})`, 'Mostra'); } }
   // persone con punti da spendere
   const pts = []; for (const k in (S.vets || {})) for (const r of S.vets[k]) if (r.pts) pts.push(r); for (const k in (S.wrk || {})) if (S.wrk[k].pts) pts.push(S.wrk[k]); for (const k in (S.hrec || {})) if (S.hrec[k].pts) pts.push(S.hrec[k]);
   if (pts.length) add(1, '⭐', `${pts.length} ${pts.length > 1 ? 'persone hanno' : 'persona ha'} punti da spendere`, pts.slice(0, 3).map(r => r.nm).join(', ') + (pts.length > 3 ? '…' : ''), `memoFolk(${pts[0].id})`, 'Mostra');
@@ -4168,14 +4194,18 @@ function folkUnit(id) { if (!SC) return null; const u = SC.U.find(u => !u.dead &
   return null; }
 function folkFocus(u) { const [x, y] = W(u.x, u.y); cam.x = x; cam.y = y + 60; cam.z = Math.max(cam.z, 1.3); }
 function folkWithPts() { const L = []; for (const k in (S.vets || {})) for (const r of S.vets[k]) if (r.pts) L.push(r.id); for (const k in (S.wrk || {})) if (S.wrk[k].pts) L.push(S.wrk[k].id); for (const k in (S.hrec || {})) if (S.hrec[k].pts) L.push(S.hrec[k].id); return L.filter(folkUnit); }
-function memoFolk(id) { closeSheet(); const L = folkWithPts(); if (!L.includes(id)) L.unshift(id); const u = folkUnit(id) || L.map(folkUnit).find(Boolean);
+function memoFolk(id) { closeSheet(); let L = folkWithPts(); if (!L.includes(id)) L.unshift(id); const i0 = L.indexOf(id); L = L.slice(i0).concat(L.slice(0, i0)); const u = folkUnit(id) || L.map(folkUnit).find(Boolean);
   if (u) { FOLK_NAV = L.length > 1 ? L : null; folkFocus(u); openFolk(u); } else toast('Nessuno da migliorare in questo momento'); }
 function folkGo(d) { if (!FOLK_NAV || !SC || !SC.folkU) return; const cur = folkOf(SC.folkU).id; let i = FOLK_NAV.indexOf(cur); const n = FOLK_NAV.length;
   // salta chi ha già speso tutto, se qualcuno ha ancora punti
   const rest = FOLK_NAV.filter(id => { const u = folkUnit(id); return u && folkOf(u).pts; });
   for (let k = 0; k < n; k++) { i = (i + d + n) % n; const u = folkUnit(FOLK_NAV[i]); if (u && (!rest.length || folkOf(u).pts || rest.length === 1 && rest[0] === cur)) { sfx('click'); folkFocus(u); openFolk(u); return; } } }
 function folkNavHTML(rec) { if (!FOLK_NAV || !FOLK_NAV.includes(rec.id)) return ''; const left = FOLK_NAV.filter(id => { const u = folkUnit(id); return u && folkOf(u).pts; }).length;
-  return `<div class="fnav"><button onclick="folkGo(-1)" aria-label="Precedente">‹</button><span>${left ? `⭐ ${FOLK_NAV.indexOf(rec.id) + 1} di ${FOLK_NAV.length} · <b>${left}</b> con punti da spendere` : '✓ Tutti i punti sono stati spesi'}</span><button class="${!rec.pts && left ? 'go' : ''}" onclick="folkGo(1)" aria-label="Successivo">›</button></div>`; }
+  return `<div class="fnav"><button onclick="folkGo(-1)" aria-label="Precedente">‹</button><span>${left ? `⭐ ${FOLK_NAV.indexOf(rec.id) + 1} di ${FOLK_NAV.length} · <b>${left}</b> con punti da spendere` : '✓ Tutti i punti sono stati spesi'}</span><button class="${!rec.pts && left ? 'go' : ''}" onclick="folkGo(1)" aria-label="Successivo">›</button></div>${left ? `<button class="fall" onclick="folkSpendAll()">⭐ Migliora tutti <small>spende i punti di ${left} ${left > 1 ? 'persone' : 'persona'} in modo bilanciato</small></button>` : ''}`; }
+function spendRec(rec, sold) { const keys = sold ? ['str', 'vit', 'def'] : ['abi', 'spd']; const cap = 5 + Math.floor(rec.lvl / 3); let n = 0;
+  while (rec.pts > 0) { const k = keys.filter(k => (rec[k] || 0) < cap).sort((a, b) => (rec[a] || 0) - (rec[b] || 0))[0]; if (!k) break; rec[k] = (rec[k] || 0) + 1; rec.pts--; n++; } return n; }
+function folkSpendAll() { if (!FOLK_NAV) return; let pp = 0, ppl = 0; for (const id of FOLK_NAV) { const u = folkUnit(id); if (!u) continue; const rec = folkOf(u); if (!rec || !rec.pts) continue; const sold = !!UDEF[u.k] || !!(u.hero && HDEF[u.k]); const n = spendRec(rec, sold); if (n) { pp += n; ppl++; if (!sold && u.d && !u.fake && rec.spd) u.d.spd = 0.7 * (1 + 0.1 * rec.spd); } }
+  if (!pp) { toast('Nessun punto da spendere'); return; } sfx('coin'); save(); toast(`⭐ ${pp} punt${pp > 1 ? 'i' : 'o'} spes${pp > 1 ? 'i' : 'o'} su ${ppl} ${ppl > 1 ? 'persone' : 'persona'}`); if (SC && SC.folkU) openFolk(SC.folkU); }
 function openMemo() {
   const it = memoItems();
   openSheet('📜 Promemoria del Siniscalco', it.length ? `<p class="desc"><i>«Mio signore, ecco cosa attende la vostra attenzione.»</i></p><div class="memo">${it.map(x => `<div class="mi p${x.pri}"><span class="mic">${x.ic}</span><div class="mt"><b>${x.t}</b><small>${x.sub}</small></div>${x.act ? `<button class="btn ${x.pri <= 1 ? '' : 'ghost'}" onclick="${x.act}">${x.lbl}</button>` : ''}</div>`).join('')}</div>` : `<div class="memo0"><div>🕯️</div><p><i>«Tutto è in ordine, mio signore. Il feudo lavora per voi.»</i></p></div>`, 'memo');
@@ -4604,7 +4634,7 @@ function heroCard(k) { const h = BT.heroes.find(h => h.k === k); if (!h) return;
 // conferma dentro al gioco (i popup del browser sono bloccati nella pagina pubblicata)
 let ASK = null;
 // ---- aggiornamento automatico: se su GitHub c'è una versione nuova, ricarica scavalcando la cache ----
-const BUILD = 'd059d04ecc';
+const BUILD = '5376302c6e';
 function checkUpdate() { if (BUILD.startsWith('__') || !/github\.io$/.test(location.hostname)) return;
   fetch('version.txt?t=' + Date.now(), { cache: 'no-store' }).then(r => r.ok ? r.text() : '').then(v => { v = (v || '').trim(); if (!v || v === BUILD) return; let tried = ''; try { tried = sessionStorage.getItem('feudum_upd') || ''; } catch (e) { } if (tried === v) return; try { sessionStorage.setItem('feudum_upd', v); } catch (e) { }
     try { if (S && MODE !== 'title') save(); } catch (e) { } location.replace(location.pathname + '?v=' + v); }).catch(() => { }); }
