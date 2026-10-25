@@ -2671,7 +2671,7 @@ function openFolk(u) {
   let el = $('#fcard'); if (!el) { el = document.createElement('div'); el.id = 'fcard'; document.body.appendChild(el); let t0 = null; el.addEventListener('touchstart', e => { const t = e.touches[0]; t0 = [t.clientX, t.clientY]; }, { passive: true }); el.addEventListener('touchend', e => { if (!t0 || !FOLK_NAV) return; const t = e.changedTouches[0], dx = t.clientX - t0[0], dy = t.clientY - t0[1]; t0 = null; if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.5) folkGo(dx < 0 ? 1 : -1); }, { passive: true }); } el.classList.toggle('hero', hero);
   el.innerHTML = `<button class="fx" onclick="closeFolk()">✕</button>
     <div class="ftop"><div class="fpor" style="${hero ? thumbStyle(u.k) : thumbAt(u.k, 74)}"></div>
-      <div class="fid"><div class="fnm">${rec.nm}${rec.tr ? ` <span class="ftr2" title="${TRAITS[rec.tr].d}">${TRAITS[rec.tr].ic} ${TRAITS[rec.tr].n}</span>` : ''}</div><div class="frl">${hero ? 'Eroe · ' + role.title.split(',')[0] : role.n}</div><div class="fds">${desc}</div></div>
+      <div class="fid"><div class="fnm">${rec.nm}${rec.tr ? ` <span class="ftr2" title="${TRAITS[rec.tr].d}">${TRAITS[rec.tr].ic} ${TRAITS[rec.tr].n}</span>` : ''}</div><div class="frl">${hero ? 'Eroe · ' + role.title.split(',')[0] : role.n}${u.fake ? ' · <small>a riposo</small>' : ''}</div><div class="fds">${desc}</div></div>
       <div class="flv"><small>LIV</small><b>${rec.lvl}</b><small>/${mx}</small></div></div>
     <div class="fxp" title="Esperienza"><i style="width:${maxed ? 100 : Math.min(100, rec.xp / need * 100)}%"></i><span>${maxed ? (rec.lvl >= 10 ? 'Livello massimo' : 'Max per ora · sali di Mastio') : `Esp. ${rec.xp}/${need}`}${rec.pts ? ` · <b>${rec.pts} punt${rec.pts > 1 ? 'i' : 'o'}!</b>` : ''}</span></div>
     <div class="fsts">${st.map(([k, ic, n, v]) => { const cap = 5 + Math.floor(rec.lvl / 3), up = rec.pts && (rec[k] || 0) < cap; return `<div class="fst ${up ? 'up' : ''}" ${up ? `onclick="folkPoint('${k}')"` : ''}><span class="i">${ic}</span><b>${v}</b><small>${n}${rec[k] ? ' ' + '•'.repeat(rec[k]) : ''}</small>${up ? '<em>+1</em>' : ''}</div>`; }).join('')}</div>
@@ -2682,7 +2682,7 @@ function folkTrain() { const u = SC && SC.folkU; if (!u) return; const rec = fol
   const dur = Math.round((30 + 30 * rec.lvl) * PACE()); if (timedOn()) { addWork({ kind: 'train', key: rec.id, rid: rec.id, xp: 40, dur }); sfx('tock'); toast(`🎯 ${rec.nm} si addestra (${dur}s)`); } else finishWork({ kind: 'train', rec, xp: 40 }); save(); updateHUD(); openFolk(u); }
 function folkPoint(k) { const u = SC && SC.folkU; if (!u) return; const rec = folkOf(u); if (!rec.pts) return; rec.pts--; rec[k] = (rec[k] || 0) + 1; sfx('coin'); if (k === 'spd' && u.d) u.d.spd = 0.7 * (1 + 0.1 * rec.spd); save(); openFolk(u);
   // punti finiti: passa da solo al prossimo da migliorare
-  if (!rec.pts && FOLK_NAV && FOLK_NAV.some(id => id !== rec.id && folkUnit(id) && folkOf(folkUnit(id)).pts)) setTimeout(() => { if (SC && SC.folkU === u && FOLK_NAV) folkGo(1); }, 650); }
+  if (!rec.pts && FOLK_NAV && FOLK_NAV.some(id => id !== rec.id && folkUnit(id) && folkOf(folkUnit(id)).pts)) setTimeout(() => { if (SC && SC.folkU && folkOf(SC.folkU) === rec && FOLK_NAV) folkGo(1); }, 650); }
 // ================= LAVORI: rimozioni, demolizioni e addestramenti richiedono tempo =================
 const MAX_CREW = 2; // squadre di sgombero (separate dai mastri d'opera)
 const timedOn = () => S && !S.creative;
@@ -3523,11 +3523,16 @@ function memoItems() {
 function memoCollect() { let n = 0; for (const r of S.buildings) if (!r.end && resOf(r) && r.stock >= 1) { if (collect(r)) n++; } if (SC) for (const b of SC.B) b.bubble = null; toast(`🧺 Raccolto da ${n} botteghe`); save(); openMemo(); }
 // scorri tra le persone con punti da spendere (aperto dal Promemoria)
 let FOLK_NAV = null;
-function folkUnit(id) { return SC && SC.U.find(u => !u.dead && u.side === 'V' && folkOf(u) && folkOf(u).id === id); }
+function folkUnit(id) { if (!SC) return null; const u = SC.U.find(u => !u.dead && u.side === 'V' && folkOf(u) && folkOf(u).id === id); if (u) return u;
+  // non cammina per il villaggio (in caserma o a riposo): scheda "virtuale" vicino all'edificio
+  const at = t => { const b = S.buildings.find(b => b.t === t) || S.buildings.find(b => b.t === 'mastio'); return b ? [b.x + (BDEF[b.t].w || 2) / 2, b.y + (BDEF[b.t].h || 2) / 2] : [N / 2, N / 2]; };
+  for (const k in (S.vets || {})) { const i = S.vets[k].findIndex(r => r.id === id); if (i >= 0) { const [x, y] = at(UDEF[k] && UDEF[k].at || 'caserma'); return { k, vi: i, wrec: S.vets[k][i], x, y, d: UDEF[k], fake: 1 }; } }
+  for (const k in (S.hrec || {})) if (S.hrec[k].id === id && HDEF[k]) { const [x, y] = at('mastio'); return { k, hero: 1, wrec: S.hrec[k], x, y, d: HDEF[k], fake: 1 }; }
+  return null; }
 function folkFocus(u) { const [x, y] = W(u.x, u.y); cam.x = x; cam.y = y + 60; cam.z = Math.max(cam.z, 1.3); }
 function folkWithPts() { const L = []; for (const k in (S.vets || {})) for (const r of S.vets[k]) if (r.pts) L.push(r.id); for (const k in (S.wrk || {})) if (S.wrk[k].pts) L.push(S.wrk[k].id); for (const k in (S.hrec || {})) if (S.hrec[k].pts) L.push(S.hrec[k].id); return L.filter(folkUnit); }
-function memoFolk(id) { closeSheet(); const L = folkWithPts(); if (!L.includes(id)) L.unshift(id); const u = folkUnit(id) || (L.length && folkUnit(L[0]));
-  if (u) { FOLK_NAV = L.length > 1 ? L : null; folkFocus(u); openFolk(u); } else toast('È in caserma: lo trovi tra i soldati vicino alla caserma'); }
+function memoFolk(id) { closeSheet(); const L = folkWithPts(); if (!L.includes(id)) L.unshift(id); const u = folkUnit(id) || L.map(folkUnit).find(Boolean);
+  if (u) { FOLK_NAV = L.length > 1 ? L : null; folkFocus(u); openFolk(u); } else toast('Nessuno da migliorare in questo momento'); }
 function folkGo(d) { if (!FOLK_NAV || !SC || !SC.folkU) return; const cur = folkOf(SC.folkU).id; let i = FOLK_NAV.indexOf(cur); const n = FOLK_NAV.length;
   // salta chi ha già speso tutto, se qualcuno ha ancora punti
   const rest = FOLK_NAV.filter(id => { const u = folkUnit(id); return u && folkOf(u).pts; });
