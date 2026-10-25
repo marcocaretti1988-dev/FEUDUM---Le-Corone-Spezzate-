@@ -327,7 +327,13 @@ html[data-theme=pietra] .folk .fs{background:rgba(255,255,255,.05)}
 #fcard .fst em{position:absolute;top:-7px;right:-4px;font-style:normal;font-size:10px;font-weight:800;background:#b45309;color:#fff;border-radius:8px;padding:1px 5px}
 #fcard .ftr{margin-top:7px;width:100%;display:flex;align-items:center;gap:6px;padding:6px 10px;border-radius:9px;border:1px solid #1a0f08;background:linear-gradient(180deg,#3a2a1c,#22170e);color:#f5e6c4;font-family:var(--fh);font-weight:700;font-size:12.5px}
 #fcard .ftr small{font-family:var(--fb);font-weight:400;opacity:.75;font-size:10.5px}#fcard .ftr span{margin-left:auto;font-family:var(--fb);font-size:11px}#fcard .ftr span .ico{width:14px;height:14px;vertical-align:-2px}
-#fcard .ftr.dis{opacity:.5}#fcard .ftr .no{color:#ff8a7a}
+#fcard .ftr.dis{opacity:.5}
+#fcard .fnav{display:flex;align-items:center;gap:6px;margin-top:7px;padding-top:7px;border-top:1px dashed rgba(0,0,0,.2)}
+#fcard .fnav span{flex:1;text-align:center;font-size:11px;line-height:1.2}
+#fcard .fnav b{color:#8f1d1d}
+#fcard .fnav button{flex:0 0 44px;height:34px;border-radius:9px;border:1px solid #1a0f08;background:linear-gradient(180deg,#3a2a1c,#22170e);color:#f5e6c4;font-size:22px;line-height:30px;padding:0}
+#fcard .fnav button.go{background:linear-gradient(180deg,#c0392b,#7a1414);animation:fnavp 1s ease-in-out infinite}
+@keyframes fnavp{50%{transform:scale(1.08)}}#fcard .ftr .no{color:#ff8a7a}
 @media(min-width:760px){#fcard{left:14px;bottom:100px}}
 html[data-theme=miniatura] #fcard{background:linear-gradient(180deg,#fbf6e6,#f0e4c2);border-color:#1f3a8a;box-shadow:0 8px 22px rgba(0,0,0,.5),inset 0 0 0 3px #fbf6e6,inset 0 0 0 4px #c99a2e}
 html[data-theme=miniatura] #fcard .flv{background:radial-gradient(circle at 35% 30%,#3557b5,#152459);border-color:#c99a2e}html[data-theme=miniatura] #fcard .ftr{background:linear-gradient(180deg,#22357c,#152459)}
@@ -533,21 +539,21 @@ html[data-theme=miniatura] #tbtns .tb .bl{font-size:17px;letter-spacing:.02em}
 #hud-bot .hb.img .i{display:block;width:100%;max-width:66px;aspect-ratio:1;background-size:contain;background-repeat:no-repeat;background-position:center;filter:drop-shadow(0 3px 4px rgba(0,0,0,.6));position:relative}
 #hud-bot .hb.img:active{transform:translateY(2px)}
 #hud-bot .hb.img .i .ico{position:absolute;left:22%;top:20%;width:56%;height:56%;filter:drop-shadow(0 2px 2px rgba(0,0,0,.7))}
-#hud-bot .k-esercito .i{background-image:url(ui/hb_esercito.webp?v=5965790b29)}#hud-bot .k-esercito:active .i{background-image:url(ui/hb_esercito_p.webp?v=5965790b29)}
-#hud-bot .k-attacca .i{background-image:url(ui/hb_attacca.webp?v=5965790b29)}#hud-bot .k-attacca:active .i{background-image:url(ui/hb_attacca_p.webp?v=5965790b29)}
-#hud-bot .k-menu .i{background-image:url(ui/hb_menu.webp?v=5965790b29)}#hud-bot .k-menu:active .i{background-image:url(ui/hb_menu_p.webp?v=5965790b29)}
-#hud-bot .k-mastio .i{background-image:url(ui/hb_mastio.webp?v=5965790b29)}#hud-bot .k-mastio:active .i{background-image:url(ui/hb_mastio_p.webp?v=5965790b29)}
-#hud-bot .k-costruisci .i{background-image:url(ui/hb_costruisci.webp?v=5965790b29)}#hud-bot .k-costruisci:active .i{background-image:url(ui/hb_costruisci_p.webp?v=5965790b29)}
+#hud-bot .k-esercito .i{background-image:url(ui/hb_esercito.webp?v=6447801358)}#hud-bot .k-esercito:active .i{background-image:url(ui/hb_esercito_p.webp?v=6447801358)}
+#hud-bot .k-attacca .i{background-image:url(ui/hb_attacca.webp?v=6447801358)}#hud-bot .k-attacca:active .i{background-image:url(ui/hb_attacca_p.webp?v=6447801358)}
+#hud-bot .k-menu .i{background-image:url(ui/hb_menu.webp?v=6447801358)}#hud-bot .k-menu:active .i{background-image:url(ui/hb_menu_p.webp?v=6447801358)}
+#hud-bot .k-mastio .i{background-image:url(ui/hb_mastio.webp?v=6447801358)}#hud-bot .k-mastio:active .i{background-image:url(ui/hb_mastio_p.webp?v=6447801358)}
+#hud-bot .k-costruisci .i{background-image:url(ui/hb_costruisci.webp?v=6447801358)}#hud-bot .k-costruisci:active .i{background-image:url(ui/hb_costruisci_p.webp?v=6447801358)}
 #hud-bot .hb.img.dis .i,#hud-bot .hb.img:disabled .i{filter:grayscale(1) brightness(.8)}
 #hud-bot{gap:4px!important;padding-left:6px!important;padding-right:6px!important}
 /* ===== icone dipinte delle risorse ===== */
-.ico.ico-cibo{background-image:url(ui/rs_cibo.webp?v=5965790b29)!important;background-size:cover!important;border-radius:22%}#res .chip:active .ico-cibo{background-image:url(ui/rs_cibo_p.webp?v=5965790b29)!important}
-.ico.ico-legno{background-image:url(ui/rs_legno.webp?v=5965790b29)!important;background-size:cover!important;border-radius:22%}#res .chip:active .ico-legno{background-image:url(ui/rs_legno_p.webp?v=5965790b29)!important}
-.ico.ico-oro{background-image:url(ui/rs_oro.webp?v=5965790b29)!important;background-size:cover!important;border-radius:22%}#res .chip:active .ico-oro{background-image:url(ui/rs_oro_p.webp?v=5965790b29)!important}
-.ico.ico-pietra{background-image:url(ui/rs_pietra.webp?v=5965790b29)!important;background-size:cover!important;border-radius:22%}#res .chip:active .ico-pietra{background-image:url(ui/rs_pietra_p.webp?v=5965790b29)!important}
-.ico.ico-ferro{background-image:url(ui/rs_ferro.webp?v=5965790b29)!important;background-size:cover!important;border-radius:22%}#res .chip:active .ico-ferro{background-image:url(ui/rs_ferro_p.webp?v=5965790b29)!important}
-.ico.ico-pelli{background-image:url(ui/rs_pelli.webp?v=5965790b29)!important;background-size:cover!important;border-radius:22%}#res .chip:active .ico-pelli{background-image:url(ui/rs_pelli_p.webp?v=5965790b29)!important}
-.ico.ico-favore{background-image:url(ui/rs_favore.webp?v=5965790b29)!important;background-size:cover!important;border-radius:22%}#res .chip:active .ico-favore{background-image:url(ui/rs_favore_p.webp?v=5965790b29)!important}
+.ico.ico-cibo{background-image:url(ui/rs_cibo.webp?v=6447801358)!important;background-size:cover!important;border-radius:22%}#res .chip:active .ico-cibo{background-image:url(ui/rs_cibo_p.webp?v=6447801358)!important}
+.ico.ico-legno{background-image:url(ui/rs_legno.webp?v=6447801358)!important;background-size:cover!important;border-radius:22%}#res .chip:active .ico-legno{background-image:url(ui/rs_legno_p.webp?v=6447801358)!important}
+.ico.ico-oro{background-image:url(ui/rs_oro.webp?v=6447801358)!important;background-size:cover!important;border-radius:22%}#res .chip:active .ico-oro{background-image:url(ui/rs_oro_p.webp?v=6447801358)!important}
+.ico.ico-pietra{background-image:url(ui/rs_pietra.webp?v=6447801358)!important;background-size:cover!important;border-radius:22%}#res .chip:active .ico-pietra{background-image:url(ui/rs_pietra_p.webp?v=6447801358)!important}
+.ico.ico-ferro{background-image:url(ui/rs_ferro.webp?v=6447801358)!important;background-size:cover!important;border-radius:22%}#res .chip:active .ico-ferro{background-image:url(ui/rs_ferro_p.webp?v=6447801358)!important}
+.ico.ico-pelli{background-image:url(ui/rs_pelli.webp?v=6447801358)!important;background-size:cover!important;border-radius:22%}#res .chip:active .ico-pelli{background-image:url(ui/rs_pelli_p.webp?v=6447801358)!important}
+.ico.ico-favore{background-image:url(ui/rs_favore.webp?v=6447801358)!important;background-size:cover!important;border-radius:22%}#res .chip:active .ico-favore{background-image:url(ui/rs_favore_p.webp?v=6447801358)!important}
 #res .chip .ic{height:34px!important}#res .chip .ic .ico{width:34px!important;height:34px!important;filter:drop-shadow(0 2px 2px rgba(0,0,0,.6))}
 #res .chip{padding-top:4px!important}
 .cc .ico,.costs .ico,.btn small .ico{width:1.4em;height:1.4em;vertical-align:-.38em}
@@ -776,7 +782,7 @@ function need3d(k, low) {
 function pump3d() {
   while (L3.active < L3.max && (L3.q.length || (L3.prefetch.length && L3.active < 1))) {
     const k = L3.q.length ? L3.q.shift() : L3.prefetch.shift(); if (L3.state[k] !== 'q') continue; L3.state[k] = 'l'; L3.active++;
-    const sc = document.createElement('script'); sc.src = 'm3d_' + k + '.js?v=5965790b29'; sc.async = true;
+    const sc = document.createElement('script'); sc.src = 'm3d_' + k + '.js?v=6447801358'; sc.async = true;
     sc.onload = () => { L3.state[k] = 'ok'; L3.active--; if (G3.gl && M3D[k]) { if (!G3.models[k]) g3load(k, M3D[k]); for (const a in M3D_ALIAS) if (M3D_ALIAS[a] === k && !G3.models[a] && a !== 'mastio') G3.models[a] = G3.models[k]; delete M3D[k]; } pump3d(); };
     sc.onerror = () => { L3.state[k] = 'err'; L3.active--; pump3d(); };
     document.head.appendChild(sc);
@@ -3157,7 +3163,7 @@ function onTap(sx, sy) {
   if (!hit) { const wx = (sx - VW / 2) / cam.z + cam.x, wy = (sy - VH / 2) / cam.z + cam.y; let best = -1; for (const b of SC.B) { if (b.dead || BDEF[b.t].wall) continue; let r = bSprite(b) ? bSpriteRect(b) : null; if (!r) { const e = bCache(b); const vr = vRect(b); const [bx, by] = WR(vr[0], vr[1]); r = [bx - e.ox + 20, by - e.oy + 20, e.w - 40, e.h - 40]; } if (wx >= r[0] && wx <= r[0] + r[2] && wy >= r[1] && wy <= r[1] + r[3]) { const vk = vRect(b); const key = vk[0] + vk[1] + (b.w + b.h) / 2; if (key > best) { best = key; hit = b; } } } }
   for (let k = 1; k <= 3 && !hit; k++) { const b = bAt(SC, Math.floor(tx + k * 0.5), Math.floor(ty + k * 0.5)); if (b) hit = b; }
   { const vu = pickVisitor(sx, sy); if (vu) { const e = EVENTS.find(x => x.id === vu.vis); if (e) { sfx('click'); openEvent(e); return; } } }
-  { const fu = pickFolk(sx, sy, tx, ty); if (fu) { sfx('click'); openFolk(fu); return; } if ($('#fcard') && !$('#fcard').classList.contains('hidden')) { closeFolk(); return; } }
+  { const fu = pickFolk(sx, sy, tx, ty); if (fu) { sfx('click'); if (FOLK_NAV && !FOLK_NAV.includes(folkOf(fu) && folkOf(fu).id)) FOLK_NAV = null; openFolk(fu); return; } if ($('#fcard') && !$('#fcard').classList.contains('hidden')) { closeFolk(); return; } }
   { const an = pickAnimal(sx, sy, tx, ty); if (an) { sfx('click'); openAnimal(an); return; } }
   if (!bAt(SC, Math.floor(tx), Math.floor(ty))) { const nat = pickNature(sx, sy, tx, ty); if (nat && (!hit || (nat.k == null && Math.hypot(nat.x - tx, nat.y - ty) < 0.75) || Math.hypot(nat.x - tx, nat.y - ty) < 0.75)) { sfx('click'); openNature(nat); return; } if (!hit && nat) { sfx('click'); openNature(nat); return; } }
   if (hit) {
@@ -3284,7 +3290,7 @@ const PORT = {};
 function thumbAt(k, h) { if (!PORT[k]) { const f = FR[k + '.idleF']; if (!f || !ATL.complete) return ''; const cv2 = document.createElement('canvas'); cv2.width = 120; cv2.height = 148; const s = Math.min(140 / f[3], 116 / f[2]); const x2 = cv2.getContext('2d'); x2.drawImage(ATL, f[0], f[1], f[2], f[3], (120 - f[2] * s) / 2, 148 - f[3] * s, f[2] * s, f[3] * s); PORT[k] = cv2.toDataURL(); }
   return `background-image:url(${PORT[k]});background-size:cover;background-position:center bottom;`; }
 setInterval(() => { if (!S || MODE !== 'village') return; const el = $('#fcard'); if (el && !el.classList.contains('hidden') && SC && SC.folkU && workOn('train', folkOf(SC.folkU).id)) openFolk(SC.folkU); const p = $('#sheet').dataset.p; if (p === 'n' && SC && SC.selN && workOn('nat', natKey(SC.selN))) openNature(SC.selN); else if (p && p.startsWith('b:') && S.works && S.works.some(w => w.key === +p.slice(2))) refreshSheet(); }, 1000);
-function closeFolk() { const el = $('#fcard'); if (el) el.classList.add('hidden'); if (SC) { SC.selU = null; SC.folkU = null; } }
+function closeFolk() { FOLK_NAV = null; const el = $('#fcard'); if (el) el.classList.add('hidden'); if (SC) { SC.selU = null; SC.folkU = null; } }
 function openFolk(u) {
   const rec = folkOf(u); if (!rec) return; if (!$('#sheet').classList.contains('hidden')) closeSheet(); SC.selU = u; SC.folkU = u; const hero = !!(u.hero && HDEF[u.k]); const sold = !!UDEF[u.k] || hero;
   const role = hero ? HDEF[u.k] : sold ? UDEF[u.k] : WROLE[u.k]; const need = xpNeed(rec.lvl), mx = FOLK_MAX(), maxed = rec.lvl >= mx;
@@ -3299,19 +3305,21 @@ function openFolk(u) {
   ];
   const c = trainCost(rec), can = canPay(c) && !maxed && !workOn('train', rec.id);
   const desc = hero ? `<b>${role.ult}:</b> ${role.ultd}` : sold ? `${role.role}. ${role.ranged ? 'Tiro a distanza.' : 'Mischia.'}` : role.d.split('.')[0] + '.';
-  let el = $('#fcard'); if (!el) { el = document.createElement('div'); el.id = 'fcard'; document.body.appendChild(el); } el.classList.toggle('hero', hero);
+  let el = $('#fcard'); if (!el) { el = document.createElement('div'); el.id = 'fcard'; document.body.appendChild(el); let t0 = null; el.addEventListener('touchstart', e => { const t = e.touches[0]; t0 = [t.clientX, t.clientY]; }, { passive: true }); el.addEventListener('touchend', e => { if (!t0 || !FOLK_NAV) return; const t = e.changedTouches[0], dx = t.clientX - t0[0], dy = t.clientY - t0[1]; t0 = null; if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.5) folkGo(dx < 0 ? 1 : -1); }, { passive: true }); } el.classList.toggle('hero', hero);
   el.innerHTML = `<button class="fx" onclick="closeFolk()">✕</button>
     <div class="ftop"><div class="fpor" style="${hero ? thumbStyle(u.k) : thumbAt(u.k, 74)}"></div>
       <div class="fid"><div class="fnm">${rec.nm}${rec.tr ? ` <span class="ftr2" title="${TRAITS[rec.tr].d}">${TRAITS[rec.tr].ic} ${TRAITS[rec.tr].n}</span>` : ''}</div><div class="frl">${hero ? 'Eroe · ' + role.title.split(',')[0] : role.n}</div><div class="fds">${desc}</div></div>
       <div class="flv"><small>LIV</small><b>${rec.lvl}</b><small>/${mx}</small></div></div>
     <div class="fxp" title="Esperienza"><i style="width:${maxed ? 100 : Math.min(100, rec.xp / need * 100)}%"></i><span>${maxed ? (rec.lvl >= 10 ? 'Livello massimo' : 'Max per ora · sali di Mastio') : `Esp. ${rec.xp}/${need}`}${rec.pts ? ` · <b>${rec.pts} punt${rec.pts > 1 ? 'i' : 'o'}!</b>` : ''}</span></div>
     <div class="fsts">${st.map(([k, ic, n, v]) => { const cap = 5 + Math.floor(rec.lvl / 3), up = rec.pts && (rec[k] || 0) < cap; return `<div class="fst ${up ? 'up' : ''}" ${up ? `onclick="folkPoint('${k}')"` : ''}><span class="i">${ic}</span><b>${v}</b><small>${n}${rec[k] ? ' ' + '•'.repeat(rec[k]) : ''}</small>${up ? '<em>+1</em>' : ''}</div>`; }).join('')}</div>
-    ${workOn('train', rec.id) ? `<button class="ftr dis busy" disabled>🎯 In addestramento… <span>${fmtT(workOn('train', rec.id).end - now())}</span></button>` : `<button class="ftr ${can ? '' : 'dis'}" ${can ? '' : 'disabled'} onclick="folkTrain()">🎯 Addestra <small>+40 esp. · ⏱ ${fmtT((30 + 30 * rec.lvl) * PACE() * 1000)}</small><span>${maxed ? '—' : costStr(c)}</span></button>`}`;
+    ${workOn('train', rec.id) ? `<button class="ftr dis busy" disabled>🎯 In addestramento… <span>${fmtT(workOn('train', rec.id).end - now())}</span></button>` : `<button class="ftr ${can ? '' : 'dis'}" ${can ? '' : 'disabled'} onclick="folkTrain()">🎯 Addestra <small>+40 esp. · ⏱ ${fmtT((30 + 30 * rec.lvl) * PACE() * 1000)}</small><span>${maxed ? '—' : costStr(c)}</span></button>`}${folkNavHTML(rec)}`;
   el.classList.remove('hidden');
 }
 function folkTrain() { const u = SC && SC.folkU; if (!u) return; const rec = folkOf(u); const c = trainCost(rec); if (!canPay(c) || rec.lvl >= FOLK_MAX() || workOn('train', rec.id)) return; pay(c);
   const dur = Math.round((30 + 30 * rec.lvl) * PACE()); if (timedOn()) { addWork({ kind: 'train', key: rec.id, rid: rec.id, xp: 40, dur }); sfx('tock'); toast(`🎯 ${rec.nm} si addestra (${dur}s)`); } else finishWork({ kind: 'train', rec, xp: 40 }); save(); updateHUD(); openFolk(u); }
-function folkPoint(k) { const u = SC && SC.folkU; if (!u) return; const rec = folkOf(u); if (!rec.pts) return; rec.pts--; rec[k] = (rec[k] || 0) + 1; sfx('coin'); if (k === 'spd' && u.d) u.d.spd = 0.7 * (1 + 0.1 * rec.spd); save(); openFolk(u); }
+function folkPoint(k) { const u = SC && SC.folkU; if (!u) return; const rec = folkOf(u); if (!rec.pts) return; rec.pts--; rec[k] = (rec[k] || 0) + 1; sfx('coin'); if (k === 'spd' && u.d) u.d.spd = 0.7 * (1 + 0.1 * rec.spd); save(); openFolk(u);
+  // punti finiti: passa da solo al prossimo da migliorare
+  if (!rec.pts && FOLK_NAV && FOLK_NAV.some(id => id !== rec.id && folkUnit(id) && folkOf(folkUnit(id)).pts)) setTimeout(() => { if (SC && SC.folkU === u && FOLK_NAV) folkGo(1); }, 650); }
 // ================= LAVORI: rimozioni, demolizioni e addestramenti richiedono tempo =================
 const MAX_CREW = 2; // squadre di sgombero (separate dai mastri d'opera)
 const timedOn = () => S && !S.creative;
@@ -4150,7 +4158,19 @@ function memoItems() {
   return it.sort((a, b) => a.pri - b.pri);
 }
 function memoCollect() { let n = 0; for (const r of S.buildings) if (!r.end && resOf(r) && r.stock >= 1) { if (collect(r)) n++; } if (SC) for (const b of SC.B) b.bubble = null; toast(`🧺 Raccolto da ${n} botteghe`); save(); openMemo(); }
-function memoFolk(id) { closeSheet(); const u = SC.U.find(u => !u.dead && u.side === 'V' && folkOf(u) && folkOf(u).id === id); if (u) { const [x, y] = W(u.x, u.y); cam.x = x; cam.y = y + 60; cam.z = Math.max(cam.z, 1.3); openFolk(u); } else toast('È in caserma: lo trovi tra i soldati vicino alla caserma'); }
+// scorri tra le persone con punti da spendere (aperto dal Promemoria)
+let FOLK_NAV = null;
+function folkUnit(id) { return SC && SC.U.find(u => !u.dead && u.side === 'V' && folkOf(u) && folkOf(u).id === id); }
+function folkFocus(u) { const [x, y] = W(u.x, u.y); cam.x = x; cam.y = y + 60; cam.z = Math.max(cam.z, 1.3); }
+function folkWithPts() { const L = []; for (const k in (S.vets || {})) for (const r of S.vets[k]) if (r.pts) L.push(r.id); for (const k in (S.wrk || {})) if (S.wrk[k].pts) L.push(S.wrk[k].id); for (const k in (S.hrec || {})) if (S.hrec[k].pts) L.push(S.hrec[k].id); return L.filter(folkUnit); }
+function memoFolk(id) { closeSheet(); const L = folkWithPts(); if (!L.includes(id)) L.unshift(id); const u = folkUnit(id) || (L.length && folkUnit(L[0]));
+  if (u) { FOLK_NAV = L.length > 1 ? L : null; folkFocus(u); openFolk(u); } else toast('È in caserma: lo trovi tra i soldati vicino alla caserma'); }
+function folkGo(d) { if (!FOLK_NAV || !SC || !SC.folkU) return; const cur = folkOf(SC.folkU).id; let i = FOLK_NAV.indexOf(cur); const n = FOLK_NAV.length;
+  // salta chi ha già speso tutto, se qualcuno ha ancora punti
+  const rest = FOLK_NAV.filter(id => { const u = folkUnit(id); return u && folkOf(u).pts; });
+  for (let k = 0; k < n; k++) { i = (i + d + n) % n; const u = folkUnit(FOLK_NAV[i]); if (u && (!rest.length || folkOf(u).pts || rest.length === 1 && rest[0] === cur)) { sfx('click'); folkFocus(u); openFolk(u); return; } } }
+function folkNavHTML(rec) { if (!FOLK_NAV || !FOLK_NAV.includes(rec.id)) return ''; const left = FOLK_NAV.filter(id => { const u = folkUnit(id); return u && folkOf(u).pts; }).length;
+  return `<div class="fnav"><button onclick="folkGo(-1)" aria-label="Precedente">‹</button><span>${left ? `⭐ ${FOLK_NAV.indexOf(rec.id) + 1} di ${FOLK_NAV.length} · <b>${left}</b> con punti da spendere` : '✓ Tutti i punti sono stati spesi'}</span><button class="${!rec.pts && left ? 'go' : ''}" onclick="folkGo(1)" aria-label="Successivo">›</button></div>`; }
 function openMemo() {
   const it = memoItems();
   openSheet('📜 Promemoria del Siniscalco', it.length ? `<p class="desc"><i>«Mio signore, ecco cosa attende la vostra attenzione.»</i></p><div class="memo">${it.map(x => `<div class="mi p${x.pri}"><span class="mic">${x.ic}</span><div class="mt"><b>${x.t}</b><small>${x.sub}</small></div>${x.act ? `<button class="btn ${x.pri <= 1 ? '' : 'ghost'}" onclick="${x.act}">${x.lbl}</button>` : ''}</div>`).join('')}</div>` : `<div class="memo0"><div>🕯️</div><p><i>«Tutto è in ordine, mio signore. Il feudo lavora per voi.»</i></p></div>`, 'memo');
@@ -4579,7 +4599,7 @@ function heroCard(k) { const h = BT.heroes.find(h => h.k === k); if (!h) return;
 // conferma dentro al gioco (i popup del browser sono bloccati nella pagina pubblicata)
 let ASK = null;
 // ---- aggiornamento automatico: se su GitHub c'è una versione nuova, ricarica scavalcando la cache ----
-const BUILD = '5965790b29';
+const BUILD = '6447801358';
 function checkUpdate() { if (BUILD.startsWith('__') || !/github\.io$/.test(location.hostname)) return;
   fetch('version.txt?t=' + Date.now(), { cache: 'no-store' }).then(r => r.ok ? r.text() : '').then(v => { v = (v || '').trim(); if (!v || v === BUILD) return; let tried = ''; try { tried = sessionStorage.getItem('feudum_upd') || ''; } catch (e) { } if (tried === v) return; try { sessionStorage.setItem('feudum_upd', v); } catch (e) { }
     try { if (S && MODE !== 'title') save(); } catch (e) { } location.replace(location.pathname + '?v=' + v); }).catch(() => { }); }

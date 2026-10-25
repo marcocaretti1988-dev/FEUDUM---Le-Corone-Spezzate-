@@ -321,7 +321,13 @@ html[data-theme=pietra] .folk .fs{background:rgba(255,255,255,.05)}
 #fcard .fst em{position:absolute;top:-7px;right:-4px;font-style:normal;font-size:10px;font-weight:800;background:#b45309;color:#fff;border-radius:8px;padding:1px 5px}
 #fcard .ftr{margin-top:7px;width:100%;display:flex;align-items:center;gap:6px;padding:6px 10px;border-radius:9px;border:1px solid #1a0f08;background:linear-gradient(180deg,#3a2a1c,#22170e);color:#f5e6c4;font-family:var(--fh);font-weight:700;font-size:12.5px}
 #fcard .ftr small{font-family:var(--fb);font-weight:400;opacity:.75;font-size:10.5px}#fcard .ftr span{margin-left:auto;font-family:var(--fb);font-size:11px}#fcard .ftr span .ico{width:14px;height:14px;vertical-align:-2px}
-#fcard .ftr.dis{opacity:.5}#fcard .ftr .no{color:#ff8a7a}
+#fcard .ftr.dis{opacity:.5}
+#fcard .fnav{display:flex;align-items:center;gap:6px;margin-top:7px;padding-top:7px;border-top:1px dashed rgba(0,0,0,.2)}
+#fcard .fnav span{flex:1;text-align:center;font-size:11px;line-height:1.2}
+#fcard .fnav b{color:#8f1d1d}
+#fcard .fnav button{flex:0 0 44px;height:34px;border-radius:9px;border:1px solid #1a0f08;background:linear-gradient(180deg,#3a2a1c,#22170e);color:#f5e6c4;font-size:22px;line-height:30px;padding:0}
+#fcard .fnav button.go{background:linear-gradient(180deg,#c0392b,#7a1414);animation:fnavp 1s ease-in-out infinite}
+@keyframes fnavp{50%{transform:scale(1.08)}}#fcard .ftr .no{color:#ff8a7a}
 @media(min-width:760px){#fcard{left:14px;bottom:100px}}
 html[data-theme=miniatura] #fcard{background:linear-gradient(180deg,#fbf6e6,#f0e4c2);border-color:#1f3a8a;box-shadow:0 8px 22px rgba(0,0,0,.5),inset 0 0 0 3px #fbf6e6,inset 0 0 0 4px #c99a2e}
 html[data-theme=miniatura] #fcard .flv{background:radial-gradient(circle at 35% 30%,#3557b5,#152459);border-color:#c99a2e}html[data-theme=miniatura] #fcard .ftr{background:linear-gradient(180deg,#22357c,#152459)}
