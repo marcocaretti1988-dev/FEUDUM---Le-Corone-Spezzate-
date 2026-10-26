@@ -154,7 +154,7 @@ function pump3d() {
 // precarico gli edifici dell'era attuale (a bassa priorità) e quelli già costruiti (subito)
 function prefetchEra() {
   if (!S) return; for (const r of S.buildings) { need3d(r.t === 'mastio' ? 'castello' : r.t); if (BDEF[r.t] && BDEF[r.t].wall) need3d(r.lvl >= 2 ? 'mura' : 'palizzata'); }
-  need3d('quercia3d'); need3d('abete3d'); need3d('lampione'); need3d('insegna'); need3d('olmo3d', true); need3d('spoglio3d', true); for (const k in ANIM3D) if (S.army && S.army[k]) need3d(ANIM3D[k].k, true);
+  need3d('quercia3d'); need3d('abete3d'); need3d('lampione'); need3d('insegna'); need3d('olmo3d', true); need3d('spoglio3d', true); for (const k in ANIM3D) need3d(ANIM3D[k].k);
   for (const t in BDEF) { try { if (maxB(t) > 0) need3d(t, true); } catch (e) { } }
   if (hasB('balista')) { need3d('balista_b', true); need3d('balista_c', true); }
 }
@@ -2085,7 +2085,7 @@ function buildVillage() {
   if (cas) {
     let i = 0; const list = [];
     // un po' di ogni tipo (a turno), così si vedono anche arcieri e truppe speciali
-    { const left = {}; for (const k of UNIT_ORDER) left[k] = S.army[k] || 0; let more = true; while (more && list.length < 14) { more = false; for (const k of UNIT_ORDER) if (left[k] > 0 && list.length < 14) { list.push(k); left[k]--; more = true; } } list.sort((a, b) => UNIT_ORDER.indexOf(a) - UNIT_ORDER.indexOf(b)); }
+    { const left = {}; for (const k of UNIT_ORDER) left[k] = S.army[k] || 0; let more = true; while (more && list.length < 14) { more = false; for (const k of UNIT_ORDER) if (left[k] > 0 && list.length < 14) { list.push(k); left[k]--; more = true; } } list.sort((a, b) => (ANIM3D[b] ? 1 : 0) - (ANIM3D[a] ? 1 : 0) || UNIT_ORDER.indexOf(a) - UNIT_ORDER.indexOf(b)); }
     const vix = {};
     for (const k of list) {
       const vi = vix[k] = (vix[k] == null ? 0 : vix[k] + 1);
@@ -2671,7 +2671,7 @@ function folkOf(u) {
   return null;
 }
 const PORT = {};
-function thumbAt(k, h) { if (!PORT[k]) { const f = FR[k + '.idleF']; if (!f || !ATL.complete) return ''; const cv2 = document.createElement('canvas'); cv2.width = 120; cv2.height = 148; const s = Math.min(140 / f[3], 116 / f[2]); const x2 = cv2.getContext('2d'); x2.drawImage(ATL, f[0], f[1], f[2], f[3], (120 - f[2] * s) / 2, 148 - f[3] * s, f[2] * s, f[3] * s); PORT[k] = cv2.toDataURL(); }
+function thumbAt(k, h) { if (ANIM3D[k]) { const u = anim3dPortrait(k); if (u) return `background-image:url(${u});background-size:cover;background-position:center bottom;`; } if (!PORT[k]) { const f = FR[k + '.idleF']; if (!f || !ATL.complete) return ''; const cv2 = document.createElement('canvas'); cv2.width = 120; cv2.height = 148; const s = Math.min(140 / f[3], 116 / f[2]); const x2 = cv2.getContext('2d'); x2.drawImage(ATL, f[0], f[1], f[2], f[3], (120 - f[2] * s) / 2, 148 - f[3] * s, f[2] * s, f[3] * s); PORT[k] = cv2.toDataURL(); }
   return `background-image:url(${PORT[k]});background-size:cover;background-position:center bottom;`; }
 setInterval(() => { if (!S || MODE !== 'village') return; const el = $('#fcard'); if (el && !el.classList.contains('hidden') && SC && SC.folkU && workOn('train', folkOf(SC.folkU).id)) openFolk(SC.folkU); const p = $('#sheet').dataset.p; if (p === 'n' && SC && SC.selN && workOn('nat', natKey(SC.selN))) openNature(SC.selN); else if (p && p.startsWith('b:') && S.works && S.works.some(w => w.key === +p.slice(2))) refreshSheet(); }, 1000);
 function closeFolk() { FOLK_NAV = null; const el = $('#fcard'); if (el) el.classList.add('hidden'); if (SC) { SC.selU = null; SC.folkU = null; } }
@@ -3212,7 +3212,12 @@ function unitRow(k) {
    <div class="ubtn">${ok ? `<button class="btn sm" onclick="train('${k}',1)">+1<small>${costStr(d.cost)}</small></button><button class="btn sm" onclick="train('${k}',5)">+5</button>` : `<span class="lock">🔒 ${lockTxt}</span>`}</div></div>`;
 }
 let THUMB_URL = null;
+// ritratto dal modello 3D animato (posa da fermo)
+const A3PORT = {};
+function anim3dPortrait(k) { const A = ANIM3D[k]; if (!A) return ''; if (A3PORT[k]) return A3PORT[k]; const o = G3.models[A.k]; if (!o) { need3d(A.k); return ''; } if (!o.ready) return '';
+  const sp = g3sprite(A.k + '#idle0', 150, 0.45, 0); if (!sp) return ''; const cv2 = document.createElement('canvas'); cv2.width = 120; cv2.height = 148; const s = 205 / -sp.y0; cv2.getContext("2d").drawImage(sp.cv, 56 + sp.x0 * s, 172 + sp.y0 * s, sp.w * s, sp.h * s); return A3PORT[k] = cv2.toDataURL(); }
 function thumbStyle(k) {
+  if (ANIM3D[k]) { const u = anim3dPortrait(k); if (u) return `background-image:url(${u});background-size:contain;background-repeat:no-repeat;background-position:center bottom;`; }
   if (UDEF[k] && UDEF[k].siege) return `background-image:url(${siegeThumb(k)});background-size:contain;background-repeat:no-repeat;background-position:center bottom;`;
   if (HDEF[k] && HDEF[k].model) { const u = heroPortrait(k); return u ? `background-image:url(${u});background-size:contain;background-repeat:no-repeat;background-position:center bottom;` : ''; }
   const f = FR[k + '.idleF']; if (!f) return '';
@@ -3220,6 +3225,7 @@ function thumbStyle(k) {
   return `background-image:url(${ATL.src});background-size:${ATLW * s}px ${ATLH * s}px;background-position:${-f[0] * s + (54 - f[2] * s) / 2}px ${-f[1] * s}px;`;
 }
 function openArmy() {
+  for (const k in ANIM3D) if (!A3PORT[k]) { let n = 0; const tk = () => { if ($('#sheet').dataset.p !== 'army' || A3PORT[k] || ++n > 30) return; if (anim3dPortrait(k)) openArmy(); else setTimeout(tk, 1000); }; setTimeout(tk, 800); }
   const q = S.queue.length ? `<div class="queue">In addestramento: ${S.queue.slice(0, 12).map((q, i) => `<span class="${i === 0 ? 'act' : ''}">${UDEF[q.k].n.split(' ')[0]}</span>`).join('')}${S.queue.length > 12 ? ' …' : ''}</div>` : '';
   const hs = Object.keys(HDEF).map(k => { const h = HDEF[k]; const ok = S.mastio >= h.lv; return `<div class="urow hero ${ok ? '' : 'dis'}"><div class="uimg" style="${thumbStyle(k)}"></div><div class="uinfo"><b>${h.n}</b> <span class="cnt">${h.title}</span><div class="role"><b>${h.ult}:</b> ${h.ultd}</div><div class="ust">❤ ${h.hp} · ⚔ ${h.dmg} · ${h.ranged ? '🏹 ' + h.rng : 'mischia'}</div></div><div class="ubtn">${ok ? '<span class="ok">Giurato ✓</span>' : `<span class="lock">🔒 Mastio ${h.lv}</span>`}</div></div>`; }).join('');
   const html = `<div class="capbar"><span>👥 Popolazione ${armyUsed()}/${armyCap()} · 🗡️ Armi +${Math.round((armsMult() - 1) * 100)}% · ✚ Cure ${Math.round(curePct() * 100)}%</span><i style="width:${Math.min(100, armyUsed() / armyCap() * 100)}%"></i></div>${q}
