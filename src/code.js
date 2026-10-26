@@ -135,7 +135,7 @@ function g3init() {
   return true;
 }
 // ---- caricamento a pezzi dei modelli 3D: si scarica solo ciò che serve, il resto con calma ----
-const M3D_FILES = new Set(["catapulta3d", "ariete3d", "insegna", "lampione", "pozzogrande", "staccionata", "steccato", "cavallofrisia", "cassa", "anfora", "cassafieno", "botte", "cassaortaggi", "fontanella", "stenditoio", "mucchiosassi", "felce", "segnavia", "gonfalone", "rovinamuro", "arco", "colonna", "rovine", "lastricato", "muretto", "rastrelliera", "carriola", "pozzo", "carretto", "croce", "lanterna", "abete3d", "accademia", "armeria", "balista", "balista_b", "balista_c", "bottino", "cancello", "capanno", "casa", "caserma", "castello", "cava", "chiesa", "falegnameria", "falo", "fattoria", "fucina", "generale", "granaio", "infermeria", "mercato", "miniera", "monastero", "municipio", "mura", "olmo3d", "palizzata", "poligono", "quercia3d", "spoglio3d", "stalla", "taverna", "tenda", "tesoreria", "torre", "torrepietra", "tronco3d", "cripta"]);
+const M3D_FILES = new Set(["arciere3d", "catapulta3d", "ariete3d", "insegna", "lampione", "pozzogrande", "staccionata", "steccato", "cavallofrisia", "cassa", "anfora", "cassafieno", "botte", "cassaortaggi", "fontanella", "stenditoio", "mucchiosassi", "felce", "segnavia", "gonfalone", "rovinamuro", "arco", "colonna", "rovine", "lastricato", "muretto", "rastrelliera", "carriola", "pozzo", "carretto", "croce", "lanterna", "abete3d", "accademia", "armeria", "balista", "balista_b", "balista_c", "bottino", "cancello", "capanno", "casa", "caserma", "castello", "cava", "chiesa", "falegnameria", "falo", "fattoria", "fucina", "generale", "granaio", "infermeria", "mercato", "miniera", "monastero", "municipio", "mura", "olmo3d", "palizzata", "poligono", "quercia3d", "spoglio3d", "stalla", "taverna", "tenda", "tesoreria", "torre", "torrepietra", "tronco3d", "cripta"]);
 const M3D_ALIAS = { granaio: 'stalla', mastio: 'castello', tronco: 'tronco3d' };
 const L3 = { state: {}, q: [], active: 0, max: 3, prefetch: [] };
 function need3d(k, low) {
@@ -154,7 +154,7 @@ function pump3d() {
 // precarico gli edifici dell'era attuale (a bassa priorità) e quelli già costruiti (subito)
 function prefetchEra() {
   if (!S) return; for (const r of S.buildings) { need3d(r.t === 'mastio' ? 'castello' : r.t); if (BDEF[r.t] && BDEF[r.t].wall) need3d(r.lvl >= 2 ? 'mura' : 'palizzata'); }
-  need3d('quercia3d'); need3d('abete3d'); need3d('lampione'); need3d('insegna'); need3d('olmo3d', true); need3d('spoglio3d', true);
+  need3d('quercia3d'); need3d('abete3d'); need3d('lampione'); need3d('insegna'); need3d('olmo3d', true); need3d('spoglio3d', true); for (const k in ANIM3D) if (S.army && S.army[k]) need3d(ANIM3D[k].k, true);
   for (const t in BDEF) { try { if (maxB(t) > 0) need3d(t, true); } catch (e) { } }
   if (hasB('balista')) { need3d('balista_b', true); need3d('balista_c', true); }
 }
@@ -165,8 +165,10 @@ function g3load(k, m) {
   const texSrc = m.tex; o.m = { min: m.min, size: m.size, n: m.n };
   const img = new Image(); img.onload = () => { const t = gl.createTexture(); gl.bindTexture(gl.TEXTURE_2D, t); gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false); gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, img);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-    o.tex = t; o.ready = true; }; img.src = texSrc;
+    o.tex = t; o.ready = true; for (const f of (o.fr || [])) { f.tex = t; f.ready = true; } }; img.src = texSrc;
   G3.models[k] = o;
+  // personaggi animati: ogni fotogramma è una posa già "cotta" (stessi uv, indici e texture)
+  if (m.frames) { o.fr = []; o.anims = {}; for (const a in m.frames) { o.anims[a] = m.frames[a].length; m.frames[a].forEach((f, i) => { const fo = { m: o.m, pos: buf(new Uint16Array(b64u8(f.pos).buffer)), nor: buf(new Int8Array(b64u8(f.nor).buffer)), uv: o.uv, idx: o.idx, count: o.count, tex: null, ready: false }; o.fr.push(fo); G3.models[k + '#' + a + i] = fo; }); } }
 }
 // draws model k for building b into ctx c (world-screen coords). fit = footprint tiles the model should span
 // due passate: prima l'ombra portata a terra (piatta, senza profondità), poi il modello sopra
@@ -1983,6 +1985,23 @@ function drawHero3D(c, sc, u, wx, wy) {
   if (u.inv > 0) { c.strokeStyle = 'rgba(160,215,255,0.8)'; c.lineWidth = 1.5; c.beginPath(); c.arc(wx, wy - 30, 24, 0, 7); c.stroke(); }
   return true;
 }
+// truppe con personaggio 3D animato (Meshy): unità -> modello e altezza in pixel
+const ANIM3D = { arclungo: { k: 'arciere3d', h: 58 } };
+function drawAnim3D(c, sc, u, wx, wy) {
+  const A = ANIM3D[u.k]; if (!A || (u.hero && HDEF[u.k])) return false; const o = G3.models[A.k]; if (!o) { need3d(A.k); const qi = L3.q.indexOf(A.k); if (qi > 0) { L3.q.splice(qi, 1); L3.q.unshift(A.k); } else if (qi < 0 && L3.state[A.k] === 'q') { const pi = L3.prefetch.indexOf(A.k); if (pi >= 0) { L3.prefetch.splice(pi, 1); L3.q.unshift(A.k); pump3d(); } } return false; } if (!o.ready || !o.anims) return false;
+  let a = 1, rot = 0; if (u.dead) { a = Math.max(0, 1 - Math.max(0, u.deadT - 4) / 3); if (a <= 0) return true; rot = Math.min(1, u.deadT / 0.5) * 1.35; }
+  const back = u.face === 'B', yaw = back ? (u.flip ? 2.4 : 3.9) : (u.flip ? 0.75 : -0.75);
+  u.phase += (u.moving ? 1 : 0.15) * (1 / 60) * 4;
+  const walk = u.moving && !u.dead && o.anims.walk; const fk = walk ? 'walk' + (Math.floor(u.phase * 2.1) % o.anims.walk) : 'idle0';
+  const sp = g3sprite(A.k + '#' + fk, A.h, yaw, 0); if (!sp) return false;
+  const recoil = !u.dead && u.atkT > 0 ? Math.sin(Math.min(1, u.atkT / 0.3) * Math.PI) * 2 : 0, breathe = !walk && !u.dead ? Math.sin(u.phase * 1.3) * 0.5 : 0;
+  const ring = u.side === 'A' ? (sc.mode === 'raid' ? 'rgba(200,50,40,0.55)' : 'rgba(70,120,230,0.55)') : u.side === 'D' ? (sc.mode === 'raid' ? 'rgba(70,120,230,0.55)' : 'rgba(200,50,40,0.55)') : null;
+  if (!u.dead && ring) { c.strokeStyle = ring; c.lineWidth = 1.6; c.beginPath(); c.ellipse(wx, wy, 10, 5, 0, 0, 7); c.stroke(); }
+  c.save(); c.globalAlpha = a; c.translate(wx + (u.flip ? recoil : -recoil), wy - breathe); if (rot) c.rotate(u.flip ? -rot : rot); if (u.hitT > 0) c.filter = 'brightness(1.6)';
+  c.drawImage(sp.cv, sp.x0, sp.y0, sp.w, sp.h); c.restore(); c.filter = 'none'; c.globalAlpha = 1;
+  if (u.inv > 0) { c.strokeStyle = 'rgba(160,215,255,0.8)'; c.lineWidth = 1.5; c.beginPath(); c.arc(wx, wy - 26, 22, 0, 7); c.stroke(); }
+  return true;
+}
 const HPORT = {};
 function heroPortrait(k) { if (HPORT[k]) return HPORT[k]; need3d(k); const sp = G3.models[k] && G3.models[k].ready ? g3sprite(k, 140, 0.5, 0) : null; if (!sp) return ''; const cv2 = document.createElement('canvas'); cv2.width = 120; cv2.height = 148; const s = Math.min(140 / sp.h, 116 / sp.w); cv2.getContext('2d').drawImage(sp.cv, (120 - sp.w * s) / 2, 148 - sp.h * s, sp.w * s, sp.h * s); return HPORT[k] = cv2.toDataURL(); }
 function drawUnit(c, sc, u) { drawUnit0(c, sc, u); if (u.vis) drawVisitorMark(c, sc, u); }
@@ -1998,6 +2017,7 @@ function drawUnit0(c, sc, u) {
     if (sc.night && !u.dead) { c.shadowColor = 'rgba(255,200,60,0.9)'; c.shadowBlur = 6; }
     c.drawImage(BATL, f[0], f[1], f[2], f[3], -w / 2, -h + 2, w, h); c.restore(); c.filter = 'none'; c.globalAlpha = 1; return; }
   if (u.d.model && drawHero3D(c, sc, u, wx, wy)) return;
+  if (ANIM3D[u.k] && drawAnim3D(c, sc, u, wx, wy)) return;
   if (u.dead) { const a = Math.max(0, 1 - Math.max(0, u.deadT - 5) / 3); if (a <= 0) return; sprDraw(c, u.k + '.death', wx, wy + 4, uScale(u) * 0.95, u.flip, a * 0.95); return; }
   u.phase += (u.moving ? 1 : 0.15) * (1 / 60) * 4;
   const ring = u.side === 'A' ? (sc.mode === 'raid' ? 'rgba(200,50,40,0.55)' : 'rgba(70,120,230,0.55)') : u.side === 'D' ? (sc.mode === 'raid' ? 'rgba(70,120,230,0.55)' : 'rgba(200,50,40,0.55)') : null;
@@ -2064,7 +2084,8 @@ function buildVillage() {
   const cas = sc.B.find(b => b.t === 'caserma');
   if (cas) {
     let i = 0; const list = [];
-    for (const k of UNIT_ORDER) for (let n = 0; n < (S.army[k] || 0) && list.length < 14; n++) list.push(k);
+    // un po' di ogni tipo (a turno), così si vedono anche arcieri e truppe speciali
+    { const left = {}; for (const k of UNIT_ORDER) left[k] = S.army[k] || 0; let more = true; while (more && list.length < 14) { more = false; for (const k of UNIT_ORDER) if (left[k] > 0 && list.length < 14) { list.push(k); left[k]--; more = true; } } list.sort((a, b) => UNIT_ORDER.indexOf(a) - UNIT_ORDER.indexOf(b)); }
     const vix = {};
     for (const k of list) {
       const vi = vix[k] = (vix[k] == null ? 0 : vix[k] + 1);
