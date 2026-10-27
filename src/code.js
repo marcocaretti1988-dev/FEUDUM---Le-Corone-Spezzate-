@@ -168,7 +168,10 @@ function g3load(k, m) {
     o.tex = t; o.ready = true; for (const f of (o.fr || [])) { f.tex = t; f.ready = true; } }; img.src = texSrc;
   G3.models[k] = o;
   // personaggi animati: ogni fotogramma è una posa già "cotta" (stessi uv, indici e texture)
-  if (m.frames) { o.fr = []; o.anims = {}; for (const a in m.frames) { o.anims[a] = m.frames[a].length; m.frames[a].forEach((f, i) => { const fo = { m: o.m, pos: buf(new Uint16Array(b64u8(f.pos).buffer)), nor: buf(new Int8Array(b64u8(f.nor).buffer)), uv: o.uv, idx: o.idx, count: o.count, tex: null, ready: false }; o.fr.push(fo); G3.models[k + '#' + a + i] = fo; }); } }
+  if (m.frames) { o.fr = []; o.anims = {}; for (const a in m.frames) { o.anims[a] = m.frames[a].length; m.frames[a].forEach((f, i) => { const fo = { m: o.m, pos: buf(new Uint16Array(b64u8(f.pos).buffer)), nor: buf(new Int8Array(b64u8(f.nor).buffer)), uv: o.uv, idx: o.idx, count: o.count, tex: null, ready: false }; o.fr.push(fo); G3.models[k + '#' + a + i] = fo; }); }
+    // varianti di colore (stessa forma, texture ricolorata)
+    for (const v in (m.texv || {})) { const fv = []; for (const a in m.frames) m.frames[a].forEach((f, i) => { const b0 = G3.models[k + '#' + a + i]; const fo = Object.assign({}, b0, { tex: null, ready: false }); fv.push(fo); G3.models[k + '~' + v + '#' + a + i] = fo; });
+      const im = new Image(); im.onload = () => { const t = gl.createTexture(); gl.bindTexture(gl.TEXTURE_2D, t); gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, im); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE); for (const f of fv) { f.tex = t; f.ready = true; } }; im.src = m.texv[v]; } }
 }
 // draws model k for building b into ctx c (world-screen coords). fit = footprint tiles the model should span
 // due passate: prima l'ombra portata a terra (piatta, senza profondità), poi il modello sopra
@@ -1986,14 +1989,15 @@ function drawHero3D(c, sc, u, wx, wy) {
   return true;
 }
 // truppe con personaggio 3D animato (Meshy): unità -> modello e altezza in pixel
-const ANIM3D = { arclungo: { k: 'arciere3d', h: 58 } };
+const ANIM3D = { arclungo: { k: 'arciere3d', h: 58 }, arccorto: { k: 'arciere3d', v: 'marrone', h: 55 }, balestriere: { k: 'arciere3d', v: 'rosso', h: 58 } };
+const a3key = (A, f) => A.k + (A.v ? '~' + A.v : '') + '#' + f;
 function drawAnim3D(c, sc, u, wx, wy) {
   const A = ANIM3D[u.k]; if (!A || (u.hero && HDEF[u.k])) return false; const o = G3.models[A.k]; if (!o) { need3d(A.k); const qi = L3.q.indexOf(A.k); if (qi > 0) { L3.q.splice(qi, 1); L3.q.unshift(A.k); } else if (qi < 0 && L3.state[A.k] === 'q') { const pi = L3.prefetch.indexOf(A.k); if (pi >= 0) { L3.prefetch.splice(pi, 1); L3.q.unshift(A.k); pump3d(); } } return false; } if (!o.ready || !o.anims) return false;
   let a = 1, rot = 0; if (u.dead) { a = Math.max(0, 1 - Math.max(0, u.deadT - 4) / 3); if (a <= 0) return true; rot = Math.min(1, u.deadT / 0.5) * 1.35; }
   const back = u.face === 'B', yaw = back ? (u.flip ? 2.4 : 3.9) : (u.flip ? 0.75 : -0.75);
   u.phase += (u.moving ? 1 : 0.15) * (1 / 60) * 4;
   const walk = u.moving && !u.dead && o.anims.walk; const fk = walk ? 'walk' + (Math.floor(u.phase * 2.1) % o.anims.walk) : 'idle0';
-  const sp = g3sprite(A.k + '#' + fk, A.h, yaw, 0); if (!sp) return false;
+  const sp = g3sprite(a3key(A, fk), A.h, yaw, 0); if (!sp) return false;
   const recoil = !u.dead && u.atkT > 0 ? Math.sin(Math.min(1, u.atkT / 0.3) * Math.PI) * 2 : 0, breathe = !walk && !u.dead ? Math.sin(u.phase * 1.3) * 0.5 : 0;
   const ring = u.side === 'A' ? (sc.mode === 'raid' ? 'rgba(200,50,40,0.55)' : 'rgba(70,120,230,0.55)') : u.side === 'D' ? (sc.mode === 'raid' ? 'rgba(70,120,230,0.55)' : 'rgba(200,50,40,0.55)') : null;
   if (!u.dead && ring) { c.strokeStyle = ring; c.lineWidth = 1.6; c.beginPath(); c.ellipse(wx, wy, 10, 5, 0, 0, 7); c.stroke(); }
@@ -3215,7 +3219,7 @@ let THUMB_URL = null;
 // ritratto dal modello 3D animato (posa da fermo)
 const A3PORT = {};
 function anim3dPortrait(k) { const A = ANIM3D[k]; if (!A) return ''; if (A3PORT[k]) return A3PORT[k]; const o = G3.models[A.k]; if (!o) { need3d(A.k); return ''; } if (!o.ready) return '';
-  const sp = g3sprite(A.k + '#idle0', 150, 0.45, 0); if (!sp) return ''; const cv2 = document.createElement('canvas'); cv2.width = 120; cv2.height = 148; const s = 205 / -sp.y0; cv2.getContext("2d").drawImage(sp.cv, 56 + sp.x0 * s, 172 + sp.y0 * s, sp.w * s, sp.h * s); return A3PORT[k] = cv2.toDataURL(); }
+  const sp = g3sprite(a3key(A, 'idle0'), 150, 0.45, 0); if (!sp) return ''; const cv2 = document.createElement('canvas'); cv2.width = 120; cv2.height = 148; const s = 205 / -sp.y0; cv2.getContext("2d").drawImage(sp.cv, 56 + sp.x0 * s, 172 + sp.y0 * s, sp.w * s, sp.h * s); return A3PORT[k] = cv2.toDataURL(); }
 function thumbStyle(k) {
   if (ANIM3D[k]) { const u = anim3dPortrait(k); if (u) return `background-image:url(${u});background-size:contain;background-repeat:no-repeat;background-position:center bottom;`; }
   if (UDEF[k] && UDEF[k].siege) return `background-image:url(${siegeThumb(k)});background-size:contain;background-repeat:no-repeat;background-position:center bottom;`;

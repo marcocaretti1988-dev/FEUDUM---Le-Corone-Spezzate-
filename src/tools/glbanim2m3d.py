@@ -96,12 +96,25 @@ def main(src, name, out, spec):
     img = j['images'][j['textures'][ti]['source']]; bv = j['bufferViews'][img['bufferView']]
     tex = Image.open(io.BytesIO(bytes(binv[bv.get('byteOffset', 0):bv.get('byteOffset', 0) + bv['byteLength']]))).convert('RGB').resize((1024, 1024), Image.LANCZOS)
     bb = io.BytesIO(); tex.save(bb, 'JPEG', quality=82, optimize=True)
+    # varianti di colore: i verdi della texture (mantello, calzoni) diventano un altro colore
+    texv = {}
+    for v in VARIANTS:
+        nm, hue, sm, vm = v.split(':'); hue, sm, vm = float(hue), float(sm), float(vm)
+        hsv = np.array(tex.convert('HSV')).astype(np.float32); H = hsv[..., 0] * 360 / 255
+        w = np.clip(1 - np.abs(H - 125) / 55, 0, 1) * np.clip((hsv[..., 1] - 25) / 40, 0, 1)
+        nh = (hue % 360) * 255 / 360
+        hsv[..., 0] = np.where(w > 0, nh, hsv[..., 0]); hsv[..., 1] = hsv[..., 1] * (1 - w) + np.clip(hsv[..., 1] * sm, 0, 255) * w; hsv[..., 2] = hsv[..., 2] * (1 - w) + np.clip(hsv[..., 2] * vm, 0, 255) * w
+        rec = Image.fromarray(hsv.astype(np.uint8), 'HSV').convert('RGB'); bv2 = io.BytesIO(); rec.save(bv2, 'JPEG', quality=80, optimize=True)
+        texv[nm] = 'data:image/jpeg;base64,' + base64.b64encode(bv2.getvalue()).decode()
     uv = np.round(np.clip(UV, 0, 1) * 65535).astype(np.uint16)
     fr = ','.join(f"{k}:[{','.join('{pos:' + repr(b64(qp(p))) + ',nor:' + repr(b64(qn(n))) + '}' for p, n in fl)}]" for k, fl in frames.items())
     first = next(iter(frames.values()))[0]
     js = (f"M3D.{name}={{min:{mn.tolist()},size:{size.tolist()},n:{len(P)},pos:'{b64(qp(first[0]))}',nor:'{b64(qn(first[1]))}',uv:'{b64(uv)}',idx:'{b64(IDX.astype(np.uint16))}',"
-          f"frames:{{{fr}}},tex:'data:image/jpeg;base64,{base64.b64encode(bb.getvalue()).decode()}'}};\n")
+          f"frames:{{{fr}}},texv:{json.dumps(texv)},tex:'data:image/jpeg;base64,{base64.b64encode(bb.getvalue()).decode()}'}};\n")
     open(out, 'w').write(js); print(name, len(P), 'vertici', len(IDX) // 3, 'triangoli', 'KB', len(js) // 1024, 'altezza', size[1])
 
+VARIANTS = []
 if __name__ == '__main__':
+    # 5° argomento facoltativo: varianti di colore "nome:tonalità:saturazione:luminosità,..." (es. "marrone:28:0.7:0.9,rosso:358:1.3:1.0")
+    if len(sys.argv) > 5: VARIANTS = [x for x in sys.argv[5].split(',') if x]
     main(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4])
