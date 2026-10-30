@@ -1186,6 +1186,40 @@ function unitFrame(u) {
   if (u.moving) { const st = (u.phase * 2.2 | 0) % 2; return [k + (st ? '.walk' : '.idle') + dir, u.flip]; }
   return [k + '.idle' + dir, u.flip];
 }
+// ---------- oltre il bordo della mappa: bosco con nebbia oppure pergamena antica ----------
+let BEYOND = 'bosco';
+function beyondPat(k) { return BEYONDP[k] || (BEYONDP[k] = (() => {
+  const S2 = 512, cv2 = document.createElement('canvas'); cv2.width = cv2.height = S2; const g = cv2.getContext('2d'); const R = rng(k === 'bosco' ? 77 : 91);
+  if (k === 'bosco') { g.fillStyle = '#1f2e14'; g.fillRect(0, 0, S2, S2);
+    for (let i = 0; i < 900; i++) { const x = R() * S2, y = R() * S2, r = 9 + R() * 22, t = R(); const col = t < 0.4 ? [24, 44, 20] : t < 0.75 ? [34, 58, 26] : t < 0.92 ? [46, 72, 30] : [58, 70, 34];
+      for (const [ox, oy] of [[0, 0], [S2, 0], [-S2, 0], [0, S2], [0, -S2]]) { const gr = g.createRadialGradient(x + ox - r * 0.3, y + oy - r * 0.35, r * 0.1, x + ox, y + oy, r); gr.addColorStop(0, `rgb(${col[0] + 22},${col[1] + 26},${col[2] + 12})`); gr.addColorStop(0.7, `rgb(${col})`); gr.addColorStop(1, 'rgba(12,22,10,0)'); g.fillStyle = gr; g.beginPath(); g.arc(x + ox, y + oy, r, 0, 7); g.fill(); } } }
+  else { g.fillStyle = '#d9c39a'; g.fillRect(0, 0, S2, S2);
+    for (let i = 0; i < 2600; i++) { const x = R() * S2, y = R() * S2, r = 2 + R() * 26, a = R() * 0.07; g.fillStyle = R() < 0.5 ? `rgba(120,85,40,${a})` : `rgba(255,245,215,${a})`; g.beginPath(); g.arc(x, y, r, 0, 7); g.fill(); }
+    for (let i = 0; i < 14; i++) { const x = R() * S2, y = R() * S2, r = 20 + R() * 60; const gr = g.createRadialGradient(x, y, r * 0.6, x, y, r); gr.addColorStop(0, 'rgba(150,105,50,0)'); gr.addColorStop(0.92, 'rgba(140,95,45,0.12)'); gr.addColorStop(1, 'rgba(140,95,45,0)'); g.fillStyle = gr; g.beginPath(); g.arc(x, y, r, 0, 7); g.fill(); } }
+  return cv2; })()); }
+const BEYONDP = {};
+function drawBeyond(c, sc) {
+  if (!(sc.mode === 'village' || sc.mode === 'raid' || sc.mode === 'visit' || sc.mode === 'attack')) return;
+  const k = BEYOND, x0 = cam.x - VW / 2 / cam.z - 20, y0 = cam.y - VH / 2 / cam.z - 20, w = VW / cam.z + 40, h = VH / cam.z + 40;
+  const pk = 'p_' + k; if (!BEYONDP[pk]) BEYONDP[pk] = c.createPattern(beyondPat(k), 'repeat'); c.fillStyle = BEYONDP[pk]; c.fillRect(x0, y0, w, h); if (k === 'bosco' && typeof seasonInfo === 'function') { const sk = seasonInfo().s.k; const tint = sk === 'autunno' ? 'rgba(190,100,25,0.32)' : sk === 'inverno' ? 'rgba(235,240,245,0.55)' : sk === 'estate' ? 'rgba(200,170,60,0.12)' : null; if (tint) { c.fillStyle = tint; c.fillRect(x0, y0, w, h); } }
+  // fascia vicino al bordo: nebbia che sale dal bosco oppure bruciatura della carta
+  c.save(); tileTransform(c, 1); const F = k === 'bosco' ? 34 : 2.2;
+  const band = (ax, ay, bx, by, rx, ry, rw, rh) => { const gr = c.createLinearGradient(ax, ay, bx, by);
+    if (k === 'bosco') { gr.addColorStop(0, 'rgba(160,175,170,0)'); gr.addColorStop(0.35, 'rgba(160,175,170,0.35)'); gr.addColorStop(1, 'rgba(170,182,178,0.92)'); }
+    else { gr.addColorStop(0, 'rgba(60,32,12,0.95)'); gr.addColorStop(0.35, 'rgba(110,62,24,0.55)'); gr.addColorStop(1, 'rgba(150,100,50,0)'); }
+    c.fillStyle = gr; c.fillRect(rx, ry, rw, rh); };
+  const E = 400; if (k !== 'bosco') band(0, 0, -F, 0, -E, -E, E, N + 2 * E); if (k !== 'bosco') { band(N, 0, N + F, 0, N, -E, E, N + 2 * E); band(0, 0, 0, -F, 0, -E, N, E); band(0, N, 0, N + F, 0, N, N, E); }
+  if (k === 'bosco') { // nebbia che si infittisce allontanandosi dal bordo: 4 trapezi con sfumatura liscia, angoli a 45°
+    const fog = (ax, ay, bx, by, pts) => { const gr = c.createLinearGradient(ax, ay, bx, by); gr.addColorStop(0, 'rgba(168,180,176,0)'); gr.addColorStop(0.3, 'rgba(168,180,176,0.12)'); gr.addColorStop(0.65, 'rgba(168,180,176,0.5)'); gr.addColorStop(1, 'rgba(170,182,178,0.93)'); c.fillStyle = gr; c.beginPath(); c.moveTo(pts[0], pts[1]); for (let q = 2; q < pts.length; q += 2) c.lineTo(pts[q], pts[q + 1]); c.closePath(); c.fill(); };
+    fog(0, 0, 0, -F, [0, 0, N, 0, N + E, -E, -E, -E]); fog(0, N, 0, N + F, [0, N, N, N, N + E, N + E, -E, N + E]); fog(0, 0, -F, 0, [0, 0, 0, N, -E, N + E, -E, -E]); fog(N, 0, N + F, 0, [N, 0, N, N, N + E, N + E, N + E, -E]); }
+  c.restore();
+  if (k === 'pergamena') { // rosa dei venti e scritte da carta antica, ai lati della mappa
+    c.save(); c.fillStyle = 'rgba(70,40,15,0.75)'; c.textAlign = 'center'; c.font = 'italic 160px "IM Fell English", Georgia, serif';
+    for (const [tx, ty, txt] of [[-14, N / 2, 'Terrae Incognitae'], [N + 14, N / 2, 'Hic sunt leones'], [N / 2, -14, 'Silva Obscura'], [N / 2, N + 14, 'Mare Tenebrarum']]) { const [wx, wy] = W(tx, ty); c.fillText(txt, wx, wy); }
+    const [cx2, cy2] = W(-24, -24); c.translate(cx2, cy2); c.strokeStyle = 'rgba(70,40,15,0.8)'; c.lineWidth = 8; c.beginPath(); c.arc(0, 0, 260, 0, 7); c.stroke(); c.beginPath(); c.arc(0, 0, 230, 0, 7); c.stroke();
+    for (let i = 0; i < 8; i++) { const a = i * Math.PI / 4, L = i % 2 ? 190 : 330; c.fillStyle = i % 2 ? 'rgba(70,40,15,0.55)' : 'rgba(120,30,20,0.8)'; c.beginPath(); c.moveTo(Math.cos(a) * L, Math.sin(a) * L); c.lineTo(Math.cos(a + 0.35) * 55, Math.sin(a + 0.35) * 55); c.lineTo(0, 0); c.lineTo(Math.cos(a - 0.35) * 55, Math.sin(a - 0.35) * 55); c.fill(); }
+    c.restore(); }
+}
 function render(sc, dt) {
   const c = ctx;
   c.setTransform(1, 0, 0, 1, 0, 0); c.fillStyle = sc.night ? '#1b2016' : '#2f3a1f'; c.fillRect(0, 0, cv.width, cv.height);
@@ -1194,6 +1228,7 @@ function render(sc, dt) {
   c.imageSmoothingEnabled = true; c.imageSmoothingQuality = 'high';
   // view bounds in world
   const vx0 = cam.x - VW / 2 / cam.z - 120, vx1 = cam.x + VW / 2 / cam.z + 120, vy0 = cam.y - VH / 2 / cam.z - 60, vy1 = cam.y + VH / 2 / cam.z + 260;
+  drawBeyond(c, sc);
   drawGround(c, sc, cam.x - VW / 2 / cam.z - 8, cam.y - VH / 2 / cam.z - 8, cam.x + VW / 2 / cam.z + 8, cam.y + VH / 2 / cam.z + 8);
   seasonGround(c, sc);
   const vis = (wx, wy) => wx > vx0 && wx < vx1 && wy > vy0 && wy < vy1;
