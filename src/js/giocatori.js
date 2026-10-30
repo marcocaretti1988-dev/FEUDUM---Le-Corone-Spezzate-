@@ -108,6 +108,7 @@ let FEST_T = 240, FEST_MT = 0;
 function festTick(dt) {
   if (!S || S.creative || MODE !== 'village' || !SC) return;
   if (S.fest && now() > S.fest.end) { S.fest = null; }
+  musicFesta(!!S.fest);
   if (S.fest) { FEST_MT = (FEST_MT || 0) - dt; if (FEST_MT <= 0) { FEST_MT = 9.1; sfx('festa'); } }
   if (famine()) { if (!S.famineWarned) { S.famineWarned = 1; toast('🍂 Carestia! Il granaio è vuoto: le case si spengono e il popolo è malcontento (-10% produzione)'); sfx('bell'); } } else S.famineWarned = 0;
   FEST_T -= dt; if (FEST_T > 0 || S.fest) return; FEST_T = 420 + Math.random() * 300;
@@ -115,7 +116,7 @@ function festTick(dt) {
   festStart();
 }
 function festStart() {
-  const [px, py] = PATHC.plaza || [MCX, MCX]; S.fest = { end: now() + 80000, x: px + 1.2, y: py + 1.4 };
+  const [px, py] = PATHC.plaza || [MCX, MCX]; S.fest = { end: now() + 50000, x: px + 1.2, y: py + 1.4 };
   addRes('favore', 1); toast('🎉 Festa in piazza! Il popolo è felice e balla attorno al falò: +1 👑 Favore'); sfx('festa'); FEST_MT = 9.1; festFX();
   for (const u of SC.U) if (u.ai === workerAI || u.kid) { u.st = 'rest'; u.wt = Math.random() * 2; }
 }
@@ -295,12 +296,17 @@ function buildVillage() {
     let i = 0; const list = [];
     // un po' di ogni tipo (a turno), così si vedono anche arcieri e truppe speciali
     { const left = {}; for (const k of UNIT_ORDER) left[k] = S.army[k] || 0; let more = true; while (more && list.length < 14) { more = false; for (const k of UNIT_ORDER) if (left[k] > 0 && list.length < 14) { list.push(k); left[k]--; more = true; } } list.sort((a, b) => (ANIM3D[b] ? 1 : 0) - (ANIM3D[a] ? 1 : 0) || UNIT_ORDER.indexOf(a) - UNIT_ORDER.indexOf(b)); }
+    // schierati in riga davanti alla caserma: file parallele allo schermo, tutti rivolti verso di noi
+    const PER = 5, DX = 0.82, DR = 0.9, rx = Math.SQRT1_2, ry = -Math.SQRT1_2, bx = -Math.SQRT1_2, by = -Math.SQRT1_2;
+    const slots = a0 => { const out = []; for (let n = 0; n < list.length; n++) { const c = n % PER - (PER - 1) / 2, r = Math.floor(n / PER); out.push([a0[0] + rx * c * DX - bx * r * DR, a0[1] + ry * c * DX - by * r * DR]); } return out; };
+    const free = ([x, y]) => inMap(Math.floor(x), Math.floor(y)) && !bAt(sc, Math.floor(x), Math.floor(y)) && !isWater(sc, Math.floor(x), Math.floor(y));
+    const anchors = [[cas.x + cas.w + 1.3, cas.y + cas.h + 1.3], [cas.x + cas.w + 2.2, cas.y + cas.h / 2], [cas.x + cas.w / 2, cas.y + cas.h + 2.2], [cas.x - 2.2, cas.y + cas.h + 1.3], [cas.x + cas.w + 1.3, cas.y - 2.2]];
+    let best = null, bn = -1; for (const a0 of anchors) { const sl = slots(a0), n = sl.filter(free).length; if (n > bn) { bn = n; best = sl; } if (n === sl.length) break; }
     const vix = {};
     for (const k of list) {
       const vi = vix[k] = (vix[k] == null ? 0 : vix[k] + 1);
-      const x = cas.x + 3.4 + (i % 4) * 0.55, y = cas.y + 0.4 + Math.floor(i / 4) * 0.6; i++;
-      if (bAt(sc, Math.floor(x), Math.floor(y))) continue;
-      const u = mkUnit(k, 'V', x, y); u.vi = vi; u.face = 'F'; u.flip = false; u.ai = soldierAI; sc.U.push(u);
+      const p = best[i++]; if (!free(p)) continue; const [x, y] = p;
+      const u = mkUnit(k, 'V', x, y); u.vi = vi; u.face = 'F'; u.flip = false; u.post = { x, y }; u.ai = soldierAI; sc.U.push(u);
     }
   }
   if (S && S.hunts && S.fauna) for (const id of S.hunts) { const a = S.fauna.find(f => f.id === id && f.dying == null); if (a) { a.huntBy = 1; hunterSpawn(sc, a); } }
@@ -390,7 +396,10 @@ function followPath(sc, u, dt) {
   if (!u.path || u.pi >= u.path.length) return true;
   const [px, py] = u.path[u.pi];
   const dx = px + 0.5 - u.x, dy = py + 0.5 - u.y, d = Math.hypot(dx, dy), sp = u.d.spd * dt;
-  if (d <= sp) { u.x = px + 0.5; u.y = py + 0.5; u.pi++; } else { u.x += dx / d * sp; u.y += dy / d * sp; }
+  // la tappa è occupata da qualcuno fermo, oppure da un po' non si avanza: salto alla tappa dopo (si gira attorno)
+  if (d < 0.8 && sc.U.some(o => o !== u && !o.dead && !o.moving && Math.hypot(o.x - px - 0.5, o.y - py - 0.5) < 0.42)) { u.pi++; u.moving = true; u.stk = 0; return u.pi >= u.path.length; }
+  if (u.lastD != null && d > u.lastD - sp * 0.3) { u.stk = (u.stk || 0) + dt; if (u.stk > 1.2) { u.stk = 0; u.pi++; u.lastD = null; return u.pi >= u.path.length; } } else u.stk = 0; u.lastD = d;
+  if (d <= sp) { u.x = px + 0.5; u.y = py + 0.5; u.pi++; u.lastD = null; } else { u.x += dx / d * sp; u.y += dy / d * sp; }
   u.moving = true; setFace(u, dx, dy); return u.pi >= u.path.length;
 }
 function workerAI(sc, u, dt) {
@@ -410,7 +419,7 @@ function pickWork(sc, u) {
   u.path = astar(Math.floor(u.x), Math.floor(u.y), (x, y) => x === tx && y === ty, villagerCost(sc), tx, ty, 2500); u.pi = 0;
   u.st = u.path ? 'go' : 'rest'; if (!u.path) u.wt = 4;
 }
-function soldierAI(sc, u, dt) { u.phase += dt * 0.2; if (Math.random() < dt * 0.05) u.flip = !u.flip; }
+function soldierAI(sc, u, dt) { u.phase += dt * 0.2; if (u.post) { u.x += (u.post.x - u.x) * Math.min(1, dt * 3); u.y += (u.post.y - u.y) * Math.min(1, dt * 3); u.face = 'F'; } }
 
 // ---------- economy tick ----------
 function rateOf(r) { const d = BDEF[r.t]; const m = DF().prod * prestigeMult() * umoreMult() * workMult(r) * seasonMod(resOf(r)); if (r.t === 'mastio') return 6 * r.lvl * m; return d.prod ? d.prod[1] * r.lvl * m : 0; }
@@ -763,7 +772,7 @@ function doResearch(k, id) { const l = tech(k) + 1, mx = lvlSum('accademia') * 2
 // ---------- upgrades / training ----------
 function upCost(r) { if (r.t === 'mastio') return MASTIO_UP[r.lvl]; if (r.t === 'muro') return { pietra: 12 }; return scaleCost(BDEF[r.t].cost, r.lvl + 1); }
 function upTime(r) { return Math.round(upTime0(r) * seasonBuildMul()); }
-function upTime0(r) { const p = PACE(); if (r.t === 'mastio') return Math.round((MASTIO_T[r.lvl] || 720) * 60 * p); if (r.t === 'muro') return Math.round(6 * r.lvl * p); const w = Math.max(0.4, (BDEF[r.t].t || 6) / 10); return Math.max(10, Math.round((UP_T[r.lvl + 1] || 150) * 60 * w * p)); }
+function upTime0(r) { const p = PACE(); if (r.t === 'mastio') return Math.round((MASTIO_T[r.lvl] || 720) * 60 * TEMPI.mastio * p); if (r.t === 'muro') return Math.round(6 * r.lvl * p); const w = Math.max(0.4, (BDEF[r.t].t || 6) / 10); return Math.max(20, Math.round((UP_T[r.lvl + 1] || 150) * 60 * w * TEMPI.miglioria * p)); }
 function canUp(r) {
   if (r.end) return 'In costruzione…';
   if (r.t === 'mastio') return r.lvl >= 16 ? `Livello massimo (${ERA(r.lvl).n})` : null;

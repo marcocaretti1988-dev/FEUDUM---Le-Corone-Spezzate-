@@ -974,6 +974,12 @@ function musicStart() {
   if (MUS.el.paused) { const p = MUS.el.play(); if (p && p.catch) p.catch(() => { }); }
 }
 function musicStop() { if (MUS.el && !MUS.el.paused) MUS.el.pause(); }
+// festa in piazza: la musica di base si zittisce finché suona il saltarello, poi torna piano piano
+function musicFesta(on) {
+  if (!!MUS.festa === !!on) return; MUS.festa = !!on; const a = AC;
+  if (on) { if (TENS.kind) return; MUS.duck = true; if (MUS.g && MUS.el && a) { const t = a.currentTime; MUS.g.gain.cancelScheduledValues(t); MUS.g.gain.setValueAtTime(MUS.g.gain.value, t); MUS.g.gain.linearRampToValueAtTime(0, t + 1.0); setTimeout(() => { if (MUS.duck) musicStop(); }, 1100); } else musicStop(); return; }
+  if (TENS.kind) return; MUS.duck = false; setTimeout(() => { if (TENS.kind || MUS.festa) return; musicStart(); if (MUS.g && AC) { const t = AC.currentTime; MUS.g.gain.cancelScheduledValues(t); MUS.g.gain.setValueAtTime(0, t); MUS.g.gain.linearRampToValueAtTime(SET.mute ? 0 : SET.mvol, t + 2.5); } else musicApply(); }, 1500);
+}
 function audioRefresh() { saveSet(); musicApply(); if (MUS.on && !SET.mute) musicStart(); else musicStop(); if (TENS.kind && (!MUS.on || SET.mute)) tensionStop(true); updateSndBtn(); }
 function musicToggle() { SET.music = !MUS.on; audioRefresh(); }
 function toggleMute() { SET.mute = !SET.mute; audioRefresh(); if (!SET.mute) sfx('click'); }
@@ -1019,7 +1025,7 @@ function tensionStop(now) {
   if (RAIDM.el && !RAIDM.el.paused) { const el = RAIDM.el; setTimeout(() => { if (!TENS.kind) el.pause(); }, now ? 400 : 2600); }
   if (TENS.iv) clearInterval(TENS.iv); TENS.iv = 0; const g = TENS.g, a = AC; TENS.g = null; const wasOn = !!TENS.kind; TENS.kind = null;
   if (g && a) { const t = a.currentTime; g.gain.cancelScheduledValues(t); g.gain.setValueAtTime(g.gain.value, t); g.gain.linearRampToValueAtTime(0, t + (now ? 0.2 : 2.2)); setTimeout(() => { try { g.disconnect(); } catch (e) { } }, now ? 400 : 2600); }
-  if (wasOn && !now) { MUS.duck = false; setTimeout(() => { if (TENS.kind) return; musicStart(); if (MUS.g && AC) { const t = AC.currentTime; MUS.g.gain.cancelScheduledValues(t); MUS.g.gain.setValueAtTime(0, t); MUS.g.gain.linearRampToValueAtTime(SET.mute ? 0 : SET.mvol, t + 2.5); } else musicApply(); }, 1600); }
+  if (wasOn && !now) { MUS.duck = !!MUS.festa; setTimeout(() => { if (TENS.kind || MUS.festa) return; musicStart(); if (MUS.g && AC) { const t = AC.currentTime; MUS.g.gain.cancelScheduledValues(t); MUS.g.gain.setValueAtTime(0, t); MUS.g.gain.linearRampToValueAtTime(SET.mute ? 0 : SET.mvol, t + 2.5); } else musicApply(); }, 1600); }
   else if (!now) { MUS.duck = false; musicApply(); }
 }
 function tensionSched() {

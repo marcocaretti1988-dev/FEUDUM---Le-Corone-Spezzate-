@@ -194,7 +194,11 @@ function updateScene(sc, dt) {
     const a = U[i]; if (a.dead) continue;
     for (let j = i + 1; j < U.length; j++) {
       const b = U[j]; if (b.dead) continue; const dx = b.x - a.x, dy = b.y - a.y, d2 = dx * dx + dy * dy, R = (a.d.cav || b.d.cav) ? 0.55 : (a.pl && b.pl ? 0.48 : 0.36);
-      if (d2 < R * R && d2 > 1e-6) { const d = Math.sqrt(d2), p = (R - d) / d * 0.25; stepTo(sc, a, a.x - dx * p, a.y - dy * p); stepTo(sc, b, b.x + dx * p, b.y + dy * p); }
+      if (d2 < R * R && d2 > 1e-6) { const d = Math.sqrt(d2), p = (R - d) / d * 0.25;
+        if (a.moving !== b.moving) { // uno cammina e l'altro è fermo: chi cammina gira attorno (scivola di lato), chi è fermo si scosta un poco
+          const m = a.moving ? a : b, o = a.moving ? b : a, ux = (o.x - m.x) / d, uy = (o.y - m.y) / d; if (!m.sg) m.sg = Math.random() < 0.5 ? 1 : -1;
+          const k = (R - d) * 0.9 + 0.02; stepTo(sc, m, m.x - uy * m.sg * k - ux * k * 0.3, m.y + ux * m.sg * k - uy * k * 0.3); stepTo(sc, o, o.x + uy * m.sg * k * 0.35 + ux * k * 0.2, o.y - ux * m.sg * k * 0.35 + uy * k * 0.2);
+        } else { stepTo(sc, a, a.x - dx * p, a.y - dy * p); stepTo(sc, b, b.x + dx * p, b.y + dy * p); } }
     }
   }
   // towers

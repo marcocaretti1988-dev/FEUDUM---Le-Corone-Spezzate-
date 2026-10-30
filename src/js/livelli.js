@@ -5,7 +5,9 @@ const PACE = () => (SET.pace === 'rapido' ? 0.1 : 1);
 const MASTIO_T = [0, 1, 6, 12, 25, 45, 70, 100, 130, 160, 120, 180, 240, 360, 480, 720]; // minuti per salire da L a L+1
 const UP_T = [0, 0, 1, 3, 8, 20, 40, 75, 120]; // minuti per portare un edificio al livello n (× peso dell'edificio)
 const maxBuilders = () => 2 + (S && S.mastio >= 5 ? 1 : 0) + (S && S.mastio >= 9 ? 1 : 0);
-const buildSecs = d => Math.round(d.t * 6 * PACE());
+// tempi più lunghi (30/10/2026): costruire ×4, migliorare ×2.5, alzare il Mastio ×2
+const TEMPI = { costruzione: 4, miglioria: 2.5, mastio: 2 };
+const buildSecs = d => Math.round(d.t * 6 * TEMPI.costruzione * PACE());
 
 // ================= STAGIONI & METEO =================
 const SEASON_MS = 2 * 60 * 60 * 1000, WX_MS = 10 * 60 * 1000;
