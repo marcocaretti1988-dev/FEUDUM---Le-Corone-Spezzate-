@@ -473,6 +473,7 @@ function startPlacement(t, moveRef) {
   placing = { t, w: d.w, h: d.h, x: Math.floor(tx - d.w / 2 + 0.5), y: Math.floor(ty - d.h / 2 + 0.5), move: moveRef || null };
   if (moveRef) { placing.x = moveRef.x; placing.y = moveRef.y; placing.rot = moveRef.rot || 0; } else { const f = findFree(t, placing.x, placing.y); if (f) { placing.x = f[0]; placing.y = f[1]; } }
   { const girabile = !!(d.wall || (d.decor && DFIT[t] && !DYAW_RND[t])); $('#pbrot').classList.toggle('hidden', !girabile); }
+  $('#pbring').classList.toggle('hidden', !(d.wall && !moveRef));
   if (d.wall && !moveRef) { placing.line = true; placing.a = null; placing.b = null; updateGhost(); $('#placebar').classList.remove('hidden'); $('#hud-bot').classList.add('hidden'); wallInfo(); return; }
   updateGhost(); $('#placebar').classList.remove('hidden'); $('#hud-bot').classList.add('hidden');
   $('#placeinfo').innerHTML = moveRef ? `Sposta: <b>${d.n}</b>` : `<b>${d.n}</b> ${costStr(d.cost || {})}`;
@@ -492,6 +493,25 @@ function wallInfo() { const d = BDEF[placing.t]; if (!placing.a) { $('#placeinfo
   const n = wallGhosts().length, c = {}; for (const k in d.cost) c[k] = d.cost[k] * n; const left = maxB(placing.t) - countB(placing.t);
   $('#placeinfo').innerHTML = !placing.b ? `<b>${d.n}</b>: ora tocca dove <b>finisce</b> (se arriva a un edificio si salda)` : `<b>${d.n}</b> · ${n} pezzi ${costStr(c)}${n > left ? ` · <span class="no">ne puoi fare ancora ${left}</span>` : ''} · ✓ per costruire`; }
 function wallTap(tx, ty) { const p = [Math.floor(tx), Math.floor(ty)]; if (!placing.a || placing.done) { placing.a = p; placing.b = null; placing.done = false; } else placing.b = p; updateGhost(); wallInfo(); sfx('tock'); }
+// ---- chiudi il recinto: un anello di palizzata attorno a tutto il villaggio (tiene i pezzi già fatti) ----
+function wallRing() {
+  let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9; for (const r of S.buildings) { const d = BDEF[r.t]; if (r.nat || (d.decor && !d.wall)) continue; x0 = Math.min(x0, r.x); y0 = Math.min(y0, r.y); x1 = Math.max(x1, r.x + d.w - 1); y1 = Math.max(y1, r.y + d.h - 1); }
+  const solid = (x, y) => S.buildings.some(r => { const d = BDEF[r.t]; return !d.wall && !r.nat && x >= r.x && x < r.x + d.w && y >= r.y && y < r.y + d.h; });
+  // margine di 2 caselle dagli edifici, ma i pezzi di palizzata già fatti sul bordo restano parte dell'anello
+  const walls = S.buildings.filter(r => r.t === 'muro'); const near = (v, a) => Math.abs(v - a) <= 4;
+  let ax0 = x0 - 2, ay0 = y0 - 2, ax1 = x1 + 2, ay1 = y1 + 2;
+  for (const w of walls) { if (w.x < ax0 && near(w.x, ax0)) ax0 = w.x; if (w.y < ay0 && near(w.y, ay0)) ay0 = w.y; if (w.x > ax1 && near(w.x, ax1)) ax1 = w.x; if (w.y > ay1 && near(w.y, ay1)) ay1 = w.y; }
+  ax0 = Math.max(3, ax0); ay0 = Math.max(3, ay0); ax1 = Math.min(N - 4, ax1); ay1 = Math.min(N - 4, ay1);
+  const ring = []; for (let x = ax0; x <= ax1; x++) ring.push([x, ay0], [x, ay1]); for (let y = ay0 + 1; y < ay1; y++) ring.push([ax0, y], [ax1, y]);
+  const has = new Set(walls.map(w => w.x + ',' + w.y)); const wv = villageWater();
+  return ring.filter(([x, y]) => !has.has(x + ',' + y) && !wv[y * N + x] && !solid(x, y)); }
+function closeRing() {
+  const d = BDEF.muro, R = wallRing(); if (!R.length) { toast('Il recinto è già chiuso'); return; }
+  const left = Math.max(0, maxB('muro') - countB('muro')), n = Math.min(R.length, left), c = {}; for (const k in d.cost) c[k] = d.cost[k] * n;
+  if (!n) { toast('Limite di palizzata raggiunto: alza il livello del Mastio'); return; }
+  askYes(`Chiudere il recinto attorno al villaggio?<br><small>${R.length} pezzi da fare${n < R.length ? ` (ora ne puoi fare ${n}: limite del Mastio)` : ''} · ${costStr(c)}</small>`, () => {
+    let k = 0; for (const [x, y] of R) { if (k >= n || !canPay(d.cost)) break; pay(d.cost); S.buildings.push({ id: S.nextId++, t: 'muro', x, y, lvl: 1, stock: 0, end: d.t && !S.creative ? now() + (buildSecs(d) * 1000 + k * 120) * seasonBuildMul() : 0, dur: buildSecs(d) * 1000 * seasonBuildMul(), toLvl: 1 }); k++; }
+    if (placing) cancelPlace(); closeSheet(); sfx('build'); SC = buildVillage(); save(); updateHUD(); toast(`🪵 Recinto: ${k} pezzi di palizzata in costruzione${k < R.length ? ` · ne mancano ${R.length - k}` : ''}`); }, 'Chiudi'); }
 function wallConfirm() {
   const d = BDEF[placing.t]; if (!placing.a || !placing.b) { toast('Tocca prima dove inizia e dove finisce la palizzata'); return; }
   const G = wallGhosts(); if (!G.length) { toast('Lì c\'è già la palizzata'); return; } let n = 0;

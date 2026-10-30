@@ -1235,7 +1235,7 @@ function render(sc, dt) {
       c.drawImage(f.img || BATL, f[0], f[1], f[2], f[3], -w / 2, -h + 2, w, h); c.restore(); c.globalAlpha = 1; } }
     else if (kind === 4) { // anteprima di piazzamento: lo stesso modello che verrà costruito
       let fb = o._fb; if (!fb || fb.t !== o.t) fb = o._fb = { t: o.t, x: o.x, y: o.y, w: o.w, h: o.h, lvl: 1, seed: 0, mask: 0, id: -7, side: 'D', hp: 1, maxhp: 1, aim: {}, ghost: true, ref: { rot: o.rot || 0 } };
-      fb.x = o.x; fb.y = o.y; fb.ref.rot = o.rot || 0; fb.mask = o.mask || 0; fb._wu = fb._wv = fb._wd = fb._we = null; const mk = o.t === 'mastio' ? 'castello' : BDEF[o.t].wall ? 'palizzata' : o.t; if (!G3.models[mk]) need3d(mk);
+      fb.x = o.x; fb.y = o.y; fb.ref.rot = o.rot || 0; fb.mask = o.mask || 0; fb._wu = fb._wv = fb._wd = fb._we = fb._hu = fb._hv = null; const mk = o.t === 'mastio' ? 'castello' : BDEF[o.t].wall ? 'palizzata' : o.t; if (!G3.models[mk]) need3d(mk);
       c.globalAlpha = 0.7; if ((G3.models[mk] && G3.models[mk].ready) || PAINT[o.t] || (bSprite(fb) && BATL_OK)) drawBuilding(c, sc, fb); else { poly(c, [W(o.x, o.y), W(o.x + o.w, o.y), W(o.x + o.w, o.y + o.h), W(o.x, o.y + o.h)], 'rgba(255,240,200,0.25)', 'rgba(255,240,200,0.8)', 1.5); const [cx, cy] = W(o.x + o.w / 2, o.y + o.h / 2); c.font = '22px serif'; c.textAlign = 'center'; c.fillText(BDEF[o.t].icon || '?', cx, cy - 8); c.textAlign = 'start'; } c.globalAlpha = 1; }
   }
   drawWorks(c, sc);
@@ -1347,8 +1347,11 @@ function drawBuilding(c, sc, b) {
     if (wk && G3.models[wk] && G3.models[wk].ready) { const m = b.mask || 0; const segs = []; const rr = (b.ref && b.ref.rot) || 0;
       // direzione scelta col pulsante ↻ (0 = automatica, segue i pezzi vicini)
       if (rr === 1) segs.push(['_wu', Math.PI / 4, 1.1]); else if (rr === 2) segs.push(['_wv', 3 * Math.PI / 4, 1.1]); else if (rr === 3) segs.push(['_wd', 0, 1.5]); else if (rr === 4) segs.push(['_we', Math.PI / 2, 1.5]);
+      else if ((m & 3) && (m & 12)) { // angolo o incrocio: mezzo pezzo verso ogni vicino, niente punte che sporgono
+        if ((m & 3) === 3) segs.push(['_wu', Math.PI / 4, 1.1]); else segs.push(['_hu', Math.PI / 4, 0.62, m & 1 ? 0.24 : -0.24, 0]);
+        if ((m & 12) === 12) segs.push(['_wv', 3 * Math.PI / 4, 1.1]); else segs.push(['_hv', 3 * Math.PI / 4, 0.62, 0, m & 4 ? 0.24 : -0.24]); }
       else { if ((m & 3) || !m) segs.push(['_wu', Math.PI / 4, 1.1]); if (m & 12) segs.push(['_wv', 3 * Math.PI / 4, 1.1]); }
-      for (const [kk, yw, ft] of segs) { if (!b[kk]) b[kk] = { x: b.x, y: b.y, w: 1, h: 1 }; g3draw(c, b[kk], wk, ft, yw); }
+      for (const [kk, yw, ft, ox, oy] of segs) { if (!b[kk]) b[kk] = { x: b.x + (ox || 0), y: b.y + (oy || 0), w: 1, h: 1 }; g3draw(c, b[kk], wk, ft, yw); }
       if (wk === 'mura' && (m & 3) && (m & 12) && (m & 3) !== 3 && (m & 12) !== 12) { if (!G3.models.torrepietra) need3d('torrepietra'); if (G3.models.torrepietra && G3.models.torrepietra.ready) { if (!b._tw) b._tw = { x: b.x, y: b.y, w: 1, h: 1 }; g3draw(c, b._tw, 'torrepietra', 1.15, 0); } } }
     else if (BDEF[b.t].wall || BDEF[b.t].moat) c.drawImage(e.cv, wx - e.ox, wy - e.oy, e.w, e.h);
     else { const q = ((ANG / (Math.PI / 2)) % 4 + 4) % 4, i = Math.floor(q), sm0 = Math.min(1, Math.max(0, (q - i - 0.38) / 0.24)), t = sm0 * sm0 * (3 - 2 * sm0); const ga = c.globalAlpha; const [cx] = W(b.x + b.w / 2, b.y + b.h / 2); const ox = cx - wx;
