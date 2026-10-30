@@ -514,8 +514,10 @@ function pickEra() {
 function beginGame(fresh, preset) {
   ac(); $('#title').classList.add('hidden');
   if (preset) { } else if (fresh || !load()) startNew(); else { S = load(); offlineCatchup(); }
-  if (!fresh && S.mapv !== 3) { const sh = S.mapv === 2 ? 24 : 32; for (const r of S.buildings) { r.x += sh; r.y += sh; } S.removed = []; S.mapv = 3; }
-  if (!S.buildings.some(b => b.t === 'mastio')) S.buildings.unshift({ id: S.nextId++, t: 'mastio', x: 14 + OFF, y: 14 + OFF, lvl: S.mastio, stock: 0, end: 0 });
+  if (!fresh && S.mapv !== 3 && S.mapv !== 4) { const sh = S.mapv === 2 ? 24 : 32; for (const r of S.buildings) { r.x += sh; r.y += sh; } S.removed = []; S.mapv = 3; }
+  if (!fresh && S.mapv === 3) { // mappa 4 volte più grande e Mastio 5×5: sposto tutto al nuovo centro
+    for (const r of S.buildings) { r.x += 48; r.y += 48; if (r.t === 'mastio') { r.x -= 1; r.y -= 1; } } for (const a of S.fauna || []) { a.x += 48; a.y += 48; } S.removed = []; S.hunts = []; S.mapv = 4; }
+  if (!S.buildings.some(b => b.t === 'mastio')) S.buildings.unshift({ id: S.nextId++, t: 'mastio', x: 13 + OFF, y: 13 + OFF, lvl: S.mastio, stock: 0, end: 0 });
   for (const r of S.buildings) { if (r.t === 'mastio' || r.nat) continue; if (!canPlace(r.t, r.x, r.y, r)) { const f = findFree(r.t, r.x, r.y, r); if (f) { r.x = f[0]; r.y = f[1]; } } }
   S.buildings = S.buildings.filter(r => !r.nat || canPlace(r.t, r.x, r.y, r));
   for (const r of S.buildings) { if (r.t === 'mastio') continue; const d = BDEF[r.t]; const wv = villageWater(); let wet = false; for (let yy = r.y; yy < r.y + d.h; yy++) for (let xx = r.x; xx < r.x + d.w; xx++) if (wv[yy * N + xx]) wet = true; if (wet) { const f = findFree(r.t, r.x, r.y, r); if (f) { r.x = f[0]; r.y = f[1]; } } }

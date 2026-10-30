@@ -131,7 +131,7 @@ function openWeather() {
 function buildMaxState(lvl) {
   S = newState(); S.mastio = lvl; S.sandbox = lvl; S.mq = 99; S.natInit = S.natBig = S.natHuge = 1;
   const cx = MCX | 0;
-  S.buildings = [{ id: S.nextId++, t: 'mastio', x: cx - 1, y: cx - 1, lvl, stock: 0, end: 0 }];
+  S.buildings = [{ id: S.nextId++, t: 'mastio', x: cx - 2, y: cx - 2, lvl, stock: 0, end: 0 }];
   const free = (t, x, y) => { const d = BDEF[t]; if (!canPlace(t, x, y)) return false; if (lvl > 8 && x < cx + 5 && x + d.w > cx - 4 && y < cx + 5 && y + d.h > cx - 4) return false; return !occupiedBy(x - 1, y - 1, d.w + 2, d.h + 2) ; };
   const place = (t, lv) => { const d = BDEF[t]; for (let r = 2; r < 30; r++) { const cand = []; for (let dy = -r; dy <= r; dy++) for (let dx = -r; dx <= r; dx++) if (Math.max(Math.abs(dx), Math.abs(dy)) === r) cand.push([cx + dx, cx + dy]); cand.sort(() => Math.random() - .5); for (const [x, y] of cand) if (free(t, x, y)) { S.buildings.push({ id: S.nextId++, t, x, y, lvl: lv, stock: 0, end: 0 }); return true; } } return false; };
   const order = ['municipio', 'caserma', 'poligono', 'scuderia', 'monastero', 'accademia', 'chiesa', 'mercato', 'fattoria', 'miniera', 'taverna', 'capanna', 'fucina', 'armeria', 'infermeria', 'granaio', 'tesoreria', 'cava', 'casa', 'balista', 'cancello', 'torre'];
@@ -166,7 +166,7 @@ function buildMaxState(lvl) {
 function startCreative(fresh) {
   SAVE_KEY = 'feudum_creativo'; const old = !fresh && load();
   if (old) { S = old; } else { S = newState(); S.creative = 1; S.mastio = 8; S.mq = 99; S.natInit = S.natBig = S.natHuge = 1; S.raids = 1; S.wins = 10;
-    const cx = MCX | 0; S.buildings = [{ id: S.nextId++, t: 'mastio', x: cx - 1, y: cx - 1, lvl: 8, stock: 0, end: 0 }]; S.army = {}; for (const k of UNIT_ORDER) S.army[k] = 2; S.tech = { arm: 5, bal: 5, log: 5 }; }
+    const cx = MCX | 0; S.buildings = [{ id: S.nextId++, t: 'mastio', x: cx - 2, y: cx - 2, lvl: 8, stock: 0, end: 0 }]; S.army = {}; for (const k of UNIT_ORDER) S.army[k] = 2; S.tech = { arm: 5, bal: 5, log: 5 }; }
   save(); beginGame(false, true);
 }
 function startMax(lvl) { SAVE_KEY = 'feudum_max_' + lvl; buildMaxState(lvl); save(); beginGame(false, true); }
@@ -343,7 +343,7 @@ function buildRealmScene(r) {
 let VISIT_PREV = null;
 function visitRealm(i) {
   const r = realms()[i]; closeSheet(); closeFolk(); VISIT_PREV = MODE;
-  MODE = 'visit'; SC = buildRealmScene(r); const m = SC.B.find(b => b.t === 'mastio'); centerCam(m.x + 1.5, m.y + 1.5); cam.z = VW < 600 ? 0.8 : 1;
+  MODE = 'visit'; SC = buildRealmScene(r); const m = SC.B.find(b => b.t === 'mastio'); centerCam(m.x + m.w / 2, m.y + m.h / 2); cam.z = VW < 600 ? 0.8 : 1;
   $('#title').classList.add('hidden'); $('#hud').classList.add('hidden'); $('#bhud').classList.add('hidden'); $('#rotbar').classList.remove('hidden');
   let el = $('#vbar'); if (!el) { el = document.createElement('div'); el.id = 'vbar'; document.body.appendChild(el); }
   const canAtk = S && VISIT_PREV === 'village' && r.lvl <= S.mastio + 3;

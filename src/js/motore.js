@@ -163,7 +163,7 @@ const TW = 64, TH = 32, RS = 2;
 function isoP(u, v, z) { return [(u - v) * TW / 2, (u + v) * TH / 2 - (z || 0)]; }
 // ---- view rotation (4 steps of 90°) ----
 // continuous angle ANG (radians) around the map centre; buildings/units are upright billboards
-let ANG = 0, RC = 1, RS_ = 0; const NMAP = 96, MC = 48, OFF = 32;
+let ANG = 0, RC = 1, RS_ = 0; const NMAP = 192, MC = 96, OFF = 80; // mappa 192×192 (4 volte la vecchia 96×96), villaggio al centro
 function setAng(a) { ANG = a; RC = Math.cos(a); RS_ = Math.sin(a); }
 function rstep() { return ((Math.round(ANG / (Math.PI / 2)) % 4) + 4) % 4; }
 function rotP(x, y) { const dx = x - MC, dy = y - MC; return [MC + dx * RC - dy * RS_, MC + dx * RS_ + dy * RC]; }
@@ -960,7 +960,7 @@ function bSpriteRect(b) { // world rect [x,y,w,h] of the sprite
 const RIVER_AT = { k: 'fiume', x: 19 + OFF, y: 19 + OFF, w: 13, h: 13 }, POND_AT = { k: 'lago', x: 3 + OFF, y: 21 + OFF, w: 7, h: 8 };
 function stampMask(arr, mask, x0, y0) { for (let ty = 0; ty < mask.length; ty++) for (let tx = 0; tx < mask[ty].length; tx++) if (mask[ty][tx] === '1') { const x = x0 + tx, y = y0 + ty; if (x >= 0 && y >= 0 && x < NMAP && y < NMAP) arr[y * NMAP + x] = 1; } }
 let WATER_V = null;
-const EXTRA_PONDS = NMAP > 64 ? [[14, 16], [74, 13], [15, 71], [73, 73], [60, 30]].map(([x, y]) => ({ k: 'lago', x, y, w: 7, h: 8 })) : [];
+const EXTRA_PONDS = NMAP > 64 ? [[62, 64], [122, 61], [63, 119], [121, 121], [108, 78], [30, 40], [150, 30], [40, 150], [160, 140], [96, 22], [22, 100], [170, 92], [100, 170]].map(([x, y]) => ({ k: 'lago', x, y, w: 7, h: 8 })) : [];
 function villageWater() { if (WATER_V) return WATER_V; const a = new Uint8Array(NMAP * NMAP); for (const p of EXTRA_PONDS) stampMask(a, EMASK.pond.mask, p.x, p.y); stampMask(a, EMASK.river.mask, RIVER_AT.x, RIVER_AT.y); stampMask(a, EMASK.pond.mask, POND_AT.x, POND_AT.y); return WATER_V = a; }
 function isWater(sc, x, y) { return !!(sc && sc.water && x >= 0 && y >= 0 && x < NMAP && y < NMAP && sc.water[y * NMAP + x]); }
 // ---------- audio ----------

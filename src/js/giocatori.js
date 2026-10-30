@@ -5,7 +5,7 @@ const RICON = { cibo: '🌾', legno: '🪵', oro: '🪙', pietra: '🪨', ferro:
 const RNAME = { cibo: 'Cibo', legno: 'Legno', oro: 'Oro', pietra: 'Pietra', ferro: 'Ferro', pelli: 'Pelli', favore: 'Favore Reale' };
 // building defs. max[] = max count per Mastio level 1..8. spr = sprite building (from Marco's art)
 const BDEF = {
-  mastio: { n: 'Mastio', w: 3, h: 3, hp: 1600, desc: 'Quartier generale del feudo. Il suo livello sblocca edifici, truppe ed eroi. Dal livello 5 diventa un Castello di pietra.', max: [1, 1, 1, 1, 1, 1, 1, 1], icon: '🏰', shoot: { range: 5.5, dmg: 8, cd: 1.3, type: 'arrow' }, pop: 2 },
+  mastio: { n: 'Mastio', w: 5, h: 5, hp: 1600, desc: 'Quartier generale del feudo. Il suo livello sblocca edifici, truppe ed eroi. Dal livello 5 diventa un Castello di pietra.', max: [1, 1, 1, 1, 1, 1, 1, 1], icon: '🏰', shoot: { range: 5.5, dmg: 8, cd: 1.3, type: 'arrow' }, pop: 2 },
   casa: { n: 'Casa', w: 2, h: 2, hp: 320, cost: { legno: 70, cibo: 30 }, prod: ['oro', 5], pop: 6, desc: 'Famiglie di contadini: +6 Popolazione per livello (posti esercito) e qualche tassa in oro.', max: [2, 3, 4, 5, 6, 7, 8, 9], icon: '🏠', t: 5, spr: 'casa' },
   taverna: { n: 'Taverna', w: 2, h: 2, hp: 450, cost: { legno: 90, oro: 20 }, prod: ['cibo', 42], desc: 'Cucina, salumi e pane per tutto il borgo. Produce molto Cibo.', max: [1, 1, 2, 2, 2, 3, 3, 3], icon: '🍖', t: 8, spr: 'taverna' },
   fattoria: { n: 'Fattoria', w: 3, h: 3, hp: 450, cost: { legno: 80 }, prod: ['cibo', 30], pop: 3, desc: 'Casa, fienile, mulino a vento e campi recintati. +30 Cibo/min, mantiene 3 abitanti in più e fornisce il fieno alla Stalla.', max: [2, 2, 3, 3, 4, 4, 5, 5], icon: '🌾', t: 6, spr: 'fattoria' },
@@ -202,9 +202,9 @@ let S = null;
 let SAVE_KEY = 'feudum_proto_v1';
 function newState() {
   return {
-    v: 1, mapv: 3, res: { cibo: 300, legno: 450, oro: 150, pietra: 0, ferro: 0, favore: 0 }, mastio: 1, mastioEnd: 0,
+    v: 1, mapv: 4, res: { cibo: 300, legno: 450, oro: 150, pietra: 0, ferro: 0, favore: 0 }, mastio: 1, mastioEnd: 0,
     buildings: [], army: { miliziano: 6, arccorto: 3 }, queue: [], heroes: {}, wins: 0, raids: 0, raidsWon: 0,
-    nightAt: 0, nightIn: DF().truce, last: Date.now(), targets: null, log: [], sound: true, nextId: 1, tut: 0, fauna: [], faunaIn: 0, mapv: 3, mq: 0, best3: 0
+    nightAt: 0, nightIn: DF().truce, last: Date.now(), targets: null, log: [], sound: true, nextId: 1, tut: 0, fauna: [], faunaIn: 0, mapv: 4, mq: 0, best3: 0
   };
 }
 // ---- salvataggio: nel browser + nel cloud del tuo account claude.ai (sopravvive a chiusure, cache pulita, altri dispositivi) ----
@@ -266,7 +266,7 @@ function builders() { if (S && S.creative) return 0; return S.buildings.filter(b
 const MAX_BUILDERS = 2;
 // ---------- initial state ----------
 function initialBuildings() {
-  const L = [['mastio', 14, 14], ['caserma', 8, 13], ['fattoria', 13, 7], ['capanna', 20, 14], ['granaio', 14, 20], ['casa', 8, 8], ['casa', 19, 8], ['torre', 6, 17], ['torre', 23, 10], ['stendardo', 13, 17], ['stendardo', 17, 13]];
+  const L = [['mastio', 13, 13], ['caserma', 8, 13], ['fattoria', 13, 7], ['capanna', 20, 14], ['granaio', 14, 20], ['casa', 8, 8], ['casa', 19, 8], ['torre', 6, 17], ['torre', 23, 10], ['stendardo', 12, 19], ['stendardo', 19, 12]];
   return L.map(([t, x, y]) => ({ id: S.nextId++, t, x: x + OFF, y: y + OFF, lvl: 1, stock: 0, end: 0 }));
 }
 function startNew() { S = newState(); S.buildings = initialBuildings(); save(); }

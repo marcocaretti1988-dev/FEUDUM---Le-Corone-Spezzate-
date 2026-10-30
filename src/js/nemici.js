@@ -290,8 +290,8 @@ function genEnemy(tg) {
   for (let i = 0; i < 4; i++) { const x = 3.5 + R() * (N - 7), y = 3.5 + R() * (N - 7); if (Math.hypot(x - MCX, y - MCX) > 9 && !isWater(sc, x | 0, y | 0)) sc.rocks.push({ x, y, s: 7, big: true }); }
   const c = N / 2 - 1; const add = (t, x, y, lvl) => { const dd = BDEF[t]; for (let yy = y; yy < y + dd.h; yy++) for (let xx = x; xx < x + dd.w; xx++) if (!inMap(xx, yy) || xx < 3 || yy < 3 || xx >= N - 3 || yy >= N - 3 || bAt(sc, xx, yy) || sc.water[yy * N + xx]) return null; const b = mkBuilding(t, x, y, lvl, 'D'); b.hp = Math.round(b.hp * DF().ehp); b.maxhp = b.hp; sc.B.push(b); sceneIndex(sc); return b; };
   const rl = Math.min(8, 1 + Math.floor(d * 0.75));
-  add('mastio', c - 1, c - 1, rl);
-  const r = d <= 2 ? 3 : d <= 5 ? 4 : 5; const wl = d >= 6 ? 2 : 1;
+  add('mastio', c - 2, c - 2, rl);
+  const r = d <= 2 ? 4 : d <= 5 ? 5 : 6; const wl = d >= 6 ? 2 : 1;
   sc.props = []; for (let i = 0; i < 6; i++) { const a = i / 6 * 6.283 + R() * 0.4, rr = r + 3 + R() * 1.5; const x = c + 0.5 + Math.cos(a) * rr, y = c + 0.5 + Math.sin(a) * rr; if (!isWater(sc, x | 0, y | 0)) sc.props.push({ x, y, yaw: a + Math.PI / 2, h: 104 + R() * 16 }); }
   // walls ring
   const gaps = d <= 2 ? 0.45 : d <= 4 ? 0.12 : 0;
@@ -351,7 +351,7 @@ function genRealmSiege(tg) {
   const d = tg.d; const pool = lootPool(d); const wt = b => ({ mastio: 3, bottino: 3, granaio: 2, fattoria: 1, torre: 0.3, balista: 0.4, casa: 1.2, taverna: 2, mercato: 2.5, municipio: 3, chiesa: 1.5, scuderia: 1.2, miniera: 1.5, fucina: 1.5, armeria: 1.5, infermeria: 1, capanna: 1.2, tesoreria: 3, cava: 1.5 })[b.t] || 0;
   const tot = sc.B.reduce((s, b) => s + wt(b), 0) || 1; for (const b of sc.B) { const w = wt(b); for (const k in pool) b.loot[k] = Math.round(pool[k] * w / tot); }
   const m = sc.B.find(b => b.t === 'mastio'); const roster = ENEMY_UNITS.slice(0, Math.min(ENEMY_UNITS.length, 2 + Math.floor(d / 1.5))); const nD = Math.max(2, Math.round((3 + d * 1.3) * DF().def)); const R = rng(r.seed + 5);
-  for (let i = 0, tries = 0; i < nD && tries < 200; tries++) { const a = R() * 6.28, rr = 2 + R() * 7; const x = m.x + 1.5 + Math.cos(a) * rr, y = m.y + 1.5 + Math.sin(a) * rr; if (!inMap(x | 0, y | 0) || bAt(sc, x | 0, y | 0) || isWater(sc, x | 0, y | 0)) continue; const u = mkUnit(roster[(R() * roster.length) | 0], 'D', x, y); u.guardR = 4.5; u.leash = 9; u.hp *= DF().ehp; u.maxhp *= DF().ehp; u.dm = DF().edmg; sc.U.push(u); i++; }
+  for (let i = 0, tries = 0; i < nD && tries < 200; tries++) { const a = R() * 6.28, rr = 2 + R() * 7; const x = m.x + m.w / 2 + Math.cos(a) * rr, y = m.y + m.h / 2 + Math.sin(a) * rr; if (!inMap(x | 0, y | 0) || bAt(sc, x | 0, y | 0) || isWater(sc, x | 0, y | 0)) continue; const u = mkUnit(roster[(R() * roster.length) | 0], 'D', x, y); u.guardR = 4.5; u.leash = 9; u.hp *= DF().ehp; u.maxhp *= DF().ehp; u.dm = DF().edmg; sc.U.push(u); i++; }
   sc.countable = sc.B.filter(b => !BDEF[b.t].wall && !BDEF[b.t].decor).length; return sc;
 }
 // ---------- battle flow ----------
@@ -388,7 +388,7 @@ function startRaid() {
   const count = Math.min(50, Math.max(2, Math.round((4 + lv * 2 + Math.min(10, S.raids)) * DF().raid)));
   const side = (Math.random() * 4) | 0;
   BT = { raid: true, timer: 150, heroes: heroList().map(k => ({ k, u: null })), avail: {}, used: {}, raiders: count, killed: 0, ended: false, spawnLeft: count, spawnT: 1.5, side, pool, pack, beasts: { lupo: 0, orso: 0 } };
-  SC = sc; SC.deploySel = null; SC.arms = armsMult();
+  SC = sc; SC.deploySel = null; SC.arms = armsMult(); BT.vrad = Math.max(0, ...sc.B.map(b => Math.hypot(b.x + b.w / 2 - MCX, b.y + b.h / 2 - MCX) + Math.max(b.w, b.h) / 2));
   SC.onUDead = u => { if (u.side === 'A') { BT.killed++; if (u.d.beast) BT.beasts[u.k]++; } };
   SC.onBDead = b => { const d = BDEF[b.t]; if (b.raidRef && (d.wall || d.gate)) { b.raidRef.rotto = 1; BT.rotti = (BT.rotti || 0) + 1; } };
   centerCam(MCX, MCX); cam.z = VW < 600 ? 0.75 : Math.max(0.6, Math.min(1.0, VW / 1250));
@@ -398,7 +398,7 @@ function raidSpawn(dt) {
   if (BT.spawnLeft <= 0) return; BT.spawnT -= dt; if (BT.spawnT > 0) return;
   BT.spawnT = 0.5; const n = Math.min(BT.spawnLeft, 3); BT.spawnLeft -= n;
   for (let i = 0; i < n; i++) {
-    const s = BT.side, ang = [-Math.PI / 2, 0, Math.PI / 2, Math.PI][s] + (Math.random() - .5) * 1.2, rr = 21 + Math.random() * 4;
+    const s = BT.side, ang = [-Math.PI / 2, 0, Math.PI / 2, Math.PI][s] + (Math.random() - .5) * 1.2, rr = Math.max(21, (BT.vrad || 0) + 5) + Math.random() * 4;
     const x = Math.max(3, Math.min(N - 3, MCX + Math.cos(ang) * rr)), y = Math.max(3, Math.min(N - 3, MCX + Math.sin(ang) * rr));
     if (isWater(SC, x | 0, y | 0)) { BT.spawnLeft++; continue; }
     const k = BT.pool[(Math.random() * BT.pool.length) | 0]; const u = mkUnit(k, 'A', x, y); u.hp *= DF().ehp; u.maxhp *= DF().ehp; u.dm = DF().edmg; SC.U.push(u);
