@@ -1322,6 +1322,7 @@ function drawBuilding(c, sc, b) {
   const sk = b.t === 'mastio' && G3.models.castello && G3.models.castello.ready ? 'castello' : (G3.models[b.t] && G3.models[b.t].ready ? b.t : bSprite(b));
   if (sk && G3.models[sk] && G3.models[sk].ready) {
     if (!BDEF[b.t].decor) { const p = plotCache(b.w, b.h); c.drawImage(p.cv, wx - p.ox, wy - p.oy, p.w, p.h); } else if (!DFIT[b.t]) { const [cx2, cy2] = W(b.x + b.w / 2, b.y + b.h / 2); c.fillStyle = 'rgba(0,0,0,0.2)'; c.beginPath(); c.ellipse(cx2, cy2, (b.w + b.h) * 13, (b.w + b.h) * 5.5, 0, 0, 7); c.fill(); } const ga = c.globalAlpha; if (b.ref && b.ref.end && b.ref.toLvl === 1) c.globalAlpha = 0.5; let k3 = sk, yaw = 0, fitm = 1;
+    if (b.t === 'cancello') { yaw = ((((b.ref && b.ref.rot) || 0) % 2) ? -1 : 1) * Math.PI / 4; fitm = 1.3; }
     if (b.t === 'tronco') { const hh = (((b.x * 7 + b.y * 13) | 0) >>> 0) + (b.ref ? b.ref.id : 0); yaw = [-Math.PI / 4, 3 * Math.PI / 4, Math.PI / 4, -3 * Math.PI / 4][hh % 4] + ((hh >> 2) % 5 - 2) * 0.07; }
     if (b.t === 'balista') { need3d('balista_b'); need3d('balista_c'); fitm = 0.68; if (b.yawT != null) { let d = b.yawT - (b.yaw || 0); while (d > Math.PI) d -= 2 * Math.PI; while (d < -Math.PI) d += 2 * Math.PI; b.yaw = (b.yaw || 0) + d * 0.18; } yaw = b.yaw || 0;
       const tf = b.fired != null ? sc.time - b.fired : 99; if (tf < 0.35 && G3.models.balista_c && G3.models.balista_c.ready) k3 = 'balista_c'; else if (tf < 1.4 && G3.models.balista_b && G3.models.balista_b.ready) k3 = 'balista_b'; }

@@ -32,7 +32,7 @@ const BDEF = {
   cripta: { n: 'Cripta degli Eroi', w: 2, h: 2, hp: 900, cost: { pietra: 160, oro: 90, legno: 40 }, desc: 'Qui riposano i veterani caduti, col loro nome e le loro gesta. Ogni eroe custodito dà +1% vita a tutte le truppe (massimo +15%).', max: [0, 0, 1, 1, 1, 1, 1, 1], icon: '⚱️', t: 14, spr: 'chiesa' },
   chiesa: { n: 'Chiesa', w: 2, h: 2, hp: 700, cost: { pietra: 200, legno: 120, oro: 100 }, req: 'municipio', desc: 'Pietra gotica, vetrate e campane. Morale: +10% vita a tutte le truppe. L\'Infermeria cura il 20% in più e di notte cura i difensori vicini.', max: [0, 0, 1, 1, 1, 1, 1, 1], icon: '⛪', t: 14, spr: 'chiesa' },
   accademia: { n: 'Accademia', w: 3, h: 3, hp: 800, cost: { legno: 300, pietra: 200, oro: 250 }, req: 'municipio', desc: 'Biblioteca e scuola di guerra: ricerche permanenti su armature, balistica e logistica.', max: [0, 0, 0, 1, 1, 1, 1, 1], icon: '📚', t: 18, spr: 'accademia' },
-  cancello: { n: 'Mura con Cancello', w: 2, h: 2, hp: 1000, cost: { pietra: 150, legno: 80, ferro: 30 }, gate: true, desc: 'Torri merlate, saracinesca e porta ferrata. 1000 vita, i nemici devono abbatterla, le tue truppe passano. Ospita 2 arcieri.', max: [0, 0, 1, 1, 2, 2, 3, 4], icon: '🏯', t: 12, shoot: { range: 6, dmg: 8, cd: 0.8, type: 'arrow' }, spr: 'cancello' },
+  cancello: { n: 'Mura con Cancello', w: 3, h: 3, hp: 1000, cost: { pietra: 150, legno: 80, ferro: 30 }, gate: true, desc: 'Torri merlate, saracinesca e porta ferrata. 1000 vita, i nemici devono abbatterla, le tue truppe passano. Ospita 2 arcieri.', max: [0, 0, 1, 1, 2, 2, 3, 4], icon: '🏯', t: 12, shoot: { range: 6, dmg: 8, cd: 0.8, type: 'arrow' }, spr: 'cancello' },
   // decorazioni / ostacoli naturali (acquistabili e rimovibili)
   funghi: { n: 'Funghi del Bosco', w: 1, h: 1, hp: 60, cost: { oro: 40 }, desc: 'Amanite rosse tra l\'erba e i fiori. Belle da vedere, da non mangiare.', max: [3, 4, 5, 6, 7, 8, 9, 10], icon: '🍄', t: 4, decor: true, spr: 'funghi', rm: { cost: { cibo: 5 }, t: 3, gain: { cibo: 40 } } },
   cespuglio: { n: 'Cespuglio', w: 1, h: 1, hp: 60, cost: { oro: 25 }, desc: 'Siepe fitta di foglie: verde e riparo per gli uccelli.', max: [4, 5, 6, 7, 8, 9, 10, 12], icon: '🌿', t: 4, decor: true, spr: 'cespuglio', rm: { cost: { cibo: 8 }, t: 5, gain: { legno: 20, cibo: 15 } } },
@@ -273,11 +273,11 @@ function startNew() { S = newState(); S.buildings = initialBuildings(); save(); 
 function mastioRef() { return S.buildings.find(b => b.t === 'mastio'); }
 
 // ---------- village scene ----------
-function occupiedBy(x, y, w, h, ignore) {
-  for (const b of S.buildings) { if (b === ignore) continue; const d = BDEF[b.t]; if (x < b.x + d.w && x + w > b.x && y < b.y + d.h && y + h > b.y) return b; }
+function occupiedBy(x, y, w, h, ignore, skipMuro) {
+  for (const b of S.buildings) { if (b === ignore || (skipMuro && b.t === 'muro')) continue; const d = BDEF[b.t]; if (x < b.x + d.w && x + w > b.x && y < b.y + d.h && y + h > b.y) return b; }
   return null;
 }
-function canPlace(t, x, y, ignore) { const d = BDEF[t]; if (x < 3 || y < 3 || x + d.w > N - 3 || y + d.h > N - 3) return false; const wv = villageWater(); for (let yy = y; yy < y + d.h; yy++) for (let xx = x; xx < x + d.w; xx++) if (wv[yy * N + xx]) return false; return !occupiedBy(x, y, d.w, d.h, ignore); }
+function canPlace(t, x, y, ignore) { const d = BDEF[t]; if (x < 3 || y < 3 || x + d.w > N - 3 || y + d.h > N - 3) return false; const wv = villageWater(); for (let yy = y; yy < y + d.h; yy++) for (let xx = x; xx < x + d.w; xx++) if (wv[yy * N + xx]) return false; return !occupiedBy(x, y, d.w, d.h, ignore, !!d.gate); }
 function buildVillage() {
   const sc = newScene('village'); villageSetup(sc);
   for (const r of S.buildings) { const b = mkBuilding(r.t, r.x, r.y, r.lvl, 'D', r); sc.B.push(b); }
@@ -472,7 +472,7 @@ function startPlacement(t, moveRef) {
   const [tx, ty] = screenToTile(VW / 2, VH / 2);
   placing = { t, w: d.w, h: d.h, x: Math.floor(tx - d.w / 2 + 0.5), y: Math.floor(ty - d.h / 2 + 0.5), move: moveRef || null };
   if (moveRef) { placing.x = moveRef.x; placing.y = moveRef.y; placing.rot = moveRef.rot || 0; } else { const f = findFree(t, placing.x, placing.y); if (f) { placing.x = f[0]; placing.y = f[1]; } }
-  { const girabile = !!(d.wall || (d.decor && DFIT[t] && !DYAW_RND[t])); $('#pbrot').classList.toggle('hidden', !girabile); }
+  { const girabile = !!(d.wall || d.gate || (d.decor && DFIT[t] && !DYAW_RND[t])); $('#pbrot').classList.toggle('hidden', !girabile); }
   $('#pbring').classList.toggle('hidden', !(d.wall && !moveRef));
   if (d.wall && !moveRef) { placing.line = true; placing.a = null; placing.b = null; updateGhost(); $('#placebar').classList.remove('hidden'); $('#hud-bot').classList.add('hidden'); wallInfo(); return; }
   updateGhost(); $('#placebar').classList.remove('hidden'); $('#hud-bot').classList.add('hidden');
@@ -530,7 +530,9 @@ function updateGhost() { if (!placing) { SC.ghost = null; SC.ghosts = null; retu
 function confirmPlace() {
   if (!placing) return; const d = BDEF[placing.t]; if (placing.line) { wallConfirm(); return; }
   if (!placing.ok) { toast('Spazio occupato o fuori dal feudo'); return; }
-  if (placing.move) { placing.move.x = placing.x; placing.move.y = placing.y; if (placing.rot != null) placing.move.rot = placing.rot; cancelPlace(); SC = buildVillage(); save(); return; }
+  // il cancello si apre nella palizzata: i pezzi sotto di lui vengono tolti
+  const sottoGate = () => { if (!d.gate) return; const sotto = S.buildings.filter(b => b.t === 'muro' && b.x >= placing.x && b.x < placing.x + d.w && b.y >= placing.y && b.y < placing.y + d.h); if (!sotto.length) return; S.buildings = S.buildings.filter(b => !sotto.includes(b)); const xs = new Set(sotto.map(b => b.x)).size, ys = new Set(sotto.map(b => b.y)).size; if (xs !== ys) placing.rot = ys > xs ? 1 : 0; }; // si gira da solo lungo la palizzata
+  if (placing.move) { sottoGate(); placing.move.x = placing.x; placing.move.y = placing.y; if (placing.rot != null) placing.move.rot = placing.rot; cancelPlace(); SC = buildVillage(); save(); return; }
   if (countB(placing.t) >= maxB(placing.t)) { toast('Limite raggiunto: alza il livello del Mastio'); cancelPlace(); return; }
   if (d.req && !S.creative && !hasB(d.req)) { toast(`Serve prima: ${BDEF[d.req].n}`); cancelPlace(); return; }
   if (!canPay(d.cost)) { const nm = d.n; cancelPlace(); needSheet(d.cost, 'costruire ' + nm); return; }
@@ -538,13 +540,13 @@ function confirmPlace() {
   pay(d.cost);
   const r = { id: S.nextId++, t: placing.t, x: placing.x, y: placing.y, lvl: 1, stock: 0, end: d.t && !S.creative ? now() + buildSecs(d) * 1000 * seasonBuildMul() : 0, dur: buildSecs(d) * 1000 * seasonBuildMul(), toLvl: 1 };
   if (placing.t === 'muro' && S.mastio >= 5) r.lvl = 1;
-  if (placing.rot) r.rot = placing.rot;
+  sottoGate(); if (placing.rot) r.rot = placing.rot;
   S.buildings.push(r); sfx('build'); SC = buildVillage(); save(); updateHUD();
   if (d.wall || d.decor) { // keep placing next
     const nx = placing.x + 1; placing.x = nx; if (!canPlace(placing.t, placing.x, placing.y)) { const f = findFree(placing.t, placing.x, placing.y); if (f) { placing.x = f[0]; placing.y = f[1]; } } if (countB(placing.t) >= maxB(placing.t) || !canPay(d.cost)) { cancelPlace(); return; } updateGhost(); $('#placeinfo').innerHTML = `<b>${d.n}</b> ${countB(placing.t)}/${maxB(placing.t)} — tocca per posizionare, ✓ per costruire`;
   } else cancelPlace();
 }
-function rotPlace() { if (!placing) return; const d = BDEF[placing.t]; if (placing.line) { placing.lflip = !placing.lflip; updateGhost(); wallInfo(); sfx('tock'); toast('↻ Angolo della palizzata girato'); return; } placing.rot = ((placing.rot || 0) + 1) % (d.wall ? 5 : 4); updateGhost(); sfx('tock'); if (d.wall) toast('↻ Direzione: ' + WALL_DIR[placing.rot]); }
+function rotPlace() { if (!placing) return; const d = BDEF[placing.t]; if (placing.line) { placing.lflip = !placing.lflip; updateGhost(); wallInfo(); sfx('tock'); toast('↻ Angolo della palizzata girato'); return; } placing.rot = ((placing.rot || 0) + 1) % (d.wall ? 5 : d.gate ? 2 : 4); updateGhost(); sfx('tock'); if (d.wall) toast('↻ Direzione: ' + WALL_DIR[placing.rot]); }
 function cancelPlace() { placing = null; if (SC) { SC.ghost = null; SC.ghosts = null; } $('#placebar').classList.add('hidden'); $('#hud-bot').classList.remove('hidden'); }
 function nudge(dx, dy) { if (!placing) return; [dx, dy] = rotVinv(dx, dy).map(Math.round); if (placing.line) { const k = placing.b ? 'b' : 'a'; if (!placing[k]) { const [tx, ty] = screenToTile(VW / 2, VH / 2); placing.a = [Math.floor(tx), Math.floor(ty)]; } else placing[k] = [placing[k][0] + dx, placing[k][1] + dy]; updateGhost(); wallInfo(); return; } placing.x += dx; placing.y += dy; updateGhost(); }
 

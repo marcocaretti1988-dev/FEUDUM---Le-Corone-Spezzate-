@@ -152,7 +152,7 @@ function openArms() { if (!S) return; if (!S.arms) S.arms = Object.assign({}, AR
     <div class="acts"><button class="btn" onclick="closeSheet()">✓ Fatto</button></div></div>`, 'arms'); }
 function setArms(k, v) { if (!S.arms) S.arms = Object.assign({}, ARMS()); S.arms[k] = v; for (const key in CACHE) if (key.startsWith('stendardo')) delete CACHE[key]; save(); updateHUD(); openArms(); }
 const WALL_DIR = ['automatica (segue i pezzi vicini)', 'dritta ↘', 'dritta ↙', 'in diagonale ↕', 'in diagonale ↔'];
-function rotDeco(id) { const r = S.buildings.find(b => b.id === id); if (!r) return; r.rot = ((r.rot || 0) + 1) % (BDEF[r.t].wall ? 5 : 4); if (BDEF[r.t].wall) toast('↻ Direzione: ' + WALL_DIR[r.rot]); const b = SC && SC.B.find(x => x.ref === r); if (b) { b.c3k = null; } save(); sfx('tock'); }
+function rotDeco(id) { const r = S.buildings.find(b => b.id === id); if (!r) return; r.rot = ((r.rot || 0) + 1) % (BDEF[r.t].wall ? 5 : BDEF[r.t].gate ? 2 : 4); if (BDEF[r.t].wall) toast('↻ Direzione: ' + WALL_DIR[r.rot]); const b = SC && SC.B.find(x => x.ref === r); if (b) { b.c3k = null; } save(); sfx('tock'); }
 let BTAB = 'b';
 function openBuild(tab) {
   if (tab) BTAB = tab; const deco = BTAB === 'd';
@@ -211,6 +211,7 @@ function openBuildingInfo(r) {
   body += `<div class="acts">`;
   if (r.t === 'mercato' && !r.end) body += `<button class="btn" onclick="openMarket()">⚖ Commercia<small>compra e vendi risorse</small></button><button class="btn ghost" onclick="openDiplo()">🤝 Diplomazia</button>`;
   if (d.decor && d.rm) { if (workOn('obj', r.id)) body += `<button class="btn dis">🪓 In rimozione… ${fmtT(workOn('obj', r.id).end - now())}</button>`; else if (r.nat) body += `<button class="btn" onclick="removeObj(${r.id})">✖ Rimuovi<small>${Object.keys(d.rm.cost).length ? costStr(d.rm.cost) : 'gratis'} · ⏱ ${d.rm.t || 4}s → ${Object.keys(d.rm.gain).map(k => ICO(k) + ' +' + d.rm.gain[k]).join(' ')}${r.t === 'funghi' ? ' (+👑?)' : ''}</small></button>`; else body += `<button class="btn" onclick="removeObj(${r.id})">✖ Rimuovi<small>${costStr({ cibo: 5 })} · ⏱ 3s · rimborso ${Object.keys(d.cost).map(k => ICO(k) + ' ' + Math.floor(d.cost[k] / 2)).join(' ')}</small></button>`; }
+  else if (r.t === 'muro') { const n = S.buildings.filter(b => b.t === 'muro' && b.lvl < 2 && !b.end).length; body += r.lvl >= 2 ? `<button class="btn dis">⬆ Già in pietra</button>` : S.mastio < 5 ? `<button class="btn dis">⬆ Mura di pietra dal Mastio 5</button>` : `<button class="btn" onclick="upgradeAllWalls()">🧱 Migliora tutta la palizzata<small>${n} pezzi in pietra · ${costStr({ pietra: 12 * n })}</small></button>`; }
   else if (!why) body += `<button class="btn" onclick="doUpgrade(${r.id})">⬆ Migliora a liv. ${r.lvl + 1}<small>${costStr(upCost(r))} ${upTime(r) ? '· ⏱ ' + fmtT(upTime(r) * 1000) : ''}</small></button>`;
   else if (!d.decor) body += `<button class="btn dis">⬆ ${why}</button>`;
   if (res && r.stock >= 1) body += `<button class="btn" onclick="collect(S.buildings.find(b=>b.id===${r.id}));openBuildingInfo(S.buildings.find(b=>b.id===${r.id}))">${ICO(res)} Raccogli ${Math.floor(r.stock)}</button>`;
@@ -219,11 +220,11 @@ function openBuildingInfo(r) {
   if (r.t === 'accademia' && !r.end) extra += `<h4>Ricerche (max liv. ${Math.min(5, lvlSum('accademia') * 2)})</h4><div class="ulist">${Object.keys(TECH).map(k => { const T = TECH[k], l = tech(k); return `<div class="urow"><div class="uimg" style="display:flex;align-items:center;justify-content:center;font-size:28px">${T.icon}</div><div class="uinfo"><b>${T.n}</b> <span class="cnt">liv. ${l}</span><div class="role">${T.d}</div></div><div class="ubtn">${l < 5 ? `<button class="btn sm" onclick="doResearch('${k}',${r.id})">Studia<small>${costStr(T.cost(l + 1))}</small></button>` : '<span class="ok">Max</span>'}</div></div>`; }).join('')}</div>`;
   if (d.army || r.t === 'monastero' || r.t === 'scuderia') body += `<button class="btn" onclick="openArmy()">⚔ Addestra</button>`;
   if (r.t === 'muro') body += `<button class="btn" onclick="closeRing()">🏰 Chiudi il recinto<small>attorno a tutto il villaggio</small></button>`;
-  if (r.t === 'muro' && S.mastio >= 5) body += `<button class="btn" onclick="upgradeAllWalls()">🧱 Tutte in pietra<small>🪨 12 l'una</small></button>`;
+  if (false) body += `<button class="btn" onclick="upgradeAllWalls()">🧱 Tutte in pietra<small>🪨 12 l'una</small></button>`;
   if (r.nat) body = body.replace('<p class="desc">', '<p class="desc"><b>Ostacolo naturale.</b> Impedisce di costruire qui: rimuovilo per liberare spazio e ottenere risorse. ');
   if (r.t !== 'mastio' && !(d.decor && d.rm)) body += workOn('demo', r.id) ? `<button class="btn dis">🔨 Demolizione… ${fmtT(workOn('demo', r.id).end - now())}</button>` : `<button class="btn ghost" onclick="demolish(${r.id})">🔨 Demolisci<small>${costStr({ cibo: 10 * r.lvl })} · ⏱ ${Math.max(4, Math.round((d.t || 4) * 0.6 * r.lvl))}s · rimborso 30%</small></button>`;
   if (r.t !== 'mastio' && !r.nat) body += `<button class="btn ghost" onclick="startPlacement('${r.t}', S.buildings.find(b=>b.id===${r.id}))">✥ Sposta</button>`;
-  if ((d.decor && DFIT[r.t] && !DYAW_RND[r.t]) || d.wall) body += `<button class="btn ghost" onclick="rotDeco(${r.id})">↻ Ruota</button>`;
+  if ((d.decor && DFIT[r.t] && !DYAW_RND[r.t]) || d.wall || d.gate) body += `<button class="btn ghost" onclick="rotDeco(${r.id})">↻ Ruota</button>`;
   body += `</div>`;
   body = body.replace('<div class="acts">', extra + '<div class="acts">');
   openSheet(`${d.icon} ${d.n}`, body, 'b:' + r.id);

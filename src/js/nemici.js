@@ -50,7 +50,7 @@ function nearestUnit0(sc, u, side, maxD) { let best = null, bd = maxD; for (cons
 function pickBuilding(sc, u) {
   let best = null, bd = 1e9; const towersFirst = u.pl && sc.order === 'towers';
   for (const b of sc.B) {
-    if (b.dead || b.side === u.side) continue; const d = BDEF[b.t]; if (d.wall || d.decor) continue;
+    if (b.dead || b.side === u.side) continue; const d = BDEF[b.t]; if (d.wall || d.decor || (u.d.beast && d.gate)) continue;
     let dist = distToB(u.x, u.y, b); if (u.pl) { let n = 0; for (const o of sc.U) if (!o.dead && o.pl && o !== u && o.tgt === b) n++; dist += n * (0.5 + 2.5 / Math.max(1, b.w * b.h)); }
     if (u.d.bld && !d.shoot) dist *= 0.9; if (towersFirst) dist *= d.shoot ? 0.25 : 3;
     if (dist < bd) { bd = dist; best = b; }
@@ -62,12 +62,18 @@ function costFnFor(sc, u, tgt) {
     if (sc.water[y * N + x]) return Infinity;
     const b = bAt(sc, x, y); if (!b) return 1;
     if (b === tgt) return 1;
-    if (BDEF[b.t].wall || BDEF[b.t].gate) return u.side === b.side ? 1.5 : (BDEF[b.t].gate ? 14 : 7);
+    if (BDEF[b.t].wall || BDEF[b.t].gate) return u.side === b.side ? 1.5 : u.d.beast ? Infinity : (BDEF[b.t].gate ? 14 : 7);
     if (BDEF[b.t].moat) return u.side === b.side ? 1.3 : 6;
     if (BDEF[b.t].decor) return 2;
     return Infinity;
   };
 }
+// bestie fuori dal recinto: girano lungo la palizzata in attesa (gli arcieri delle torri possono colpirle)
+function beastProwl(sc, u, dt) {
+  if (u.pw && u.pw.path && u.pw.i < u.pw.path.length) { const [px, py] = u.pw.path[u.pw.i]; if (moveTo(sc, u, px + 0.5, py + 0.5, dt)) u.pw.i++; return; }
+  u.pw = u.pw || {}; u.pw.wait = (u.pw.wait || 0) - dt; if (u.pw.wait > 0) return; u.pw.wait = 1 + Math.random() * 2.5;
+  for (let k = 0; k < 6; k++) { const a = Math.random() * 6.283, r = 2 + Math.random() * 4, tx = Math.floor(u.x + Math.cos(a) * r), ty = Math.floor(u.y + Math.sin(a) * r); if (!inMap(tx, ty) || bAt(sc, tx, ty) || isWater(sc, tx, ty)) continue;
+    const p = astar(Math.floor(u.x), Math.floor(u.y), (x, y) => x === tx && y === ty, costFnFor(sc, u, null), tx, ty, 500); if (p) { u.pw.path = p; u.pw.i = 0; return; } } }
 function repath(sc, u) {
   const t = u.tgt; if (!t) { u.path = null; return; }
   const r = Math.max(u.d.rng, 0.75);
@@ -144,7 +150,8 @@ function updateScene(sc, dt) {
     if (u.wall && u.wall.dead) { u.wall = null; u.path = null; }
     const foe = enemiesOf(u.side);
     if (u.side === 'A') {
-      if (u.rt <= 0) {
+      if (u.prowlT > 0) u.prowlT -= dt;
+      if (u.rt <= 0 && !(u.d.beast && u.prowlT > 0)) {
         u.rt = 0.5;
         const aggro = u.d.ranged ? u.d.rng + 1 : 2.6;
         const hero = u.pl && sc.order === 'hero' && !u.hero ? sc.U.find(o => o.hero && o.pl && !o.dead) : null;
@@ -155,6 +162,8 @@ function updateScene(sc, dt) {
         if (nu && (!u.tgt || u.tgt.isB)) { u.tgt = nu; u.wall = null; repath(sc, u); }
         else if (!u.tgt) { u.tgt = pickBuilding(sc, u); if (u.tgt) repath(sc, u); } }
       }
+      // le bestie non sfondano le palizzate: se non c'è un passaggio rinunciano e girano fuori dal recinto
+      if (u.d.beast && u.tgt && !u.path && distTo(u, u.tgt) > Math.max(u.d.rng, 0.7) + 0.5) { u.tgt = null; u.wall = null; u.prowlT = 3 + Math.random() * 2; }
     } else { // defender guard
       if (u.rt <= 0) {
         u.rt = 0.5;
@@ -185,6 +194,7 @@ function updateScene(sc, dt) {
           else if (moveTo(sc, u, px + 0.5, py + 0.5, dt)) u.pi++;
         }
       }
+    } else if (u.d.beast) { beastProwl(sc, u, dt);
     } else if (u.side === 'D') {
       if (Math.hypot(u.x - u.post.x, u.y - u.post.y) > 0.4) moveTo(sc, u, u.post.x, u.post.y, dt);
     } else if (u.follow && u.path && u.pi < u.path.length) { const [px, py] = u.path[u.pi]; if (moveTo(sc, u, px + 0.5, py + 0.5, dt)) u.pi++; }
