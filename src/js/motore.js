@@ -1460,7 +1460,7 @@ function rotateView(d) {
 }
 function snapRot(pivot, sx, sy) { const tgt = Math.round(ANG / Q90) * Q90; animRot(tgt, Math.min(0.35, 0.12 + Math.abs(tgt - ANG) * 0.5), pivot); if (sx != null) { ROTA.px = sx; ROTA.py = sy; } }
 function centerCam(tx, ty) { const [wx, wy] = W(tx, ty); cam.x = wx; cam.y = wy; }
-function clampCam() { cam.z = Math.max(0.32, Math.min(2.4, cam.z)); cam.x = Math.max(-N * 30, Math.min(N * 30, cam.x)); cam.y = Math.max(N * 2, Math.min(N * 30, cam.y)); }
+function clampCam() { cam.z = Math.max(0.16, Math.min(2.4, cam.z)); cam.x = Math.max(-N * 30, Math.min(N * 30, cam.x)); cam.y = Math.max(N * 2, Math.min(N * 30, cam.y)); }
 const ptr = new Map(); let G = null, holdTimer = null, holdIv = null, lastPos = null;
 function stopHold() { clearTimeout(holdTimer); clearInterval(holdIv); holdTimer = holdIv = null; }
 cv.addEventListener('pointerdown', e => {
@@ -1479,7 +1479,7 @@ cv.addEventListener('pointermove', e => {
   else if (G.k === 'pinch' && ptr.size >= 2) {
     const [a, b] = [...ptr.values()]; let da = Math.atan2(b.y - a.y, b.x - a.x) - G.f0; while (da > Math.PI) da -= 2 * Math.PI; while (da < -Math.PI) da += 2 * Math.PI;
     if (MODE !== 'title' && (G.rot || Math.abs(da) > 0.14)) { if (!G.rot) { G.rot = true; G.f0 += Math.sign(da) * 0.14; da -= Math.sign(da) * 0.14; } setAng(G.a0 - da); }
-    const d = Math.hypot(a.x - b.x, a.y - b.y); cam.z = Math.max(0.32, Math.min(2.4, G.z0 * d / G.d0));
+    const d = Math.hypot(a.x - b.x, a.y - b.y); cam.z = Math.max(0.16, Math.min(2.4, G.z0 * d / G.d0));
     const mx = (a.x + b.x) / 2, my = (a.y + b.y) / 2; keepPivot(G.pivot, mx, my); G.mx = mx; G.my = my; clampCam(); }
   else if (G.k === 'twist') { setAng(G.a0 + (e.clientX - G.sx) * 0.009); keepPivot(G.pivot, VW / 2, VH / 2); }
 });
@@ -1492,7 +1492,7 @@ function endPtr(e) {
 cv.addEventListener('pointerup', endPtr); cv.addEventListener('pointercancel', endPtr);
 cv.addEventListener('contextmenu', e => e.preventDefault());
 window.addEventListener('keydown', e => { if (e.key === 'q' || e.key === 'Q') rotateView(-1); if (e.key === 'e' || e.key === 'E') rotateView(1); });
-cv.addEventListener('wheel', e => { e.preventDefault(); const z0 = cam.z, z = Math.max(0.32, Math.min(2.4, z0 * Math.exp(-e.deltaY * 0.0015))); const wx = (e.clientX - VW / 2) / z0 + cam.x, wy = (e.clientY - VH / 2) / z0 + cam.y; cam.z = z; cam.x = wx - (e.clientX - VW / 2) / z; cam.y = wy - (e.clientY - VH / 2) / z; clampCam(); }, { passive: false });
+cv.addEventListener('wheel', e => { e.preventDefault(); const z0 = cam.z, z = Math.max(0.16, Math.min(2.4, z0 * Math.exp(-e.deltaY * 0.0015))); const wx = (e.clientX - VW / 2) / z0 + cam.x, wy = (e.clientY - VH / 2) / z0 + cam.y; cam.z = z; cam.x = wx - (e.clientX - VW / 2) / z; cam.y = wy - (e.clientY - VH / 2) / z; clampCam(); }, { passive: false });
 function onTap(sx, sy) {
   if (MODE === 'visit') { visitTap(sx, sy); return; }
   if (MODE === 'attack' || MODE === 'raid') { deployAt(sx, sy); return; }
