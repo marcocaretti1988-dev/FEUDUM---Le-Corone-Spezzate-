@@ -1140,7 +1140,7 @@ function sceneIndex(sc) {
   // wall masks
   for (const b of sc.B) if (BDEF[b.t].moat) { const at = (x, y) => { if (!inMap(x, y)) return false; const i = sc.grid[y * N + x]; return i >= 0 && BDEF[sc.B[i].t].moat; }; b.mask = (at(b.x + 1, b.y) ? 1 : 0) | (at(b.x - 1, b.y) ? 2 : 0) | (at(b.x, b.y + 1) ? 4 : 0) | (at(b.x, b.y - 1) ? 8 : 0); }
   for (const b of sc.B) if (BDEF[b.t].wall) {
-    const at = (x, y) => { if (!inMap(x, y)) return false; const i = sc.grid[y * N + x]; return i >= 0 && BDEF[sc.B[i].t].wall; };
+    const at = (x, y) => { if (!inMap(x, y)) return false; const i = sc.grid[y * N + x]; if (i < 0) return false; const o = sc.B[i], d = BDEF[o.t]; return d.wall || (!d.decor && !d.moat && !(o.ref && o.ref.nat)); };
     b.mask = (at(b.x + 1, b.y) ? 1 : 0) | (at(b.x - 1, b.y) ? 2 : 0) | (at(b.x, b.y + 1) ? 4 : 0) | (at(b.x, b.y - 1) ? 8 : 0);
   }
 }
@@ -1204,6 +1204,7 @@ function render(sc, dt) {
   // selection
   if (sc.selN) { const [x, y] = W(sc.selN.x, sc.selN.y); c.strokeStyle = 'rgba(255,230,140,0.95)'; c.lineWidth = 2; c.fillStyle = 'rgba(255,230,140,0.18)'; c.beginPath(); c.ellipse(x, y, 24, 12, 0, 0, 7); c.fill(); c.stroke(); }
   if (sc.sel && !sc.sel.dead) { const b = sc.sel; poly(c, [W(b.x, b.y), W(b.x + b.w, b.y), W(b.x + b.w, b.y + b.h), W(b.x, b.y + b.h)], 'rgba(255,230,140,0.18)', 'rgba(255,230,140,0.9)', 2); }
+  if (sc.ghosts) for (const gh of sc.ghosts) poly(c, [W(gh.x, gh.y), W(gh.x + 1, gh.y), W(gh.x + 1, gh.y + 1), W(gh.x, gh.y + 1)], 'rgba(120,220,120,0.3)', '#9f9', 1.2);
   if (sc.ghost) { const ok = sc.ghost.ok; const gh = sc.ghost; poly(c, [W(gh.x, gh.y), W(gh.x + gh.w, gh.y), W(gh.x + gh.w, gh.y + gh.h), W(gh.x, gh.y + gh.h)], ok ? 'rgba(120,220,120,0.35)' : 'rgba(230,80,60,0.4)', ok ? '#9f9' : '#f88', 2); }
   // drawables
   const L = [];
@@ -1215,6 +1216,7 @@ function render(sc, dt) {
   const bans = (sc.mode === 'village' || sc.mode === 'raid') && PATHC.banners && sc.pathG === PATHC.grid ? PATHC.banners : sc.props || []; for (const l of bans) { const [wx, wy] = W(l.x, l.y); if (vis(wx, wy)) { const p = rotP(l.x, l.y); L.push([p[0] + p[1], 9, l]); } }
   if ((sc.mode === 'village' || sc.mode === 'raid') && PATHC.lamps && sc.pathG === PATHC.grid) for (const l of PATHC.lamps) { const [wx, wy] = W(l.x, l.y); if (vis(wx, wy)) { const p = rotP(l.x, l.y); L.push([p[0] + p[1], 8, l]); } }
   if (sc.ghost && sc.ghost.t) { const vr = vRect(sc.ghost); L.push([vr[0] + vr[1] + (sc.ghost.w + sc.ghost.h) / 2, 4, sc.ghost]); }
+  if (sc.ghosts) for (const gh of sc.ghosts) { const vr = vRect(gh); L.push([vr[0] + vr[1] + 1, 4, gh]); }
   L.sort((a, b) => a[0] - b[0]);
   for (const [, kind, o] of L) {
     if (kind === 0) drawBuilding(c, sc, o);
@@ -1233,7 +1235,7 @@ function render(sc, dt) {
       c.drawImage(f.img || BATL, f[0], f[1], f[2], f[3], -w / 2, -h + 2, w, h); c.restore(); c.globalAlpha = 1; } }
     else if (kind === 4) { // anteprima di piazzamento: lo stesso modello che verrà costruito
       let fb = o._fb; if (!fb || fb.t !== o.t) fb = o._fb = { t: o.t, x: o.x, y: o.y, w: o.w, h: o.h, lvl: 1, seed: 0, mask: 0, id: -7, side: 'D', hp: 1, maxhp: 1, aim: {}, ghost: true, ref: { rot: o.rot || 0 } };
-      fb.x = o.x; fb.y = o.y; fb.ref.rot = o.rot || 0; fb._wu = fb._wv = fb._wd = fb._we = null; const mk = o.t === 'mastio' ? 'castello' : o.t; if (!G3.models[mk]) need3d(mk);
+      fb.x = o.x; fb.y = o.y; fb.ref.rot = o.rot || 0; fb.mask = o.mask || 0; fb._wu = fb._wv = fb._wd = fb._we = null; const mk = o.t === 'mastio' ? 'castello' : BDEF[o.t].wall ? 'palizzata' : o.t; if (!G3.models[mk]) need3d(mk);
       c.globalAlpha = 0.7; if ((G3.models[mk] && G3.models[mk].ready) || PAINT[o.t] || (bSprite(fb) && BATL_OK)) drawBuilding(c, sc, fb); else { poly(c, [W(o.x, o.y), W(o.x + o.w, o.y), W(o.x + o.w, o.y + o.h), W(o.x, o.y + o.h)], 'rgba(255,240,200,0.25)', 'rgba(255,240,200,0.8)', 1.5); const [cx, cy] = W(o.x + o.w / 2, o.y + o.h / 2); c.font = '22px serif'; c.textAlign = 'center'; c.fillText(BDEF[o.t].icon || '?', cx, cy - 8); c.textAlign = 'start'; } c.globalAlpha = 1; }
   }
   drawWorks(c, sc);
@@ -1489,6 +1491,7 @@ function onTap(sx, sy) {
   if (MODE === 'attack' || MODE === 'raid') { deployAt(sx, sy); return; }
   if (MODE !== 'village') return;
   const [tx, ty] = screenToTile(sx, sy);
+  if (placing && placing.line) { wallTap(tx, ty); return; }
   if (placing) { const d = BDEF[placing.t]; placing.x = Math.floor(tx - d.w / 2 + 0.5); placing.y = Math.floor(ty - d.h / 2 + 0.5); updateGhost(); return; }
   // pick building: prefer one whose sprite area contains point; test tile then tiles below (tall sprites)
   let hit = bAt(SC, Math.floor(tx), Math.floor(ty));
