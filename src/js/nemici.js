@@ -62,7 +62,7 @@ function costFnFor(sc, u, tgt) {
     if (sc.water[y * N + x]) return Infinity;
     const b = bAt(sc, x, y); if (!b) return 1;
     if (b === tgt) return 1;
-    if (BDEF[b.t].wall || BDEF[b.t].gate) return u.side === b.side ? 1.5 : u.d.beast ? Infinity : (BDEF[b.t].gate ? 14 : 7);
+    if (BDEF[b.t].wall || BDEF[b.t].gate) return u.side === b.side ? 1.5 : (BDEF[b.t].gate ? 14 : 7);
     if (BDEF[b.t].moat) return u.side === b.side ? 1.3 : 6;
     if (BDEF[b.t].decor) return 2;
     return Infinity;
@@ -107,6 +107,7 @@ function dealDamage(sc, t, amt, src, kind) {
     if (src && src.d && src.d.bld) amt *= 1.6;
     if (src && src.d && src.d.ranged && !src.hero && !src.d.siege) amt *= 0.55;
     if (src && src.d && src.d.siege === 'ram' && (BDEF[t.t].wall || BDEF[t.t].gate)) amt *= 3;
+    if (src && src.d && src.d.beast && (BDEF[t.t].wall || BDEF[t.t].gate)) amt *= 2; // zanne e artigli sui tronchi
   }
   if (t.df) amt *= t.df; t.hp -= amt; t.hitT = 0.15; if (amt > 30 && sc.mode !== 'village') shake(amt > 60 ? 4 : 2);
   if (t.hp <= 0 && t.duro) { t.duro = 0; t.hp = Math.max(1, t.maxhp * 0.15); t.inv = 1.2; floatText(sc, t.x, t.y, '💀 Duro a Morire!', '#ffd27a', 1.3); }
@@ -374,7 +375,7 @@ function firstAvail() { for (const k of UNIT_ORDER) if (BT.avail[k] > 0) return 
 function startRaid() {
   closeSheet(); closeFolk(); MODE = 'raid'; sfx('bell'); S.raids++; tensionStart('raid');
   const sc = newScene('raid'); villageSetup(sc);
-  for (const r of S.buildings) { const b = mkBuilding(r.t, r.x, r.y, r.lvl, 'D', null); b.raidRef = r; if (r.end) b.inactive = true; sc.B.push(b); }
+  for (const r of S.buildings) { const b = mkBuilding(r.t, r.x, r.y, r.lvl, 'D', null); b.raidRef = r; if (r.end) b.inactive = true; if (r.rotto) { b.dead = true; b.deadT = 99; b.hp = 0; } sc.B.push(b); }
   sceneIndex(sc); try { computePaths(sc); } catch (e) { }
   sc.countable = sc.B.filter(b => !BDEF[b.t].wall && !BDEF[b.t].decor).length;
   // defenders = army
@@ -389,6 +390,7 @@ function startRaid() {
   BT = { raid: true, timer: 150, heroes: heroList().map(k => ({ k, u: null })), avail: {}, used: {}, raiders: count, killed: 0, ended: false, spawnLeft: count, spawnT: 1.5, side, pool, pack, beasts: { lupo: 0, orso: 0 } };
   SC = sc; SC.deploySel = null; SC.arms = armsMult();
   SC.onUDead = u => { if (u.side === 'A') { BT.killed++; if (u.d.beast) BT.beasts[u.k]++; } };
+  SC.onBDead = b => { const d = BDEF[b.t]; if (b.raidRef && (d.wall || d.gate)) { b.raidRef.rotto = 1; BT.rotti = (BT.rotti || 0) + 1; } };
   centerCam(MCX, MCX); cam.z = VW < 600 ? 0.75 : Math.max(0.6, Math.min(1.0, VW / 1250));
   showBattleHUD(); toast(BT.pack ? '🐺 Ululati nella notte! Un branco di lupi e orsi scende dai boschi…' : '🔔 Le campane suonano! Predoni e bestie arrivano con la nebbia…'); if (BT.pack) sfx('horn');
 }
@@ -508,6 +510,7 @@ function endBattle() {
     if (won) { S.raidsWon++; const b = addRes('oro', 12 * BT.raiders); const f = addRes('favore', 1); stolen = null; html = `<h3>Il feudo resiste!</h3><p class="sub">Predoni respinti: ${BT.killed}/${BT.raiders}</p><div class="row"><b>Taglia sui briganti:</b> 🪙 ${b}  👑 ${f}</div>`; }
     else { const k = Math.min(0.35, BT.pct / 100 * 0.6); for (const r of ['cibo', 'legno', 'oro']) { stolen[r] = Math.floor(S.res[r] * k); S.res[r] -= stolen[r]; } html = `<h3>I predoni fuggono col bottino</h3><p class="sub">Distruzione ${BT.pct}% — predoni abbattuti ${BT.killed}/${BT.raiders}</p><div class="row"><b>Rubato:</b> ${Object.keys(stolen).map(k => `${ICO(k)} ${stolen[k]}`).join('  ')}</div>`; }
     const pl = BT.beasts.lupo * 1 + BT.beasts.orso * 3; if (pl) { const gp = addRes('pelli', pl); html += `<div class="row"><b>Bestie abbattute:</b> 🐺 ${BT.beasts.lupo} · 🐻 ${BT.beasts.orso} → 🧥 +${gp} Pelli</div>`; }
+    if (BT.rotti) html += `<div class="row"><b>🔧 Breccia nelle difese:</b> ${BT.rotti} ${BT.rotti > 1 ? 'pezzi rotti' : 'pezzo rotto'} — tocca le macerie per riparare</div>`;
     html += `<div class="row"><b>Difensori caduti:</b> ${Object.keys(dead).map(k => `${UDEF[k].n} ×${dead[k]}`).join(', ') || 'nessuno'}</div>${cureLine}<p class="lore">Le mura vengono rattoppate all'alba. Il prossimo buio arriverà.</p>`;
     S.nightIn = DF().night * seasonRaidMul() * (S.mastio <= 4 ? 1.4 : 1);
   }

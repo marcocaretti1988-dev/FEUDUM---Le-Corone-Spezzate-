@@ -280,7 +280,7 @@ function occupiedBy(x, y, w, h, ignore, skipMuro) {
 function canPlace(t, x, y, ignore) { const d = BDEF[t]; if (x < 3 || y < 3 || x + d.w > N - 3 || y + d.h > N - 3) return false; const wv = villageWater(); for (let yy = y; yy < y + d.h; yy++) for (let xx = x; xx < x + d.w; xx++) if (wv[yy * N + xx]) return false; return !occupiedBy(x, y, d.w, d.h, ignore, !!d.gate); }
 function buildVillage() {
   const sc = newScene('village'); villageSetup(sc);
-  for (const r of S.buildings) { const b = mkBuilding(r.t, r.x, r.y, r.lvl, 'D', r); sc.B.push(b); }
+  for (const r of S.buildings) { const b = mkBuilding(r.t, r.x, r.y, r.lvl, 'D', r); if (r.rotto) { b.dead = true; b.deadT = 99; } sc.B.push(b); }
   sceneIndex(sc);
   computePaths(sc);
   // workers
@@ -852,6 +852,17 @@ function doUpgrade(id) {
   sfx('build'); const sel = r; SC = buildVillage(); SC.sel = SC.B.find(b => b.ref === sel) || null; save(); updateHUD(); openBuildingInfo(r);
   if (BLD_NAV && BLD_NAV.includes(r.id) && builders() < maxBuilders() && BLD_NAV.some(id => bldUpOk(S.buildings.find(b => b.id === id)))) setTimeout(() => { if ($('#sheet').dataset.p === 'b:' + r.id) bldGo(1); }, 650);
 }
+// ---- riparazioni: palizzata e cancello sfondati durante le razzie
+function repairCost(r) { const d = BDEF[r.t]; const base = r.t === 'muro' && r.lvl >= 2 ? { pietra: 12 } : d.cost; const o = {}; for (const k in base) o[k] = Math.max(1, Math.ceil(base[k] * 0.5)); return o; }
+function sumCost(list) { const o = {}; for (const r of list) { const c = repairCost(r); for (const k in c) o[k] = (o[k] || 0) + c[k]; } return o; }
+function openRepair(r) { const d = BDEF[r.t]; const rotti = S.buildings.filter(b => b.rotto && (BDEF[b.t].wall || BDEF[b.t].gate)); const c1 = repairCost(r), ca = sumCost(rotti);
+  let body = `<p class="desc">${d.wall ? 'Questo pezzo di palizzata' : 'Il cancello'} è stato sfondato durante la razzia: da qui il nemico passa finché non lo ripari.</p>`;
+  body += `<button class="btn${canPay(c1) ? '' : ' dis'}" onclick="repairWalls(${r.id})">🔧 Ripara ${d.wall ? 'questo pezzo' : 'il cancello'}<small>${costStr(c1)}</small></button>`;
+  if (rotti.length > 1) body += `<button class="btn${canPay(ca) ? '' : ' dis'}" onclick="repairWalls()">🔧 Ripara tutto (${rotti.length} pezzi)<small>${costStr(ca)}</small></button>`;
+  openSheet(`🔧 ${d.n} rotta`, body, 'b:' + r.id); }
+function repairWalls(id) { const list = S.buildings.filter(b => b.rotto && (id == null ? (BDEF[b.t].wall || BDEF[b.t].gate) : b.id === id)); let n = 0;
+  for (const r of list) { const c = repairCost(r); if (!canPay(c)) break; pay(c); delete r.rotto; n++; }
+  if (n) { toast(`🔧 ${n === 1 ? 'Riparato!' : n + ' pezzi riparati'}`); sfx('build'); SC = buildVillage(); save(); updateHUD(); closeSheet(); } else toast('Risorse insufficienti per riparare'); }
 function upgradeAllWalls() {
   const ws = S.buildings.filter(b => b.t === 'muro' && b.lvl < 2); let n = 0;
   for (const w of ws) { if (w.end) continue; if (S.res.pietra < 12) break; S.res.pietra -= 12; if (timedOn()) { w.end = now() + (4 + n * 0.3) * 1000; w.dur = (4 + n * 0.3) * 1000; w.toLvl = 2; } else w.lvl = 2; n++; }

@@ -187,6 +187,7 @@ function bldUpAll() { if (!BLD_NAV) return; let n = 0; const names = [];
   toast(`⬆ In miglioramento: ${names.join(', ')}${left ? ` · altri ${left} quando si liberano i mastri d'opera` : ''}`);
   const cur = S.buildings.find(b => b.id === +($('#sheet').dataset.p || '').slice(2)); if (cur) openBuildingInfo(cur); }
 function openBuildingInfo(r) {
+  if (r.rotto) { openRepair(r); return; }
   const d = BDEF[r.t]; const why = canUp(r); const res = resOf(r);
   let body = `${bldNavHTML(r)}<p class="desc">${d.desc}</p>${r.t === 'cripta' ? cryptHTML() : ''}${r.t === 'mastio' ? crownHTML() : ''}<div class="stats">`;
   body += `<span>Livello <b>${r.lvl}</b>${r.end ? ` → ${r.toLvl}` : ''}</span><span>Vita <b>${Math.round(d.hp * (1 + 0.35 * (r.lvl - 1)))}</b></span>`;

@@ -692,6 +692,9 @@ function villageBanners(sc, m, mx, my, blocked) {
   // ai lati della piazza davanti al Mastio
   const fx = mx + 0.5 - cx, fy = my + 0.5 - cy, fl = Math.hypot(fx, fy) || 1, nx = -fy / fl, ny = fx / fl;
   for (const sd of [1, -1]) { const px = mx + 0.5 + nx * 1.6 * sd + fx / fl * 0.6, py = my + 0.5 + ny * 1.6 * sd + fy / fl * 0.6; if (ok(px, py)) out.push({ x: px, y: py, yaw: Math.atan2(fy, fx) }); }
+  // stendardi ai due lati dell'entrata di ogni cancello, dentro e fuori
+  for (const g of sc.B) { if (g.t !== 'cancello' || g.dead) continue; const ref = g.ref || g.raidRef; const lx = ((ref && ref.rot) || 0) % 2 === 1; // passaggio lungo x oppure lungo y
+    for (const e of [-0.25, 3.25]) for (const s of [0.35, 2.65]) out.push(lx ? { x: g.x + e, y: g.y + s, yaw: s < 1.5 ? Math.PI : 0 } : { x: g.x + s, y: g.y + e, yaw: s < 1.5 ? -Math.PI / 2 : Math.PI / 2 }); }
   return out;
 }
 function pathLamps(sc, lines, G, blocked) {
@@ -1322,12 +1325,12 @@ function drawBuilding(c, sc, b) {
   const sk = b.t === 'mastio' && G3.models.castello && G3.models.castello.ready ? 'castello' : (G3.models[b.t] && G3.models[b.t].ready ? b.t : bSprite(b));
   if (sk && G3.models[sk] && G3.models[sk].ready) {
     if (!BDEF[b.t].decor) { const p = plotCache(b.w, b.h); c.drawImage(p.cv, wx - p.ox, wy - p.oy, p.w, p.h); } else if (!DFIT[b.t]) { const [cx2, cy2] = W(b.x + b.w / 2, b.y + b.h / 2); c.fillStyle = 'rgba(0,0,0,0.2)'; c.beginPath(); c.ellipse(cx2, cy2, (b.w + b.h) * 13, (b.w + b.h) * 5.5, 0, 0, 7); c.fill(); } const ga = c.globalAlpha; if (b.ref && b.ref.end && b.ref.toLvl === 1) c.globalAlpha = 0.5; let k3 = sk, yaw = 0, fitm = 1;
-    if (b.t === 'cancello') { yaw = ((((b.ref && b.ref.rot) || 0) % 2) ? -1 : 1) * Math.PI / 4; fitm = 1.3; }
+    if (b.t === 'cancello') { yaw = (((((b.ref || b.raidRef) && (b.ref || b.raidRef).rot) || 0) % 2) ? -1 : 1) * Math.PI / 4; fitm = 1.3; }
     if (b.t === 'tronco') { const hh = (((b.x * 7 + b.y * 13) | 0) >>> 0) + (b.ref ? b.ref.id : 0); yaw = [-Math.PI / 4, 3 * Math.PI / 4, Math.PI / 4, -3 * Math.PI / 4][hh % 4] + ((hh >> 2) % 5 - 2) * 0.07; }
     if (b.t === 'balista') { need3d('balista_b'); need3d('balista_c'); fitm = 0.68; if (b.yawT != null) { let d = b.yawT - (b.yaw || 0); while (d > Math.PI) d -= 2 * Math.PI; while (d < -Math.PI) d += 2 * Math.PI; b.yaw = (b.yaw || 0) + d * 0.18; } yaw = b.yaw || 0;
       const tf = b.fired != null ? sc.time - b.fired : 99; if (tf < 0.35 && G3.models.balista_c && G3.models.balista_c.ready) k3 = 'balista_c'; else if (tf < 1.4 && G3.models.balista_b && G3.models.balista_b.ready) k3 = 'balista_b'; }
     if (b.t === 'cancello' && M3D_FILES.has('cancello_aperto')) { need3d('cancello_aperto'); const om = G3.models.cancello_aperto; if (om && om.ready && sc.U.some(u => !u.dead && u.side === b.side && Math.hypot(u.x - (b.x + 1), u.y - (b.y + 1)) < 2.2)) k3 = 'cancello_aperto'; }
-    const dfit = DFIT[b.t] && G3.models[k3] && G3.models[k3].m; if (dfit) { const mm = G3.models[k3].m, hz = Math.max(mm.size[0], mm.size[2]); fitm = DFIT[b.t].h ? DFIT[b.t].h * hz / Math.max(1e-6, mm.size[1]) / (b.w * 1.3) : DFIT[b.t].w / (b.w * 1.3); yaw = ((b.ref && b.ref.rot) || 0) * Math.PI / 2 + (DYAW_RND[b.t] ? ((b.id * 2654435761) >>> 0) % 628 / 100 : 0); }
+    const dfit = DFIT[b.t] && G3.models[k3] && G3.models[k3].m; if (dfit) { const mm = G3.models[k3].m, hz = Math.max(mm.size[0], mm.size[2]); fitm = DFIT[b.t].h ? DFIT[b.t].h * hz / Math.max(1e-6, mm.size[1]) / (b.w * 1.3) : DFIT[b.t].w / (b.w * 1.3); yaw = (((b.ref || b.raidRef) && (b.ref || b.raidRef).rot) || 0) * Math.PI / 2 + (DYAW_RND[b.t] ? ((b.id * 2654435761) >>> 0) % 628 / 100 : 0); }
     let fit3 = fitm * b.w * 1.3 * (b.t === 'mastio' ? (b.lvl <= 8 ? 1.25 + 0.03 * b.lvl : 1.49 + 0.014 * (b.lvl - 8)) : b.t === 'caserma' ? 0.82 : b.t === 'falo' ? 0.8 : b.t === 'tronco' ? 0.55 : 1);
     // nessun edificio deve superare in altezza il Mastio: tetto all'altezza in base all'impronta
     if (b.t !== 'mastio' && !H3FREE[b.t] && b.w >= 2) { const mm = G3.models[k3].m, hNow = mm.size[1] * fit3 / Math.max(mm.size[0], mm.size[2]), hMax = 0.75 * b.w + 0.3; if (hNow > hMax) fit3 *= hMax / hNow; }
@@ -1345,7 +1348,7 @@ function drawBuilding(c, sc, b) {
   } else {
     const e = bCache(b);
     const wk = BDEF[b.t].wall ? (b.lvl >= 2 ? 'mura' : 'palizzata') : null; if (wk && !G3.models[wk]) need3d(wk);
-    if (wk && G3.models[wk] && G3.models[wk].ready) { const m = b.mask || 0; const segs = []; const rr = (b.ref && b.ref.rot) || 0;
+    if (wk && G3.models[wk] && G3.models[wk].ready) { const m = b.mask || 0; const segs = []; const rr = ((b.ref || b.raidRef) && (b.ref || b.raidRef).rot) || 0;
       // direzione scelta col pulsante ↻ (0 = automatica, segue i pezzi vicini)
       if (rr === 1) segs.push(['_wu', Math.PI / 4, 1.1]); else if (rr === 2) segs.push(['_wv', 3 * Math.PI / 4, 1.1]); else if (rr === 3) segs.push(['_wd', 0, 1.5]); else if (rr === 4) segs.push(['_we', Math.PI / 2, 1.5]);
       else if ((m & 3) && (m & 12)) { // angolo o incrocio: mezzo pezzo verso ogni vicino, niente punte che sporgono
@@ -1499,6 +1502,7 @@ function onTap(sx, sy) {
   if (placing) { const d = BDEF[placing.t]; placing.x = Math.floor(tx - d.w / 2 + 0.5); placing.y = Math.floor(ty - d.h / 2 + 0.5); updateGhost(); return; }
   // pick building: prefer one whose sprite area contains point; test tile then tiles below (tall sprites)
   let hit = bAt(SC, Math.floor(tx), Math.floor(ty));
+  if (!hit && MODE === 'village') { const rb = SC.B.find(b => b.dead && b.ref && b.ref.rotto && tx >= b.x - 0.15 && tx < b.x + b.w + 0.15 && ty >= b.y - 0.15 && ty < b.y + b.h + 0.15); if (rb) { sfx('click'); openBuildingInfo(rb.ref); return; } }
   if (!hit) { const wx = (sx - VW / 2) / cam.z + cam.x, wy = (sy - VH / 2) / cam.z + cam.y; let best = -1; for (const b of SC.B) { if (b.dead || BDEF[b.t].wall) continue; let r = bSprite(b) ? bSpriteRect(b) : null; if (!r) { const e = bCache(b); const vr = vRect(b); const [bx, by] = WR(vr[0], vr[1]); r = [bx - e.ox + 20, by - e.oy + 20, e.w - 40, e.h - 40]; } if (wx >= r[0] && wx <= r[0] + r[2] && wy >= r[1] && wy <= r[1] + r[3]) { const vk = vRect(b); const key = vk[0] + vk[1] + (b.w + b.h) / 2; if (key > best) { best = key; hit = b; } } } }
   for (let k = 1; k <= 3 && !hit; k++) { const b = bAt(SC, Math.floor(tx + k * 0.5), Math.floor(ty + k * 0.5)); if (b) hit = b; }
   { const vu = pickVisitor(sx, sy); if (vu) { const e = EVENTS.find(x => x.id === vu.vis); if (e) { sfx('click'); openEvent(e); return; } } }
