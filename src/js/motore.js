@@ -1462,7 +1462,7 @@ function snapRot(pivot, sx, sy) { const tgt = Math.round(ANG / Q90) * Q90; animR
 function centerCam(tx, ty) { const [wx, wy] = W(tx, ty); cam.x = wx; cam.y = wy; }
 function clampCam() { cam.z = Math.max(0.16, Math.min(2.4, cam.z)); cam.x = Math.max(-N * 30, Math.min(N * 30, cam.x)); cam.y = Math.max(N * 2, Math.min(N * 30, cam.y));
   // il centro della vista resta dentro la mappa, lontano dal bordo quanto basta perché lo schermo sia pieno di terra
-  { const [tx, ty] = screenToTile(VW / 2, VH / 2); const m = Math.min(N / 2 - 1, 6 + 0.55 * (VH / 2 / cam.z) / (TH / 2)); const cx = Math.max(m, Math.min(N - m, tx)), cy = Math.max(m, Math.min(N - m, ty)); if (cx !== tx || cy !== ty) centerCam(cx, cy); } }
+  { const [tx, ty] = screenToTile(VW / 2, VH / 2); const m = Math.min(N / 2 - 30, 6 + 0.3 * (VH / 2 / cam.z) / (TH / 2)); const cx = Math.max(m, Math.min(N - m, tx)), cy = Math.max(m, Math.min(N - m, ty)); if (cx !== tx || cy !== ty) centerCam(cx, cy); } }
 const ptr = new Map(); let G = null, holdTimer = null, holdIv = null, lastPos = null;
 function stopHold() { clearTimeout(holdTimer); clearInterval(holdIv); holdTimer = holdIv = null; }
 cv.addEventListener('pointerdown', e => {
