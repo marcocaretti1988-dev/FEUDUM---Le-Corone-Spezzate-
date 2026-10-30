@@ -151,7 +151,8 @@ function openArms() { if (!S) return; if (!S.arms) S.arms = Object.assign({}, AR
     <h4>Figura</h4><div class="arow">${ARMS_SYM.map(v => `<button class="achip s ${a.sym === v ? 'on' : ''}" onclick="setArms('sym','${v}')">${v}</button>`).join('')}</div>
     <div class="acts"><button class="btn" onclick="closeSheet()">✓ Fatto</button></div></div>`, 'arms'); }
 function setArms(k, v) { if (!S.arms) S.arms = Object.assign({}, ARMS()); S.arms[k] = v; for (const key in CACHE) if (key.startsWith('stendardo')) delete CACHE[key]; save(); updateHUD(); openArms(); }
-function rotDeco(id) { const r = S.buildings.find(b => b.id === id); if (!r) return; r.rot = ((r.rot || 0) + 1) % 4; const b = SC && SC.B.find(x => x.ref === r); if (b) { b.c3k = null; } save(); sfx('tock'); }
+const WALL_DIR = ['automatica (segue i pezzi vicini)', 'dritta ↘', 'dritta ↙', 'in diagonale ↕', 'in diagonale ↔'];
+function rotDeco(id) { const r = S.buildings.find(b => b.id === id); if (!r) return; r.rot = ((r.rot || 0) + 1) % (BDEF[r.t].wall ? 5 : 4); if (BDEF[r.t].wall) toast('↻ Direzione: ' + WALL_DIR[r.rot]); const b = SC && SC.B.find(x => x.ref === r); if (b) { b.c3k = null; } save(); sfx('tock'); }
 let BTAB = 'b';
 function openBuild(tab) {
   if (tab) BTAB = tab; const deco = BTAB === 'd';
@@ -221,7 +222,7 @@ function openBuildingInfo(r) {
   if (r.nat) body = body.replace('<p class="desc">', '<p class="desc"><b>Ostacolo naturale.</b> Impedisce di costruire qui: rimuovilo per liberare spazio e ottenere risorse. ');
   if (r.t !== 'mastio' && !(d.decor && d.rm)) body += workOn('demo', r.id) ? `<button class="btn dis">🔨 Demolizione… ${fmtT(workOn('demo', r.id).end - now())}</button>` : `<button class="btn ghost" onclick="demolish(${r.id})">🔨 Demolisci<small>${costStr({ cibo: 10 * r.lvl })} · ⏱ ${Math.max(4, Math.round((d.t || 4) * 0.6 * r.lvl))}s · rimborso 30%</small></button>`;
   if (r.t !== 'mastio' && !r.nat) body += `<button class="btn ghost" onclick="startPlacement('${r.t}', S.buildings.find(b=>b.id===${r.id}))">✥ Sposta</button>`;
-  if (d.decor && DFIT[r.t] && !DYAW_RND[r.t]) body += `<button class="btn ghost" onclick="rotDeco(${r.id})">↻ Ruota</button>`;
+  if ((d.decor && DFIT[r.t] && !DYAW_RND[r.t]) || d.wall) body += `<button class="btn ghost" onclick="rotDeco(${r.id})">↻ Ruota</button>`;
   body += `</div>`;
   body = body.replace('<div class="acts">', extra + '<div class="acts">');
   openSheet(`${d.icon} ${d.n}`, body, 'b:' + r.id);

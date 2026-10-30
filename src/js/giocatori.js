@@ -471,7 +471,8 @@ function startPlacement(t, moveRef) {
   closeSheet(); const d = BDEF[t];
   const [tx, ty] = screenToTile(VW / 2, VH / 2);
   placing = { t, w: d.w, h: d.h, x: Math.floor(tx - d.w / 2 + 0.5), y: Math.floor(ty - d.h / 2 + 0.5), move: moveRef || null };
-  if (moveRef) { placing.x = moveRef.x; placing.y = moveRef.y; } else { const f = findFree(t, placing.x, placing.y); if (f) { placing.x = f[0]; placing.y = f[1]; } }
+  if (moveRef) { placing.x = moveRef.x; placing.y = moveRef.y; placing.rot = moveRef.rot || 0; } else { const f = findFree(t, placing.x, placing.y); if (f) { placing.x = f[0]; placing.y = f[1]; } }
+  { const girabile = !!(d.wall || (d.decor && DFIT[t] && !DYAW_RND[t])); $('#pbrot').classList.toggle('hidden', !girabile); }
   updateGhost(); $('#placebar').classList.remove('hidden'); $('#hud-bot').classList.add('hidden');
   $('#placeinfo').innerHTML = moveRef ? `Sposta: <b>${d.n}</b>` : `<b>${d.n}</b> ${costStr(d.cost || {})}`;
 }
@@ -480,7 +481,7 @@ function updateGhost() { if (!placing) { SC.ghost = null; return; } placing.ok =
 function confirmPlace() {
   if (!placing) return; const d = BDEF[placing.t];
   if (!placing.ok) { toast('Spazio occupato o fuori dal feudo'); return; }
-  if (placing.move) { placing.move.x = placing.x; placing.move.y = placing.y; cancelPlace(); SC = buildVillage(); save(); return; }
+  if (placing.move) { placing.move.x = placing.x; placing.move.y = placing.y; if (placing.rot != null) placing.move.rot = placing.rot; cancelPlace(); SC = buildVillage(); save(); return; }
   if (countB(placing.t) >= maxB(placing.t)) { toast('Limite raggiunto: alza il livello del Mastio'); cancelPlace(); return; }
   if (d.req && !S.creative && !hasB(d.req)) { toast(`Serve prima: ${BDEF[d.req].n}`); cancelPlace(); return; }
   if (!canPay(d.cost)) { const nm = d.n; cancelPlace(); needSheet(d.cost, 'costruire ' + nm); return; }
@@ -488,11 +489,13 @@ function confirmPlace() {
   pay(d.cost);
   const r = { id: S.nextId++, t: placing.t, x: placing.x, y: placing.y, lvl: 1, stock: 0, end: d.t && !S.creative ? now() + buildSecs(d) * 1000 * seasonBuildMul() : 0, dur: buildSecs(d) * 1000 * seasonBuildMul(), toLvl: 1 };
   if (placing.t === 'muro' && S.mastio >= 5) r.lvl = 1;
+  if (placing.rot) r.rot = placing.rot;
   S.buildings.push(r); sfx('build'); SC = buildVillage(); save(); updateHUD();
   if (d.wall || d.decor) { // keep placing next
     const nx = placing.x + 1; placing.x = nx; if (!canPlace(placing.t, placing.x, placing.y)) { const f = findFree(placing.t, placing.x, placing.y); if (f) { placing.x = f[0]; placing.y = f[1]; } } if (countB(placing.t) >= maxB(placing.t) || !canPay(d.cost)) { cancelPlace(); return; } updateGhost(); $('#placeinfo').innerHTML = `<b>${d.n}</b> ${countB(placing.t)}/${maxB(placing.t)} — tocca per posizionare, ✓ per costruire`;
   } else cancelPlace();
 }
+function rotPlace() { if (!placing) return; const d = BDEF[placing.t]; placing.rot = ((placing.rot || 0) + 1) % (d.wall ? 5 : 4); updateGhost(); sfx('tock'); if (d.wall) toast('↻ Direzione: ' + WALL_DIR[placing.rot]); }
 function cancelPlace() { placing = null; if (SC) SC.ghost = null; $('#placebar').classList.add('hidden'); $('#hud-bot').classList.remove('hidden'); }
 function nudge(dx, dy) { if (!placing) return; [dx, dy] = rotVinv(dx, dy).map(Math.round); placing.x += dx; placing.y += dy; updateGhost(); }
 

@@ -79,6 +79,7 @@ h4{font-family:var(--fh);margin:12px 0 6px}
 .stars{font-size:40px;color:#d9a520;text-shadow:0 2px 0 #6b4a10;letter-spacing:4px}.stars span{color:rgba(0,0,0,.18);text-shadow:none}
 .result .row{font-size:13px;margin:4px 0}.lore{font-style:italic;color:#5c3a25;margin:10px 0 14px}
 /* placement bar */
+#pbrot{margin-top:2px;padding:7px 16px;border-radius:20px;border:2px solid #d9b25a;background:#2b1a0f;color:#f5e6c4;font-family:var(--fh);font-weight:700;font-size:14px}
 #placebar{position:fixed;left:0;right:0;bottom:0;padding:8px 8px calc(var(--sab) + 10px);display:flex;flex-direction:column;align-items:center;gap:6px;background:linear-gradient(0deg,rgba(30,24,18,.92),transparent)}
 #placeinfo{color:#f5e6c4;font-size:12.5px;text-align:center}#placeinfo .no{color:#ff9a87}
 .prow{display:flex;gap:6px;align-items:center}
@@ -547,21 +548,21 @@ html[data-theme=miniatura] #tbtns .tb .bl{font-size:17px;letter-spacing:.02em}
 #hud-bot .hb.img .i{display:block;width:100%;max-width:66px;aspect-ratio:1;background-size:contain;background-repeat:no-repeat;background-position:center;filter:drop-shadow(0 3px 4px rgba(0,0,0,.6));position:relative}
 #hud-bot .hb.img:active{transform:translateY(2px)}
 #hud-bot .hb.img .i .ico{position:absolute;left:22%;top:20%;width:56%;height:56%;filter:drop-shadow(0 2px 2px rgba(0,0,0,.7))}
-#hud-bot .k-esercito .i{background-image:url(ui/hb_esercito.webp?v=f727d417ad)}#hud-bot .k-esercito:active .i{background-image:url(ui/hb_esercito_p.webp?v=f727d417ad)}
-#hud-bot .k-attacca .i{background-image:url(ui/hb_attacca.webp?v=f727d417ad)}#hud-bot .k-attacca:active .i{background-image:url(ui/hb_attacca_p.webp?v=f727d417ad)}
-#hud-bot .k-menu .i{background-image:url(ui/hb_menu.webp?v=f727d417ad)}#hud-bot .k-menu:active .i{background-image:url(ui/hb_menu_p.webp?v=f727d417ad)}
-#hud-bot .k-mastio .i{background-image:url(ui/hb_mastio.webp?v=f727d417ad)}#hud-bot .k-mastio:active .i{background-image:url(ui/hb_mastio_p.webp?v=f727d417ad)}
-#hud-bot .k-costruisci .i{background-image:url(ui/hb_costruisci.webp?v=f727d417ad)}#hud-bot .k-costruisci:active .i{background-image:url(ui/hb_costruisci_p.webp?v=f727d417ad)}
+#hud-bot .k-esercito .i{background-image:url(ui/hb_esercito.webp?v=4f88c86509)}#hud-bot .k-esercito:active .i{background-image:url(ui/hb_esercito_p.webp?v=4f88c86509)}
+#hud-bot .k-attacca .i{background-image:url(ui/hb_attacca.webp?v=4f88c86509)}#hud-bot .k-attacca:active .i{background-image:url(ui/hb_attacca_p.webp?v=4f88c86509)}
+#hud-bot .k-menu .i{background-image:url(ui/hb_menu.webp?v=4f88c86509)}#hud-bot .k-menu:active .i{background-image:url(ui/hb_menu_p.webp?v=4f88c86509)}
+#hud-bot .k-mastio .i{background-image:url(ui/hb_mastio.webp?v=4f88c86509)}#hud-bot .k-mastio:active .i{background-image:url(ui/hb_mastio_p.webp?v=4f88c86509)}
+#hud-bot .k-costruisci .i{background-image:url(ui/hb_costruisci.webp?v=4f88c86509)}#hud-bot .k-costruisci:active .i{background-image:url(ui/hb_costruisci_p.webp?v=4f88c86509)}
 #hud-bot .hb.img.dis .i,#hud-bot .hb.img:disabled .i{filter:grayscale(1) brightness(.8)}
 #hud-bot{gap:4px!important;padding-left:6px!important;padding-right:6px!important}
 /* ===== icone dipinte delle risorse ===== */
-.ico.ico-cibo{background-image:url(ui/rs_cibo.webp?v=f727d417ad)!important;background-size:cover!important;border-radius:22%}#res .chip:active .ico-cibo{background-image:url(ui/rs_cibo_p.webp?v=f727d417ad)!important}
-.ico.ico-legno{background-image:url(ui/rs_legno.webp?v=f727d417ad)!important;background-size:cover!important;border-radius:22%}#res .chip:active .ico-legno{background-image:url(ui/rs_legno_p.webp?v=f727d417ad)!important}
-.ico.ico-oro{background-image:url(ui/rs_oro.webp?v=f727d417ad)!important;background-size:cover!important;border-radius:22%}#res .chip:active .ico-oro{background-image:url(ui/rs_oro_p.webp?v=f727d417ad)!important}
-.ico.ico-pietra{background-image:url(ui/rs_pietra.webp?v=f727d417ad)!important;background-size:cover!important;border-radius:22%}#res .chip:active .ico-pietra{background-image:url(ui/rs_pietra_p.webp?v=f727d417ad)!important}
-.ico.ico-ferro{background-image:url(ui/rs_ferro.webp?v=f727d417ad)!important;background-size:cover!important;border-radius:22%}#res .chip:active .ico-ferro{background-image:url(ui/rs_ferro_p.webp?v=f727d417ad)!important}
-.ico.ico-pelli{background-image:url(ui/rs_pelli.webp?v=f727d417ad)!important;background-size:cover!important;border-radius:22%}#res .chip:active .ico-pelli{background-image:url(ui/rs_pelli_p.webp?v=f727d417ad)!important}
-.ico.ico-favore{background-image:url(ui/rs_favore.webp?v=f727d417ad)!important;background-size:cover!important;border-radius:22%}#res .chip:active .ico-favore{background-image:url(ui/rs_favore_p.webp?v=f727d417ad)!important}
+.ico.ico-cibo{background-image:url(ui/rs_cibo.webp?v=4f88c86509)!important;background-size:cover!important;border-radius:22%}#res .chip:active .ico-cibo{background-image:url(ui/rs_cibo_p.webp?v=4f88c86509)!important}
+.ico.ico-legno{background-image:url(ui/rs_legno.webp?v=4f88c86509)!important;background-size:cover!important;border-radius:22%}#res .chip:active .ico-legno{background-image:url(ui/rs_legno_p.webp?v=4f88c86509)!important}
+.ico.ico-oro{background-image:url(ui/rs_oro.webp?v=4f88c86509)!important;background-size:cover!important;border-radius:22%}#res .chip:active .ico-oro{background-image:url(ui/rs_oro_p.webp?v=4f88c86509)!important}
+.ico.ico-pietra{background-image:url(ui/rs_pietra.webp?v=4f88c86509)!important;background-size:cover!important;border-radius:22%}#res .chip:active .ico-pietra{background-image:url(ui/rs_pietra_p.webp?v=4f88c86509)!important}
+.ico.ico-ferro{background-image:url(ui/rs_ferro.webp?v=4f88c86509)!important;background-size:cover!important;border-radius:22%}#res .chip:active .ico-ferro{background-image:url(ui/rs_ferro_p.webp?v=4f88c86509)!important}
+.ico.ico-pelli{background-image:url(ui/rs_pelli.webp?v=4f88c86509)!important;background-size:cover!important;border-radius:22%}#res .chip:active .ico-pelli{background-image:url(ui/rs_pelli_p.webp?v=4f88c86509)!important}
+.ico.ico-favore{background-image:url(ui/rs_favore.webp?v=4f88c86509)!important;background-size:cover!important;border-radius:22%}#res .chip:active .ico-favore{background-image:url(ui/rs_favore_p.webp?v=4f88c86509)!important}
 #res .chip .ic{height:34px!important}#res .chip .ic .ico{width:34px!important;height:34px!important;filter:drop-shadow(0 2px 2px rgba(0,0,0,.6))}
 #res .chip{padding-top:4px!important}
 .cc .ico,.costs .ico,.btn small .ico{width:1.4em;height:1.4em;vertical-align:-.38em}
@@ -618,6 +619,7 @@ body.asking #title,body.asking #sheet,body.asking #hud{pointer-events:none}
     <div class="pad"><span></span><button onclick="nudge(0,-1)">↗</button><span></span><button onclick="nudge(-1,0)">↖</button><span></span><button onclick="nudge(1,0)">↘</button><span></span><button onclick="nudge(0,1)">↙</button><span></span></div>
     <button class="pbtn ok" onclick="confirmPlace()">✓</button>
   </div>
+  <button id="pbrot" class="hidden" onclick="rotPlace()">↻ Gira</button>
 </div>
 <div id="bhud" class="hidden"><div id="btop"></div><div id="bord"></div><div id="bbot"><div id="bcards"></div><button class="rbtn" onclick="retreat()">🏳 Ritirata</button></div></div>
 <div id="sheet" class="hidden"><div class="sh-h"><div id="sheet-t"></div><button class="x" onclick="closeSheet()">✕</button></div><div id="sheet-b"></div></div>
@@ -715,7 +717,7 @@ function need3d(k, low) {
 function pump3d() {
   while (L3.active < L3.max && (L3.q.length || (L3.prefetch.length && L3.active < 1))) {
     const k = L3.q.length ? L3.q.shift() : L3.prefetch.shift(); if (L3.state[k] !== 'q') continue; L3.state[k] = 'l'; L3.active++;
-    const sc = document.createElement('script'); sc.src = 'm3d_' + k + '.js?v=f727d417ad'; sc.async = true;
+    const sc = document.createElement('script'); sc.src = 'm3d_' + k + '.js?v=4f88c86509'; sc.async = true;
     sc.onload = () => { L3.state[k] = 'ok'; L3.active--; if (G3.gl && M3D[k]) { if (!G3.models[k]) g3load(k, M3D[k]); for (const a in M3D_ALIAS) if (M3D_ALIAS[a] === k && !G3.models[a] && a !== 'mastio') G3.models[a] = G3.models[k]; delete M3D[k]; } pump3d(); };
     sc.onerror = () => { L3.state[k] = 'err'; L3.active--; pump3d(); };
     document.head.appendChild(sc);
@@ -1906,7 +1908,7 @@ function render(sc, dt) {
       c.drawImage(f.img || BATL, f[0], f[1], f[2], f[3], -w / 2, -h + 2, w, h); c.restore(); c.globalAlpha = 1; } }
     else if (kind === 4) { // anteprima di piazzamento: lo stesso modello che verrà costruito
       let fb = o._fb; if (!fb || fb.t !== o.t) fb = o._fb = { t: o.t, x: o.x, y: o.y, w: o.w, h: o.h, lvl: 1, seed: 0, mask: 0, id: -7, side: 'D', hp: 1, maxhp: 1, aim: {}, ghost: true, ref: { rot: o.rot || 0 } };
-      fb.x = o.x; fb.y = o.y; const mk = o.t === 'mastio' ? 'castello' : o.t; if (!G3.models[mk]) need3d(mk);
+      fb.x = o.x; fb.y = o.y; fb.ref.rot = o.rot || 0; fb._wu = fb._wv = fb._wd = fb._we = null; const mk = o.t === 'mastio' ? 'castello' : o.t; if (!G3.models[mk]) need3d(mk);
       c.globalAlpha = 0.7; if ((G3.models[mk] && G3.models[mk].ready) || PAINT[o.t] || (bSprite(fb) && BATL_OK)) drawBuilding(c, sc, fb); else { poly(c, [W(o.x, o.y), W(o.x + o.w, o.y), W(o.x + o.w, o.y + o.h), W(o.x, o.y + o.h)], 'rgba(255,240,200,0.25)', 'rgba(255,240,200,0.8)', 1.5); const [cx, cy] = W(o.x + o.w / 2, o.y + o.h / 2); c.font = '22px serif'; c.textAlign = 'center'; c.fillText(BDEF[o.t].icon || '?', cx, cy - 8); c.textAlign = 'start'; } c.globalAlpha = 1; }
   }
   drawWorks(c, sc);
@@ -2015,8 +2017,11 @@ function drawBuilding(c, sc, b) {
   } else {
     const e = bCache(b);
     const wk = BDEF[b.t].wall ? (b.lvl >= 2 ? 'mura' : 'palizzata') : null; if (wk && !G3.models[wk]) need3d(wk);
-    if (wk && G3.models[wk] && G3.models[wk].ready) { const m = b.mask || 0; const segs = []; if ((m & 3) || !m) segs.push(['_wu', Math.PI / 4]); if (m & 12) segs.push(['_wv', 3 * Math.PI / 4]);
-      for (const [kk, yw] of segs) { if (!b[kk]) b[kk] = { x: b.x, y: b.y, w: 1, h: 1 }; g3draw(c, b[kk], wk, 1.1, yw); }
+    if (wk && G3.models[wk] && G3.models[wk].ready) { const m = b.mask || 0; const segs = []; const rr = (b.ref && b.ref.rot) || 0;
+      // direzione scelta col pulsante ↻ (0 = automatica, segue i pezzi vicini)
+      if (rr === 1) segs.push(['_wu', Math.PI / 4, 1.1]); else if (rr === 2) segs.push(['_wv', 3 * Math.PI / 4, 1.1]); else if (rr === 3) segs.push(['_wd', 0, 1.5]); else if (rr === 4) segs.push(['_we', Math.PI / 2, 1.5]);
+      else { if ((m & 3) || !m) segs.push(['_wu', Math.PI / 4, 1.1]); if (m & 12) segs.push(['_wv', 3 * Math.PI / 4, 1.1]); }
+      for (const [kk, yw, ft] of segs) { if (!b[kk]) b[kk] = { x: b.x, y: b.y, w: 1, h: 1 }; g3draw(c, b[kk], wk, ft, yw); }
       if (wk === 'mura' && (m & 3) && (m & 12) && (m & 3) !== 3 && (m & 12) !== 12) { if (!G3.models.torrepietra) need3d('torrepietra'); if (G3.models.torrepietra && G3.models.torrepietra.ready) { if (!b._tw) b._tw = { x: b.x, y: b.y, w: 1, h: 1 }; g3draw(c, b._tw, 'torrepietra', 1.15, 0); } } }
     else if (BDEF[b.t].wall || BDEF[b.t].moat) c.drawImage(e.cv, wx - e.ox, wy - e.oy, e.w, e.h);
     else { const q = ((ANG / (Math.PI / 2)) % 4 + 4) % 4, i = Math.floor(q), sm0 = Math.min(1, Math.max(0, (q - i - 0.38) / 0.24)), t = sm0 * sm0 * (3 - 2 * sm0); const ga = c.globalAlpha; const [cx] = W(b.x + b.w / 2, b.y + b.h / 2); const ox = cx - wx;
@@ -2646,7 +2651,8 @@ function startPlacement(t, moveRef) {
   closeSheet(); const d = BDEF[t];
   const [tx, ty] = screenToTile(VW / 2, VH / 2);
   placing = { t, w: d.w, h: d.h, x: Math.floor(tx - d.w / 2 + 0.5), y: Math.floor(ty - d.h / 2 + 0.5), move: moveRef || null };
-  if (moveRef) { placing.x = moveRef.x; placing.y = moveRef.y; } else { const f = findFree(t, placing.x, placing.y); if (f) { placing.x = f[0]; placing.y = f[1]; } }
+  if (moveRef) { placing.x = moveRef.x; placing.y = moveRef.y; placing.rot = moveRef.rot || 0; } else { const f = findFree(t, placing.x, placing.y); if (f) { placing.x = f[0]; placing.y = f[1]; } }
+  { const girabile = !!(d.wall || (d.decor && DFIT[t] && !DYAW_RND[t])); $('#pbrot').classList.toggle('hidden', !girabile); }
   updateGhost(); $('#placebar').classList.remove('hidden'); $('#hud-bot').classList.add('hidden');
   $('#placeinfo').innerHTML = moveRef ? `Sposta: <b>${d.n}</b>` : `<b>${d.n}</b> ${costStr(d.cost || {})}`;
 }
@@ -2655,7 +2661,7 @@ function updateGhost() { if (!placing) { SC.ghost = null; return; } placing.ok =
 function confirmPlace() {
   if (!placing) return; const d = BDEF[placing.t];
   if (!placing.ok) { toast('Spazio occupato o fuori dal feudo'); return; }
-  if (placing.move) { placing.move.x = placing.x; placing.move.y = placing.y; cancelPlace(); SC = buildVillage(); save(); return; }
+  if (placing.move) { placing.move.x = placing.x; placing.move.y = placing.y; if (placing.rot != null) placing.move.rot = placing.rot; cancelPlace(); SC = buildVillage(); save(); return; }
   if (countB(placing.t) >= maxB(placing.t)) { toast('Limite raggiunto: alza il livello del Mastio'); cancelPlace(); return; }
   if (d.req && !S.creative && !hasB(d.req)) { toast(`Serve prima: ${BDEF[d.req].n}`); cancelPlace(); return; }
   if (!canPay(d.cost)) { const nm = d.n; cancelPlace(); needSheet(d.cost, 'costruire ' + nm); return; }
@@ -2663,11 +2669,13 @@ function confirmPlace() {
   pay(d.cost);
   const r = { id: S.nextId++, t: placing.t, x: placing.x, y: placing.y, lvl: 1, stock: 0, end: d.t && !S.creative ? now() + buildSecs(d) * 1000 * seasonBuildMul() : 0, dur: buildSecs(d) * 1000 * seasonBuildMul(), toLvl: 1 };
   if (placing.t === 'muro' && S.mastio >= 5) r.lvl = 1;
+  if (placing.rot) r.rot = placing.rot;
   S.buildings.push(r); sfx('build'); SC = buildVillage(); save(); updateHUD();
   if (d.wall || d.decor) { // keep placing next
     const nx = placing.x + 1; placing.x = nx; if (!canPlace(placing.t, placing.x, placing.y)) { const f = findFree(placing.t, placing.x, placing.y); if (f) { placing.x = f[0]; placing.y = f[1]; } } if (countB(placing.t) >= maxB(placing.t) || !canPay(d.cost)) { cancelPlace(); return; } updateGhost(); $('#placeinfo').innerHTML = `<b>${d.n}</b> ${countB(placing.t)}/${maxB(placing.t)} — tocca per posizionare, ✓ per costruire`;
   } else cancelPlace();
 }
+function rotPlace() { if (!placing) return; const d = BDEF[placing.t]; placing.rot = ((placing.rot || 0) + 1) % (d.wall ? 5 : 4); updateGhost(); sfx('tock'); if (d.wall) toast('↻ Direzione: ' + WALL_DIR[placing.rot]); }
 function cancelPlace() { placing = null; if (SC) SC.ghost = null; $('#placebar').classList.add('hidden'); $('#hud-bot').classList.remove('hidden'); }
 function nudge(dx, dy) { if (!placing) return; [dx, dy] = rotVinv(dx, dy).map(Math.round); placing.x += dx; placing.y += dy; updateGhost(); }
 
@@ -4410,7 +4418,8 @@ function openArms() { if (!S) return; if (!S.arms) S.arms = Object.assign({}, AR
     <h4>Figura</h4><div class="arow">${ARMS_SYM.map(v => `<button class="achip s ${a.sym === v ? 'on' : ''}" onclick="setArms('sym','${v}')">${v}</button>`).join('')}</div>
     <div class="acts"><button class="btn" onclick="closeSheet()">✓ Fatto</button></div></div>`, 'arms'); }
 function setArms(k, v) { if (!S.arms) S.arms = Object.assign({}, ARMS()); S.arms[k] = v; for (const key in CACHE) if (key.startsWith('stendardo')) delete CACHE[key]; save(); updateHUD(); openArms(); }
-function rotDeco(id) { const r = S.buildings.find(b => b.id === id); if (!r) return; r.rot = ((r.rot || 0) + 1) % 4; const b = SC && SC.B.find(x => x.ref === r); if (b) { b.c3k = null; } save(); sfx('tock'); }
+const WALL_DIR = ['automatica (segue i pezzi vicini)', 'dritta ↘', 'dritta ↙', 'in diagonale ↕', 'in diagonale ↔'];
+function rotDeco(id) { const r = S.buildings.find(b => b.id === id); if (!r) return; r.rot = ((r.rot || 0) + 1) % (BDEF[r.t].wall ? 5 : 4); if (BDEF[r.t].wall) toast('↻ Direzione: ' + WALL_DIR[r.rot]); const b = SC && SC.B.find(x => x.ref === r); if (b) { b.c3k = null; } save(); sfx('tock'); }
 let BTAB = 'b';
 function openBuild(tab) {
   if (tab) BTAB = tab; const deco = BTAB === 'd';
@@ -4480,7 +4489,7 @@ function openBuildingInfo(r) {
   if (r.nat) body = body.replace('<p class="desc">', '<p class="desc"><b>Ostacolo naturale.</b> Impedisce di costruire qui: rimuovilo per liberare spazio e ottenere risorse. ');
   if (r.t !== 'mastio' && !(d.decor && d.rm)) body += workOn('demo', r.id) ? `<button class="btn dis">🔨 Demolizione… ${fmtT(workOn('demo', r.id).end - now())}</button>` : `<button class="btn ghost" onclick="demolish(${r.id})">🔨 Demolisci<small>${costStr({ cibo: 10 * r.lvl })} · ⏱ ${Math.max(4, Math.round((d.t || 4) * 0.6 * r.lvl))}s · rimborso 30%</small></button>`;
   if (r.t !== 'mastio' && !r.nat) body += `<button class="btn ghost" onclick="startPlacement('${r.t}', S.buildings.find(b=>b.id===${r.id}))">✥ Sposta</button>`;
-  if (d.decor && DFIT[r.t] && !DYAW_RND[r.t]) body += `<button class="btn ghost" onclick="rotDeco(${r.id})">↻ Ruota</button>`;
+  if ((d.decor && DFIT[r.t] && !DYAW_RND[r.t]) || d.wall) body += `<button class="btn ghost" onclick="rotDeco(${r.id})">↻ Ruota</button>`;
   body += `</div>`;
   body = body.replace('<div class="acts">', extra + '<div class="acts">');
   openSheet(`${d.icon} ${d.n}`, body, 'b:' + r.id);
@@ -4714,7 +4723,7 @@ function heroCard(k) { const h = BT.heroes.find(h => h.k === k); if (!h) return;
 // conferma dentro al gioco (i popup del browser sono bloccati nella pagina pubblicata)
 let ASK = null;
 // ---- aggiornamento automatico: se su GitHub c'è una versione nuova, ricarica scavalcando la cache ----
-const BUILD = 'f727d417ad';
+const BUILD = '4f88c86509';
 function checkUpdate() { if (BUILD.startsWith('__') || !/github\.io$/.test(location.hostname)) return;
   fetch('version.txt?t=' + Date.now(), { cache: 'no-store' }).then(r => r.ok ? r.text() : '').then(v => { v = (v || '').trim(); if (!v || v === BUILD) return; let tried = ''; try { tried = sessionStorage.getItem('feudum_upd') || ''; } catch (e) { } if (tried === v) return; try { sessionStorage.setItem('feudum_upd', v); } catch (e) { }
     try { if (S && MODE !== 'title') save(); } catch (e) { } location.replace(location.pathname + '?v=' + v); }).catch(() => { }); }

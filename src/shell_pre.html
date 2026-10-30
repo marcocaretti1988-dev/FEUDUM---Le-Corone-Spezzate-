@@ -73,6 +73,7 @@ h4{font-family:var(--fh);margin:12px 0 6px}
 .stars{font-size:40px;color:#d9a520;text-shadow:0 2px 0 #6b4a10;letter-spacing:4px}.stars span{color:rgba(0,0,0,.18);text-shadow:none}
 .result .row{font-size:13px;margin:4px 0}.lore{font-style:italic;color:#5c3a25;margin:10px 0 14px}
 /* placement bar */
+#pbrot{margin-top:2px;padding:7px 16px;border-radius:20px;border:2px solid #d9b25a;background:#2b1a0f;color:#f5e6c4;font-family:var(--fh);font-weight:700;font-size:14px}
 #placebar{position:fixed;left:0;right:0;bottom:0;padding:8px 8px calc(var(--sab) + 10px);display:flex;flex-direction:column;align-items:center;gap:6px;background:linear-gradient(0deg,rgba(30,24,18,.92),transparent)}
 #placeinfo{color:#f5e6c4;font-size:12.5px;text-align:center}#placeinfo .no{color:#ff9a87}
 .prow{display:flex;gap:6px;align-items:center}
@@ -612,6 +613,7 @@ body.asking #title,body.asking #sheet,body.asking #hud{pointer-events:none}
     <div class="pad"><span></span><button onclick="nudge(0,-1)">↗</button><span></span><button onclick="nudge(-1,0)">↖</button><span></span><button onclick="nudge(1,0)">↘</button><span></span><button onclick="nudge(0,1)">↙</button><span></span></div>
     <button class="pbtn ok" onclick="confirmPlace()">✓</button>
   </div>
+  <button id="pbrot" class="hidden" onclick="rotPlace()">↻ Gira</button>
 </div>
 <div id="bhud" class="hidden"><div id="btop"></div><div id="bord"></div><div id="bbot"><div id="bcards"></div><button class="rbtn" onclick="retreat()">🏳 Ritirata</button></div></div>
 <div id="sheet" class="hidden"><div class="sh-h"><div id="sheet-t"></div><button class="x" onclick="closeSheet()">✕</button></div><div id="sheet-b"></div></div>
