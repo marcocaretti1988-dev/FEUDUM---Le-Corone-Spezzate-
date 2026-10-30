@@ -29,7 +29,7 @@ button{font-family:inherit;cursor:pointer}
 .chip .ic{font-size:13px}.chip .cap{font-size:9px;color:#c4b096;opacity:.7;font-weight:600}
 .chip>i{position:absolute;left:0;bottom:0;height:2px;background:linear-gradient(90deg,#b45309,#d9b25a)}
 #era{color:#f5e6c4;font-size:11px;text-shadow:0 1px 2px #000;display:flex;flex-direction:column;gap:1px}
-#era .m{font-family:var(--fh);font-size:12px;letter-spacing:.04em}#era .n{opacity:.85}
+#era .m{font-family:var(--fh);font-size:12px;letter-spacing:.04em}#era .gday{color:#ffe08a;font-variant-numeric:tabular-nums;cursor:pointer;white-space:nowrap}#era .n{opacity:.85}
 #hud-bot{pointer-events:auto;position:fixed;left:0;right:0;bottom:0;padding:8px 8px calc(var(--sab) + 8px);display:flex;gap:6px;justify-content:center;background:linear-gradient(0deg,rgba(30,24,18,.9),transparent)}
 .hb{flex:1;max-width:120px;display:flex;flex-direction:column;align-items:center;gap:1px;padding:8px 4px 7px;border-radius:12px;border:1px solid #6b5338;background:linear-gradient(180deg,#f6ead0,#d9c39a);color:var(--ink);font-family:var(--fh);font-weight:700;font-size:11px;letter-spacing:.03em;box-shadow:0 3px 0 #5c3a25,0 6px 12px rgba(0,0,0,.45)}
 .hb .i{font-size:20px;line-height:1}.hb:active{transform:translateY(2px);box-shadow:0 1px 0 #5c3a25}
@@ -547,21 +547,21 @@ html[data-theme=miniatura] #tbtns .tb .bl{font-size:17px;letter-spacing:.02em}
 #hud-bot .hb.img .i{display:block;width:100%;max-width:66px;aspect-ratio:1;background-size:contain;background-repeat:no-repeat;background-position:center;filter:drop-shadow(0 3px 4px rgba(0,0,0,.6));position:relative}
 #hud-bot .hb.img:active{transform:translateY(2px)}
 #hud-bot .hb.img .i .ico{position:absolute;left:22%;top:20%;width:56%;height:56%;filter:drop-shadow(0 2px 2px rgba(0,0,0,.7))}
-#hud-bot .k-esercito .i{background-image:url(ui/hb_esercito.webp?v=e6f5e4a747)}#hud-bot .k-esercito:active .i{background-image:url(ui/hb_esercito_p.webp?v=e6f5e4a747)}
-#hud-bot .k-attacca .i{background-image:url(ui/hb_attacca.webp?v=e6f5e4a747)}#hud-bot .k-attacca:active .i{background-image:url(ui/hb_attacca_p.webp?v=e6f5e4a747)}
-#hud-bot .k-menu .i{background-image:url(ui/hb_menu.webp?v=e6f5e4a747)}#hud-bot .k-menu:active .i{background-image:url(ui/hb_menu_p.webp?v=e6f5e4a747)}
-#hud-bot .k-mastio .i{background-image:url(ui/hb_mastio.webp?v=e6f5e4a747)}#hud-bot .k-mastio:active .i{background-image:url(ui/hb_mastio_p.webp?v=e6f5e4a747)}
-#hud-bot .k-costruisci .i{background-image:url(ui/hb_costruisci.webp?v=e6f5e4a747)}#hud-bot .k-costruisci:active .i{background-image:url(ui/hb_costruisci_p.webp?v=e6f5e4a747)}
+#hud-bot .k-esercito .i{background-image:url(ui/hb_esercito.webp?v=f727d417ad)}#hud-bot .k-esercito:active .i{background-image:url(ui/hb_esercito_p.webp?v=f727d417ad)}
+#hud-bot .k-attacca .i{background-image:url(ui/hb_attacca.webp?v=f727d417ad)}#hud-bot .k-attacca:active .i{background-image:url(ui/hb_attacca_p.webp?v=f727d417ad)}
+#hud-bot .k-menu .i{background-image:url(ui/hb_menu.webp?v=f727d417ad)}#hud-bot .k-menu:active .i{background-image:url(ui/hb_menu_p.webp?v=f727d417ad)}
+#hud-bot .k-mastio .i{background-image:url(ui/hb_mastio.webp?v=f727d417ad)}#hud-bot .k-mastio:active .i{background-image:url(ui/hb_mastio_p.webp?v=f727d417ad)}
+#hud-bot .k-costruisci .i{background-image:url(ui/hb_costruisci.webp?v=f727d417ad)}#hud-bot .k-costruisci:active .i{background-image:url(ui/hb_costruisci_p.webp?v=f727d417ad)}
 #hud-bot .hb.img.dis .i,#hud-bot .hb.img:disabled .i{filter:grayscale(1) brightness(.8)}
 #hud-bot{gap:4px!important;padding-left:6px!important;padding-right:6px!important}
 /* ===== icone dipinte delle risorse ===== */
-.ico.ico-cibo{background-image:url(ui/rs_cibo.webp?v=e6f5e4a747)!important;background-size:cover!important;border-radius:22%}#res .chip:active .ico-cibo{background-image:url(ui/rs_cibo_p.webp?v=e6f5e4a747)!important}
-.ico.ico-legno{background-image:url(ui/rs_legno.webp?v=e6f5e4a747)!important;background-size:cover!important;border-radius:22%}#res .chip:active .ico-legno{background-image:url(ui/rs_legno_p.webp?v=e6f5e4a747)!important}
-.ico.ico-oro{background-image:url(ui/rs_oro.webp?v=e6f5e4a747)!important;background-size:cover!important;border-radius:22%}#res .chip:active .ico-oro{background-image:url(ui/rs_oro_p.webp?v=e6f5e4a747)!important}
-.ico.ico-pietra{background-image:url(ui/rs_pietra.webp?v=e6f5e4a747)!important;background-size:cover!important;border-radius:22%}#res .chip:active .ico-pietra{background-image:url(ui/rs_pietra_p.webp?v=e6f5e4a747)!important}
-.ico.ico-ferro{background-image:url(ui/rs_ferro.webp?v=e6f5e4a747)!important;background-size:cover!important;border-radius:22%}#res .chip:active .ico-ferro{background-image:url(ui/rs_ferro_p.webp?v=e6f5e4a747)!important}
-.ico.ico-pelli{background-image:url(ui/rs_pelli.webp?v=e6f5e4a747)!important;background-size:cover!important;border-radius:22%}#res .chip:active .ico-pelli{background-image:url(ui/rs_pelli_p.webp?v=e6f5e4a747)!important}
-.ico.ico-favore{background-image:url(ui/rs_favore.webp?v=e6f5e4a747)!important;background-size:cover!important;border-radius:22%}#res .chip:active .ico-favore{background-image:url(ui/rs_favore_p.webp?v=e6f5e4a747)!important}
+.ico.ico-cibo{background-image:url(ui/rs_cibo.webp?v=f727d417ad)!important;background-size:cover!important;border-radius:22%}#res .chip:active .ico-cibo{background-image:url(ui/rs_cibo_p.webp?v=f727d417ad)!important}
+.ico.ico-legno{background-image:url(ui/rs_legno.webp?v=f727d417ad)!important;background-size:cover!important;border-radius:22%}#res .chip:active .ico-legno{background-image:url(ui/rs_legno_p.webp?v=f727d417ad)!important}
+.ico.ico-oro{background-image:url(ui/rs_oro.webp?v=f727d417ad)!important;background-size:cover!important;border-radius:22%}#res .chip:active .ico-oro{background-image:url(ui/rs_oro_p.webp?v=f727d417ad)!important}
+.ico.ico-pietra{background-image:url(ui/rs_pietra.webp?v=f727d417ad)!important;background-size:cover!important;border-radius:22%}#res .chip:active .ico-pietra{background-image:url(ui/rs_pietra_p.webp?v=f727d417ad)!important}
+.ico.ico-ferro{background-image:url(ui/rs_ferro.webp?v=f727d417ad)!important;background-size:cover!important;border-radius:22%}#res .chip:active .ico-ferro{background-image:url(ui/rs_ferro_p.webp?v=f727d417ad)!important}
+.ico.ico-pelli{background-image:url(ui/rs_pelli.webp?v=f727d417ad)!important;background-size:cover!important;border-radius:22%}#res .chip:active .ico-pelli{background-image:url(ui/rs_pelli_p.webp?v=f727d417ad)!important}
+.ico.ico-favore{background-image:url(ui/rs_favore.webp?v=f727d417ad)!important;background-size:cover!important;border-radius:22%}#res .chip:active .ico-favore{background-image:url(ui/rs_favore_p.webp?v=f727d417ad)!important}
 #res .chip .ic{height:34px!important}#res .chip .ic .ico{width:34px!important;height:34px!important;filter:drop-shadow(0 2px 2px rgba(0,0,0,.6))}
 #res .chip{padding-top:4px!important}
 .cc .ico,.costs .ico,.btn small .ico{width:1.4em;height:1.4em;vertical-align:-.38em}
@@ -715,7 +715,7 @@ function need3d(k, low) {
 function pump3d() {
   while (L3.active < L3.max && (L3.q.length || (L3.prefetch.length && L3.active < 1))) {
     const k = L3.q.length ? L3.q.shift() : L3.prefetch.shift(); if (L3.state[k] !== 'q') continue; L3.state[k] = 'l'; L3.active++;
-    const sc = document.createElement('script'); sc.src = 'm3d_' + k + '.js?v=e6f5e4a747'; sc.async = true;
+    const sc = document.createElement('script'); sc.src = 'm3d_' + k + '.js?v=f727d417ad'; sc.async = true;
     sc.onload = () => { L3.state[k] = 'ok'; L3.active--; if (G3.gl && M3D[k]) { if (!G3.models[k]) g3load(k, M3D[k]); for (const a in M3D_ALIAS) if (M3D_ALIAS[a] === k && !G3.models[a] && a !== 'mastio') G3.models[a] = G3.models[k]; delete M3D[k]; } pump3d(); };
     sc.onerror = () => { L3.state[k] = 'err'; L3.active--; pump3d(); };
     document.head.appendChild(sc);
@@ -1639,7 +1639,7 @@ if (SET.mvol == null) SET.mvol = 0.45; if (SET.fvol == null) SET.fvol = 0.8; if 
 const MUS = { el: null, src: null, g: null, duck: false, get on() { return SET.music !== false; } };
 let FXG = null;
 function fxOut(a) { if (!FXG) { FXG = a.createGain(); FXG.connect(a.destination); } FXG.gain.value = SET.mute ? 0 : SET.fvol; return FXG; }
-function musicApply() { const mv = SET.mute || MUS.duck ? 0 : SET.mvol; try { if (RAIDM.el) RAIDM.el.volume = SET.mute ? 0 : Math.min(1, SET.mvol * 1.1); } catch (e) { } if (MUS.g) MUS.g.gain.value = mv; else if (MUS.el) MUS.el.volume = mv; if (FXG) FXG.gain.value = SET.mute ? 0 : SET.fvol; if (TENS.g) TENS.g.gain.value = SET.mute || !MUS.on ? 0 : SET.mvol * 0.9; }
+function musicApply() { const mv = SET.mute || MUS.duck ? 0 : SET.mvol; try { if (RAIDM.el) RAIDM.el.volume = SET.mute ? 0 : Math.min(1, SET.mvol * 1.1); } catch (e) { } if (MUS.g) MUS.g.gain.value = mv; else if (MUS.el) MUS.el.volume = mv; if (FXG) FXG.gain.value = SET.mute ? 0 : SET.fvol; if (TENS.g) TENS.g.gain.value = SET.mute || !MUS.on ? 0 : SET.mvol * 0.9; if (typeof FESTM !== 'undefined' && FESTM.g) FESTM.g.gain.value = SET.mute || !MUS.on ? 0.0001 : SET.mvol; }
 function musicStart() {
   if (!MUS.on || SET.mute || document.hidden || MUS.duck) return;
   if (!MUS.el) { MUS.el = new Audio('feudum.mp3'); MUS.el.loop = true; MUS.el.preload = 'auto'; const a = ac(); if (a) { try { MUS.src = a.createMediaElementSource(MUS.el); MUS.g = a.createGain(); MUS.src.connect(MUS.g).connect(a.destination); } catch (e) { MUS.g = null; } } musicApply(); }
@@ -1650,8 +1650,8 @@ function musicStop() { if (MUS.el && !MUS.el.paused) MUS.el.pause(); }
 // festa in piazza: la musica di base si zittisce finché suona il saltarello, poi torna piano piano
 function musicFesta(on) {
   if (!!MUS.festa === !!on) return; MUS.festa = !!on; const a = AC;
-  if (on) { if (TENS.kind) return; MUS.duck = true; if (MUS.g && MUS.el && a) { const t = a.currentTime; MUS.g.gain.cancelScheduledValues(t); MUS.g.gain.setValueAtTime(MUS.g.gain.value, t); MUS.g.gain.linearRampToValueAtTime(0, t + 1.0); setTimeout(() => { if (MUS.duck) musicStop(); }, 1100); } else musicStop(); return; }
-  if (TENS.kind) return; MUS.duck = false; setTimeout(() => { if (TENS.kind || MUS.festa) return; musicStart(); if (MUS.g && AC) { const t = AC.currentTime; MUS.g.gain.cancelScheduledValues(t); MUS.g.gain.setValueAtTime(0, t); MUS.g.gain.linearRampToValueAtTime(SET.mute ? 0 : SET.mvol, t + 2.5); } else musicApply(); }, 1500);
+  if (on) { if (TENS.kind) return; MUS.duck = true; if (MUS.g && MUS.el && a) { const t = a.currentTime; MUS.g.gain.cancelScheduledValues(t); MUS.g.gain.setValueAtTime(MUS.g.gain.value, t); MUS.g.gain.linearRampToValueAtTime(0, t + 2.0); setTimeout(() => { if (MUS.duck) musicStop(); }, 2100); } else musicStop(); return; }
+  if (TENS.kind) return; MUS.duck = false; setTimeout(() => { if (TENS.kind || MUS.festa) return; musicStart(); if (MUS.g && AC) { const t = AC.currentTime; MUS.g.gain.cancelScheduledValues(t); MUS.g.gain.setValueAtTime(0, t); MUS.g.gain.linearRampToValueAtTime(SET.mute ? 0 : SET.mvol, t + 3.0); } else musicApply(); }, 1200);
 }
 function audioRefresh() { saveSet(); musicApply(); if (MUS.on && !SET.mute) musicStart(); else musicStop(); if (TENS.kind && (!MUS.on || SET.mute)) tensionStop(true); updateSndBtn(); }
 function musicToggle() { SET.music = !MUS.on; audioRefresh(); }
@@ -1659,9 +1659,9 @@ function toggleMute() { SET.mute = !SET.mute; audioRefresh(); if (!SET.mute) sfx
 function updateSndBtn() { const b = $('#sndmute'); if (b) { b.textContent = SET.mute ? '🔇' : '🔊'; b.title = SET.mute ? 'Audio spento' : 'Audio attivo'; b.classList.toggle('off', !!SET.mute); } }
 function setVol(k, v) { SET[k] = Math.max(0, Math.min(1, v / 100)); if (SET.mute && v > 0) SET.mute = false; saveSet(); musicApply(); if (k === 'mvol' && SET.mvol > 0) musicStart(); updateSndBtn(); const o = $('#v_' + k); if (o) o.textContent = Math.round(v) + '%'; }
 // ---- prova dei suoni: ascolta musiche ed effetti senza giocare ----
-const SND_TEST = [['festa', '🎉', 'Musica della festa'], ['ram', '🐏', 'Ariete'], ['launch', '🪨', 'Catapulta: lancio'], ['boulder', '💥', 'Masso che cade'], ['ladder', '🪜', 'Scala sulle mura'], ['bow', '🏹', 'Arco del cacciatore'], ['step', '👣', 'Passi'], ['horn', '📯', 'Corno di battaglia'], ['bell', '🔔', 'Campana'], ['win', '🏆', 'Vittoria'], ['coin', '🪙', 'Monete'], ['build', '🔨', 'Costruzione'], ['crash', '🏚️', 'Crollo']];
+const SND_TEST = [['festa_raccolto', '🌾', 'Festa del Raccolto'], ['festa_feudale', '🏰', 'Festa Feudale'], ['ram', '🐏', 'Ariete'], ['launch', '🪨', 'Catapulta: lancio'], ['boulder', '💥', 'Masso che cade'], ['ladder', '🪜', 'Scala sulle mura'], ['bow', '🏹', 'Arco del cacciatore'], ['step', '👣', 'Passi'], ['horn', '📯', 'Corno di battaglia'], ['bell', '🔔', 'Campana'], ['win', '🏆', 'Vittoria'], ['coin', '🪙', 'Monete'], ['build', '🔨', 'Costruzione'], ['crash', '🏚️', 'Crollo']];
 function sndTestHTML() { return `<div class="vbox"><div class="vh"><span>🎧 Prova i suoni</span></div><div class="sndt">${SND_TEST.map(([k, ic, n]) => `<button class="btn ghost" onclick="sndTest('${k}')">${ic} ${n}</button>`).join('')}<button class="btn ghost" onclick="sndTest('raidmus')">⚔ Musica di battaglia</button><button class="btn ghost" onclick="sndTest('stop')">⏹ Ferma</button></div></div>`; }
-function sndTest(k) { const a = ac(); if (a && a.state === 'suspended') a.resume(); if (k === 'stop') { if (TENS.kind) tensionStop(); return; } if (k === 'raidmus') { if (TENS.kind) tensionStop(true); tensionStart('raid'); toast('⚔ Musica di battaglia: tocca «Ferma» per tornare alla musica del villaggio'); return; } if (k === 'step') { for (let i = 0; i < 6; i++) setTimeout(() => sfx('step'), i * 420); return; } sfx(k); }
+function sndTest(k) { const a = ac(); if (a && a.state === 'suspended') a.resume(); if (k === 'stop') { if (TENS.kind) tensionStop(); if (FESTM.node) { FESTM.test = false; festaTrackStop(); if (!(S && S.fest)) musicFesta(false); } return; } if (k.startsWith('festa_')) { const T = trackLoad(k); if (!T || !T.buf) { toast(T && T.bad ? 'Musica non disponibile' : '⏳ La musica si sta caricando, riprova tra un attimo'); return; } if (TENS.kind) tensionStop(true); FESTM.test = true; musicFesta(true); festaTrack(k.slice(6)); if (FESTM.node) FESTM.node.onended = () => { if (FESTM.test) { FESTM.test = false; festaTrackStop(true); if (!(S && S.fest)) musicFesta(false); } }; toast('🎶 ' + (k === 'festa_raccolto' ? 'Festa del Raccolto' : 'Festa Feudale') + ': tocca «Ferma» per tornare alla musica del villaggio'); return; } if (k === 'raidmus') { if (TENS.kind) tensionStop(true); tensionStart('raid'); toast('⚔ Musica di battaglia: tocca «Ferma» per tornare alla musica del villaggio'); return; } if (k === 'step') { for (let i = 0; i < 6; i++) setTimeout(() => sfx('step'), i * 420); return; } sfx(k); }
 function openAudio(back) {
   const re = `openAudio(${back ? `'${back}'` : ''})`;
   openSheet('🔊 Audio', `<div class="aud">${audioHTML(re)}${sndTestHTML()}<div class="acts"><button class="btn" onclick="${back ? back : 'closeSheet()'}">✓ Fatto</button></div></div>`, 'audio');
@@ -1674,19 +1674,32 @@ const TENS = { kind: null, g: null, iv: 0, nextT: 0, step: 0, bus: null };
 const TENS_CH = [[38, [0, 3, 7]], [34, [0, 4, 7]], [31, [0, 3, 7]], [33, [0, 4, 7]]]; // Re- Sib Sol- La (midi radice + accordo)
 const mtof = m => 440 * Math.pow(2, (m - 69) / 12);
 function tensionStart(kind) {
-  const a = ac(); if (!a) return; tensionStop(true);
-  MUS.duck = true; if (MUS.g && MUS.el) { const t = a.currentTime; MUS.g.gain.cancelScheduledValues(t); MUS.g.gain.setValueAtTime(MUS.g.gain.value, t); MUS.g.gain.linearRampToValueAtTime(0, t + 1.2); setTimeout(() => { if (MUS.duck) musicStop(); }, 1300); } else musicStop();
+  const a = ac(); if (!a) return; tensionStop(true); if (typeof festaTrackStop === 'function') festaTrackStop(true);
+  MUS.duck = true; if (MUS.g && MUS.el) { const t = a.currentTime; MUS.g.gain.cancelScheduledValues(t); MUS.g.gain.setValueAtTime(MUS.g.gain.value, t); MUS.g.gain.linearRampToValueAtTime(0, t + 2.5); setTimeout(() => { if (MUS.duck) musicStop(); }, 2600); } else musicStop();
   if (!MUS.on || SET.mute) { TENS.kind = kind; return; }
   TENS.kind = kind; TENS.g = a.createGain(); TENS.g.connect(a.destination);
-  const t0 = a.currentTime; TENS.g.gain.setValueAtTime(0.0001, t0); TENS.g.gain.linearRampToValueAtTime(SET.mvol * 0.9, t0 + 1.5);
+  const t0 = a.currentTime; TENS.g.gain.setValueAtTime(0.0001, t0); TENS.g.gain.linearRampToValueAtTime(SET.mvol * 0.9, t0 + 3.0);
   if (raidTrack(a)) return; // razzie e assedi: colonna sonora "Ombre delle Terre Feudali
   TENS.bus = a.createDynamicsCompressor(); TENS.bus.threshold.value = -18; TENS.bus.ratio.value = 4; TENS.bus.connect(TENS.g);
   TENS.nextT = t0 + 0.15; TENS.step = 0;
   TENS.iv = setInterval(tensionSched, 40);
 }
+// ---- brani mp3 decodificati in WebAudio: si possono sfumare anche su iPhone (dove il volume degli <audio> è bloccato) ----
+const TRACKS = {};
+function trackLoad(name) {
+  const a = ac(); if (!a) return null; if (TRACKS[name]) return TRACKS[name];
+  const T = TRACKS[name] = { buf: null, bad: false };
+  fetch(name + '.mp3').then(r => { if (!r.ok) throw 0; return r.arrayBuffer(); })
+    .then(ab => new Promise((ok, ko) => a.decodeAudioData(ab, ok, ko))).then(b => { T.buf = b; }).catch(() => { T.bad = true; });
+  return T;
+}
+function trackPlay(name, dest, loop) { const a = AC, T = TRACKS[name]; if (!a || !T || !T.buf) return null; const s = a.createBufferSource(); s.buffer = T.buf; s.loop = !!loop; s.connect(dest); s.start(); return s; }
+function fadeGain(g, to, sec) { const a = AC; if (!a || !g) return; const t = a.currentTime; g.gain.cancelScheduledValues(t); g.gain.setValueAtTime(Math.max(0.0001, g.gain.value), t); g.gain.linearRampToValueAtTime(Math.max(0.0001, to), t + sec); }
+function tracksPreload() { trackLoad('raid'); trackLoad('festa_raccolto'); trackLoad('festa_feudale'); }
 // colonna sonora vera per le razzie (quando ti attaccano); se non si carica, resta la musica generata
-const RAIDM = { el: null, src: null, bad: false };
+const RAIDM = { el: null, src: null, bad: false, node: null };
 function raidTrack(a) {
+  const T = trackLoad('raid'); if (T && T.buf && TENS.g) { RAIDM.node = trackPlay('raid', TENS.g, true); if (RAIDM.node) return true; }
   if (RAIDM.bad) return false;
   try {
     if (!RAIDM.el) { RAIDM.el = new Audio('raid.mp3'); RAIDM.el.loop = true; RAIDM.el.preload = 'auto'; RAIDM.el.addEventListener('error', () => { RAIDM.bad = true; if (TENS.kind && !TENS.iv) { TENS.nextT = AC.currentTime + 0.1; TENS.step = 0; TENS.iv = setInterval(tensionSched, 40); } }); }
@@ -1695,10 +1708,11 @@ function raidTrack(a) {
   } catch (e) { RAIDM.bad = true; return false; }
 }
 function tensionStop(now) {
-  if (RAIDM.el && !RAIDM.el.paused) { const el = RAIDM.el; setTimeout(() => { if (!TENS.kind) el.pause(); }, now ? 400 : 2600); }
+  if (RAIDM.node) { const nd = RAIDM.node; RAIDM.node = null; setTimeout(() => { try { nd.stop(); } catch (e) { } }, now ? 400 : 3300); }
+  if (RAIDM.el && !RAIDM.el.paused) { const el = RAIDM.el, v0 = el.volume; if (now) setTimeout(() => { if (!TENS.kind) el.pause(); }, 400); else { let k = 0; const iv = setInterval(() => { k++; try { el.volume = Math.max(0, v0 * (1 - k / 30)); } catch (e) { } if (k >= 30) { clearInterval(iv); if (!TENS.kind) el.pause(); } }, 100); } }
   if (TENS.iv) clearInterval(TENS.iv); TENS.iv = 0; const g = TENS.g, a = AC; TENS.g = null; const wasOn = !!TENS.kind; TENS.kind = null;
-  if (g && a) { const t = a.currentTime; g.gain.cancelScheduledValues(t); g.gain.setValueAtTime(g.gain.value, t); g.gain.linearRampToValueAtTime(0, t + (now ? 0.2 : 2.2)); setTimeout(() => { try { g.disconnect(); } catch (e) { } }, now ? 400 : 2600); }
-  if (wasOn && !now) { MUS.duck = !!MUS.festa; setTimeout(() => { if (TENS.kind || MUS.festa) return; musicStart(); if (MUS.g && AC) { const t = AC.currentTime; MUS.g.gain.cancelScheduledValues(t); MUS.g.gain.setValueAtTime(0, t); MUS.g.gain.linearRampToValueAtTime(SET.mute ? 0 : SET.mvol, t + 2.5); } else musicApply(); }, 1600); }
+  if (g && a) { const t = a.currentTime; g.gain.cancelScheduledValues(t); g.gain.setValueAtTime(g.gain.value, t); g.gain.linearRampToValueAtTime(0, t + (now ? 0.2 : 3.0)); setTimeout(() => { try { g.disconnect(); } catch (e) { } }, now ? 400 : 3400); }
+  if (wasOn && !now) { MUS.duck = !!MUS.festa; setTimeout(() => { if (TENS.kind || MUS.festa) return; musicStart(); if (MUS.g && AC) { const t = AC.currentTime; MUS.g.gain.cancelScheduledValues(t); MUS.g.gain.setValueAtTime(0, t); MUS.g.gain.linearRampToValueAtTime(SET.mute ? 0 : SET.mvol, t + 3.5); } else musicApply(); }, 900); }
   else if (!now) { MUS.duck = false; musicApply(); }
 }
 function tensionSched() {
@@ -1730,7 +1744,7 @@ function tensionStep(a, t, st, s16, raid, late) {
   if (raid && sb === 0 && bar % 2 === 0) { [1, 2.01, 2.76, 4.07].forEach((m, i) => osc('sine', mtof(root + 12) * m, 0.07 / (i + 1), 0.005, 2.6 - i * 0.4)); }
 }
 let AC = null;
-function ac() { if (!AC) { try { AC = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { } } if (AC && AC.state === 'suspended') AC.resume(); return AC; }
+function ac() { if (!AC) { try { AC = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { } if (AC) setTimeout(tracksPreload, 1500); } if (AC && AC.state === 'suspended') AC.resume(); return AC; }
 // ---- musica della festa: un saltarello medievale (flauto, cornamusa con bordone, tamburello) ----
 function festaMusic(a, OUT) {
   const t0 = a.currentTime + 0.05, beat = 0.19; // crome in 6/8, tempo vivace
@@ -2269,16 +2283,24 @@ let FEST_T = 240, FEST_MT = 0;
 function festTick(dt) {
   if (!S || S.creative || MODE !== 'village' || !SC) return;
   if (S.fest && now() > S.fest.end) { S.fest = null; }
-  musicFesta(!!S.fest);
-  if (S.fest) { FEST_MT = (FEST_MT || 0) - dt; if (FEST_MT <= 0) { FEST_MT = 9.1; sfx('festa'); } }
+  musicFesta(!!S.fest || !!FESTM.test);
+  if (S.fest && !FESTM.node) { FEST_MT = (FEST_MT || 0) - dt; if (FEST_MT <= 0) { FEST_MT = 9.1; if (!festaTrack()) sfx('festa'); } }
+  if (!S.fest && FESTM.node && !FESTM.test) festaTrackStop();
   if (famine()) { if (!S.famineWarned) { S.famineWarned = 1; toast('🍂 Carestia! Il granaio è vuoto: le case si spengono e il popolo è malcontento (-10% produzione)'); sfx('bell'); } } else S.famineWarned = 0;
   FEST_T -= dt; if (FEST_T > 0 || S.fest) return; FEST_T = 420 + Math.random() * 300;
   if (umore() < 70 || !PATHC.plaza || (S.nightIn != null && S.nightIn < 120)) return;
   festStart();
 }
+// le feste si alternano: una volta la Festa del Raccolto, la volta dopo la Festa Feudale (ognuna con la sua musica)
+const FESTE = { raccolto: { n: 'Festa del Raccolto', ic: '🌾', d: 'il popolo balla attorno al falò per il grano nuovo', dur: 49 }, feudale: { n: 'Festa Feudale', ic: '🏰', d: 'stendardi, musici e danze in tondo davanti al Mastio', dur: 52 } };
+const FESTM = { node: null, g: null, test: false };
+function festaTrack(kk) { const k = kk || (S && S.fest && S.fest.k) || 'raccolto'; const a = ac(); if (!a || !MUS.on || SET.mute) return false; const T = trackLoad('festa_' + k); if (!T || !T.buf) return false;
+  festaTrackStop(true); FESTM.g = a.createGain(); FESTM.g.gain.value = 0.0001; FESTM.g.connect(a.destination); FESTM.node = trackPlay('festa_' + k, FESTM.g, false); if (!FESTM.node) return false; fadeGain(FESTM.g, SET.mvol, 1.5); return true; }
+function festaTrackStop(subito) { const nd = FESTM.node, g = FESTM.g; FESTM.node = null; FESTM.g = null; if (!nd) return; fadeGain(g, 0.0001, subito ? 0.2 : 2.5); setTimeout(() => { try { nd.stop(); g.disconnect(); } catch (e) { } }, subito ? 300 : 2700); }
 function festStart() {
-  const [px, py] = PATHC.plaza || [MCX, MCX]; S.fest = { end: now() + 50000, x: px + 1.2, y: py + 1.4 };
-  addRes('favore', 1); toast('🎉 Festa in piazza! Il popolo è felice e balla attorno al falò: +1 👑 Favore'); sfx('festa'); FEST_MT = 9.1; festFX();
+  const [px, py] = PATHC.plaza || [MCX, MCX]; S.festN = (S.festN || 0) + 1; const k = S.festN % 2 ? 'raccolto' : 'feudale', F = FESTE[k];
+  S.fest = { end: now() + F.dur * 1000, x: px + 1.2, y: py + 1.4, k };
+  addRes('favore', 1); toast(`${F.ic} ${F.n}! ${F.d[0].toUpperCase() + F.d.slice(1)}: +1 👑 Favore`); FEST_MT = 9.1; if (!festaTrack()) sfx('festa'); festFX();
   for (const u of SC.U) if (u.ai === workerAI || u.kid) { u.st = 'rest'; u.wt = Math.random() * 2; }
 }
 function festFX() { if (!S.fest || !SC) return; if (SC.FX.some(f => f.k === 'festa')) return; SC.FX.push({ k: 'festa', x: S.fest.x, y: S.fest.y, t: 0, dur: Math.max(1, (S.fest.end - now()) / 1000), draw: drawFesta }); }
@@ -3781,9 +3803,13 @@ function diary() { if (!S.diary) S.diary = { t0: now(), play: 0, sess: 1, lastSe
 function diaryTick(dt) {
   if (!S || S.creative || S.sandbox || MODE === 'title') return; const D = diary();
   if (now() - D.lastSeen > 10 * 60 * 1000) D.sess++; D.lastSeen = now(); D.play += dt;
+  const oggi = new Date().toDateString(); if (!D.days) D.days = [new Date(D.t0).toDateString()]; if (D.days[D.days.length - 1] !== oggi) D.days.push(oggi);
   if (!D.lvl[S.mastio]) D.lvl[S.mastio] = [Math.round(D.play), now()];
   const q = QUESTS[S.mq]; if (q && D.ch[q.ch] == null) D.ch[q.ch] = [Math.round(D.play), now()];
 }
+// segna-giorni: quanti giorni diversi hai giocato e quanto tempo di gioco attivo (scorre mentre giochi)
+function giorniGioco() { const D = S && S.diary; return D ? (D.days || [1]).length : 1; }
+function oreGioco() { const s = Math.floor(S && S.diary ? S.diary.play : 0), h = Math.floor(s / 3600), m = Math.floor(s / 60) % 60, ss = s % 60; return h ? `${h}:${String(m).padStart(2, '0')}:${String(ss).padStart(2, '0')}` : `${m}:${String(ss).padStart(2, '0')}`; }
 function diaryWaste(r, v) { if (!S || S.creative || !S.diary || v <= 0) return; S.diary.waste[r] = (S.diary.waste[r] || 0) + v; }
 const hm = s => { s = Math.round(s); const h = Math.floor(s / 3600), m = Math.floor(s / 60) % 60; return h ? `${h}h ${String(m).padStart(2, '0')}m` : `${m}m`; };
 const dayOf = t => 1 + Math.floor((t - diary().t0) / 86400000);
@@ -3804,7 +3830,7 @@ function openDiary() {
   const chs = Object.keys(D.ch).map(k => `<tr><td>Cap. ${CHAPTERS[k].n}</td><td>${hm(D.ch[k][0])}</td><td colspan="3">giorno ${dayOf(D.ch[k][1])}</td></tr>`).join('');
   const w = Object.keys(D.waste).map(k => `${ICO(k)} ${fmt(Math.round(D.waste[k]))}`).join(' ') || 'niente';
   const raidsH = D.play > 600 ? ((S.raids || 0) / (D.play / 3600)).toFixed(1) : '—';
-  openSheet('📈 Diario del ritmo', `<div class="diary"><div class="dsum"><div><b>${hm(D.play)}</b><small>gioco attivo</small></div><div><b>${D.sess}</b><small>sessioni</small></div><div><b>${hm(D.play / Math.max(1, D.sess))}</b><small>sessione media</small></div><div><b>${dayOf(now())}</b><small>giorno</small></div></div>
+  openSheet('📈 Diario del ritmo', `<div class="diary"><div class="dsum"><div><b>${giorniGioco()}</b><small>giorni di gioco</small></div><div><b>${hm(D.play)}</b><small>gioco attivo</small></div><div><b>${D.sess}</b><small>sessioni</small></div><div><b>${hm(D.play / Math.max(1, D.sess))}</b><small>sessione media</small></div><div><b>${dayOf(now())}</b><small>giorno</small></div></div>
     <table><tr><th>Traguardo</th><th>Tu</th><th>Previsto</th><th></th><th></th></tr>${rows}${chs}</table>
     <div class="row"><b>Sprecato a magazzino pieno:</b> ${w}</div><div class="row"><b>Razzie all'ora:</b> ${raidsH} · <b>eventi</b> ${S.events || 0} · <b>assedi vinti</b> ${S.wins || 0}</div>
     <p class="desc">Il diario registra quanto tempo di gioco attivo serve per ogni traguardo e lo confronta con il ritmo previsto. Copialo e incollalo in chat: così sistemiamo i numeri sui dati veri.</p>
@@ -4332,7 +4358,7 @@ function updateHUD() {
   const nt = Math.max(0, S.nightIn || 0) * 1000; const mm = Math.floor(nt / 60000), ss = Math.floor(nt / 1000) % 60; const truce = !S.raids;
   if (S.creative) { const qe0 = $('#quest'); if (qe0) qe0.innerHTML = '<span class="ql">🧱 Modalità Creativa</span> <span class="qt">tutto sbloccato · risorse infinite · niente razzie</span>'; }
   const qe = S.creative ? null : $('#quest'); if (qe) { const h = questHTML(); if (qe.dataset.h !== h) { qe.innerHTML = h; qe.dataset.h = h; } qe.classList.toggle('ready', !!(QUESTS[S.mq] && QUESTS[S.mq].c())); }
-  $('#era').innerHTML = `<div class="m">${S.creative ? '' : `<span onclick="openArms()" style="cursor:pointer;margin-right:3px">${crestSVG(ARMS(), 13)}</span>`}<b>Mastio ${S.mastio}</b> · <span style="color:${e.hc}">${e.n}</span> · A.D. ${YEAR(S.mastio)} · <span style="color:${DF().col === '#8f1d1d' ? '#ff8a7a' : DF().col === '#3f7a2e' ? '#9fe08a' : '#ffcf7a'}">${DF().n}</span></div><div class="n">${truce ? ICO('truce') + ' Tregua: predoni tra' : ICO('moon') + ' Notte tra'} ${mm}:${String(ss).padStart(2, '0')} · ${ICO('pop')} ${popTxt()} · ${ICO('hammer')} ${builders()}/${MAX_BUILDERS}${S.creative ? '' : ` · <span onclick="openMood()" style="cursor:pointer">${umoreWord(umore())[0]} ${umore()}</span>`}</div>`;
+  $('#era').innerHTML = `<div class="m">${S.creative ? '' : `<span onclick="openArms()" style="cursor:pointer;margin-right:3px">${crestSVG(ARMS(), 13)}</span>`}<b>Mastio ${S.mastio}</b> · <span style="color:${e.hc}">${e.n}</span> · A.D. ${YEAR(S.mastio)}${S.creative || S.sandbox ? '' : ` · <span class="gday" onclick="openDiary()">📅 Giorno ${giorniGioco()} · ⏱ ${oreGioco()}</span>`}</div><div class="n">${truce ? ICO('truce') + ' Tregua: predoni tra' : ICO('moon') + ' Notte tra'} ${mm}:${String(ss).padStart(2, '0')} · ${ICO('pop')} ${popTxt()} · ${ICO('hammer')} ${builders()}/${MAX_BUILDERS}${S.creative ? '' : ` · <span onclick="openMood()" style="cursor:pointer">${umoreWord(umore())[0]} ${umore()}</span>`}</div>`;
 }
 function resInfo(r) { if (!S) return; const c = caps(); toast(`${ICO(r)} ${RNAME[r]}: ${fmt(S.res[r])}${r !== 'favore' ? ' / ' + fmt(c[r]) + (S.res[r] >= c[r] ? ' — magazzino pieno!' : '') : ''}`); }
 function audioHTML(back) {
@@ -4688,7 +4714,7 @@ function heroCard(k) { const h = BT.heroes.find(h => h.k === k); if (!h) return;
 // conferma dentro al gioco (i popup del browser sono bloccati nella pagina pubblicata)
 let ASK = null;
 // ---- aggiornamento automatico: se su GitHub c'è una versione nuova, ricarica scavalcando la cache ----
-const BUILD = 'e6f5e4a747';
+const BUILD = 'f727d417ad';
 function checkUpdate() { if (BUILD.startsWith('__') || !/github\.io$/.test(location.hostname)) return;
   fetch('version.txt?t=' + Date.now(), { cache: 'no-store' }).then(r => r.ok ? r.text() : '').then(v => { v = (v || '').trim(); if (!v || v === BUILD) return; let tried = ''; try { tried = sessionStorage.getItem('feudum_upd') || ''; } catch (e) { } if (tried === v) return; try { sessionStorage.setItem('feudum_upd', v); } catch (e) { }
     try { if (S && MODE !== 'title') save(); } catch (e) { } location.replace(location.pathname + '?v=' + v); }).catch(() => { }); }

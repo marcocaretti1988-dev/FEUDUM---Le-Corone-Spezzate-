@@ -237,9 +237,13 @@ function diary() { if (!S.diary) S.diary = { t0: now(), play: 0, sess: 1, lastSe
 function diaryTick(dt) {
   if (!S || S.creative || S.sandbox || MODE === 'title') return; const D = diary();
   if (now() - D.lastSeen > 10 * 60 * 1000) D.sess++; D.lastSeen = now(); D.play += dt;
+  const oggi = new Date().toDateString(); if (!D.days) D.days = [new Date(D.t0).toDateString()]; if (D.days[D.days.length - 1] !== oggi) D.days.push(oggi);
   if (!D.lvl[S.mastio]) D.lvl[S.mastio] = [Math.round(D.play), now()];
   const q = QUESTS[S.mq]; if (q && D.ch[q.ch] == null) D.ch[q.ch] = [Math.round(D.play), now()];
 }
+// segna-giorni: quanti giorni diversi hai giocato e quanto tempo di gioco attivo (scorre mentre giochi)
+function giorniGioco() { const D = S && S.diary; return D ? (D.days || [1]).length : 1; }
+function oreGioco() { const s = Math.floor(S && S.diary ? S.diary.play : 0), h = Math.floor(s / 3600), m = Math.floor(s / 60) % 60, ss = s % 60; return h ? `${h}:${String(m).padStart(2, '0')}:${String(ss).padStart(2, '0')}` : `${m}:${String(ss).padStart(2, '0')}`; }
 function diaryWaste(r, v) { if (!S || S.creative || !S.diary || v <= 0) return; S.diary.waste[r] = (S.diary.waste[r] || 0) + v; }
 const hm = s => { s = Math.round(s); const h = Math.floor(s / 3600), m = Math.floor(s / 60) % 60; return h ? `${h}h ${String(m).padStart(2, '0')}m` : `${m}m`; };
 const dayOf = t => 1 + Math.floor((t - diary().t0) / 86400000);
@@ -260,7 +264,7 @@ function openDiary() {
   const chs = Object.keys(D.ch).map(k => `<tr><td>Cap. ${CHAPTERS[k].n}</td><td>${hm(D.ch[k][0])}</td><td colspan="3">giorno ${dayOf(D.ch[k][1])}</td></tr>`).join('');
   const w = Object.keys(D.waste).map(k => `${ICO(k)} ${fmt(Math.round(D.waste[k]))}`).join(' ') || 'niente';
   const raidsH = D.play > 600 ? ((S.raids || 0) / (D.play / 3600)).toFixed(1) : '—';
-  openSheet('📈 Diario del ritmo', `<div class="diary"><div class="dsum"><div><b>${hm(D.play)}</b><small>gioco attivo</small></div><div><b>${D.sess}</b><small>sessioni</small></div><div><b>${hm(D.play / Math.max(1, D.sess))}</b><small>sessione media</small></div><div><b>${dayOf(now())}</b><small>giorno</small></div></div>
+  openSheet('📈 Diario del ritmo', `<div class="diary"><div class="dsum"><div><b>${giorniGioco()}</b><small>giorni di gioco</small></div><div><b>${hm(D.play)}</b><small>gioco attivo</small></div><div><b>${D.sess}</b><small>sessioni</small></div><div><b>${hm(D.play / Math.max(1, D.sess))}</b><small>sessione media</small></div><div><b>${dayOf(now())}</b><small>giorno</small></div></div>
     <table><tr><th>Traguardo</th><th>Tu</th><th>Previsto</th><th></th><th></th></tr>${rows}${chs}</table>
     <div class="row"><b>Sprecato a magazzino pieno:</b> ${w}</div><div class="row"><b>Razzie all'ora:</b> ${raidsH} · <b>eventi</b> ${S.events || 0} · <b>assedi vinti</b> ${S.wins || 0}</div>
     <p class="desc">Il diario registra quanto tempo di gioco attivo serve per ogni traguardo e lo confronta con il ritmo previsto. Copialo e incollalo in chat: così sistemiamo i numeri sui dati veri.</p>

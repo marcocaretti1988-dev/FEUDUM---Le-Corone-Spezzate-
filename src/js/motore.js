@@ -966,7 +966,7 @@ if (SET.mvol == null) SET.mvol = 0.45; if (SET.fvol == null) SET.fvol = 0.8; if 
 const MUS = { el: null, src: null, g: null, duck: false, get on() { return SET.music !== false; } };
 let FXG = null;
 function fxOut(a) { if (!FXG) { FXG = a.createGain(); FXG.connect(a.destination); } FXG.gain.value = SET.mute ? 0 : SET.fvol; return FXG; }
-function musicApply() { const mv = SET.mute || MUS.duck ? 0 : SET.mvol; try { if (RAIDM.el) RAIDM.el.volume = SET.mute ? 0 : Math.min(1, SET.mvol * 1.1); } catch (e) { } if (MUS.g) MUS.g.gain.value = mv; else if (MUS.el) MUS.el.volume = mv; if (FXG) FXG.gain.value = SET.mute ? 0 : SET.fvol; if (TENS.g) TENS.g.gain.value = SET.mute || !MUS.on ? 0 : SET.mvol * 0.9; }
+function musicApply() { const mv = SET.mute || MUS.duck ? 0 : SET.mvol; try { if (RAIDM.el) RAIDM.el.volume = SET.mute ? 0 : Math.min(1, SET.mvol * 1.1); } catch (e) { } if (MUS.g) MUS.g.gain.value = mv; else if (MUS.el) MUS.el.volume = mv; if (FXG) FXG.gain.value = SET.mute ? 0 : SET.fvol; if (TENS.g) TENS.g.gain.value = SET.mute || !MUS.on ? 0 : SET.mvol * 0.9; if (typeof FESTM !== 'undefined' && FESTM.g) FESTM.g.gain.value = SET.mute || !MUS.on ? 0.0001 : SET.mvol; }
 function musicStart() {
   if (!MUS.on || SET.mute || document.hidden || MUS.duck) return;
   if (!MUS.el) { MUS.el = new Audio('music/feudum.mp3'); MUS.el.loop = true; MUS.el.preload = 'auto'; const a = ac(); if (a) { try { MUS.src = a.createMediaElementSource(MUS.el); MUS.g = a.createGain(); MUS.src.connect(MUS.g).connect(a.destination); } catch (e) { MUS.g = null; } } musicApply(); }
@@ -977,8 +977,8 @@ function musicStop() { if (MUS.el && !MUS.el.paused) MUS.el.pause(); }
 // festa in piazza: la musica di base si zittisce finché suona il saltarello, poi torna piano piano
 function musicFesta(on) {
   if (!!MUS.festa === !!on) return; MUS.festa = !!on; const a = AC;
-  if (on) { if (TENS.kind) return; MUS.duck = true; if (MUS.g && MUS.el && a) { const t = a.currentTime; MUS.g.gain.cancelScheduledValues(t); MUS.g.gain.setValueAtTime(MUS.g.gain.value, t); MUS.g.gain.linearRampToValueAtTime(0, t + 1.0); setTimeout(() => { if (MUS.duck) musicStop(); }, 1100); } else musicStop(); return; }
-  if (TENS.kind) return; MUS.duck = false; setTimeout(() => { if (TENS.kind || MUS.festa) return; musicStart(); if (MUS.g && AC) { const t = AC.currentTime; MUS.g.gain.cancelScheduledValues(t); MUS.g.gain.setValueAtTime(0, t); MUS.g.gain.linearRampToValueAtTime(SET.mute ? 0 : SET.mvol, t + 2.5); } else musicApply(); }, 1500);
+  if (on) { if (TENS.kind) return; MUS.duck = true; if (MUS.g && MUS.el && a) { const t = a.currentTime; MUS.g.gain.cancelScheduledValues(t); MUS.g.gain.setValueAtTime(MUS.g.gain.value, t); MUS.g.gain.linearRampToValueAtTime(0, t + 2.0); setTimeout(() => { if (MUS.duck) musicStop(); }, 2100); } else musicStop(); return; }
+  if (TENS.kind) return; MUS.duck = false; setTimeout(() => { if (TENS.kind || MUS.festa) return; musicStart(); if (MUS.g && AC) { const t = AC.currentTime; MUS.g.gain.cancelScheduledValues(t); MUS.g.gain.setValueAtTime(0, t); MUS.g.gain.linearRampToValueAtTime(SET.mute ? 0 : SET.mvol, t + 3.0); } else musicApply(); }, 1200);
 }
 function audioRefresh() { saveSet(); musicApply(); if (MUS.on && !SET.mute) musicStart(); else musicStop(); if (TENS.kind && (!MUS.on || SET.mute)) tensionStop(true); updateSndBtn(); }
 function musicToggle() { SET.music = !MUS.on; audioRefresh(); }
@@ -986,9 +986,9 @@ function toggleMute() { SET.mute = !SET.mute; audioRefresh(); if (!SET.mute) sfx
 function updateSndBtn() { const b = $('#sndmute'); if (b) { b.textContent = SET.mute ? '🔇' : '🔊'; b.title = SET.mute ? 'Audio spento' : 'Audio attivo'; b.classList.toggle('off', !!SET.mute); } }
 function setVol(k, v) { SET[k] = Math.max(0, Math.min(1, v / 100)); if (SET.mute && v > 0) SET.mute = false; saveSet(); musicApply(); if (k === 'mvol' && SET.mvol > 0) musicStart(); updateSndBtn(); const o = $('#v_' + k); if (o) o.textContent = Math.round(v) + '%'; }
 // ---- prova dei suoni: ascolta musiche ed effetti senza giocare ----
-const SND_TEST = [['festa', '🎉', 'Musica della festa'], ['ram', '🐏', 'Ariete'], ['launch', '🪨', 'Catapulta: lancio'], ['boulder', '💥', 'Masso che cade'], ['ladder', '🪜', 'Scala sulle mura'], ['bow', '🏹', 'Arco del cacciatore'], ['step', '👣', 'Passi'], ['horn', '📯', 'Corno di battaglia'], ['bell', '🔔', 'Campana'], ['win', '🏆', 'Vittoria'], ['coin', '🪙', 'Monete'], ['build', '🔨', 'Costruzione'], ['crash', '🏚️', 'Crollo']];
+const SND_TEST = [['festa_raccolto', '🌾', 'Festa del Raccolto'], ['festa_feudale', '🏰', 'Festa Feudale'], ['ram', '🐏', 'Ariete'], ['launch', '🪨', 'Catapulta: lancio'], ['boulder', '💥', 'Masso che cade'], ['ladder', '🪜', 'Scala sulle mura'], ['bow', '🏹', 'Arco del cacciatore'], ['step', '👣', 'Passi'], ['horn', '📯', 'Corno di battaglia'], ['bell', '🔔', 'Campana'], ['win', '🏆', 'Vittoria'], ['coin', '🪙', 'Monete'], ['build', '🔨', 'Costruzione'], ['crash', '🏚️', 'Crollo']];
 function sndTestHTML() { return `<div class="vbox"><div class="vh"><span>🎧 Prova i suoni</span></div><div class="sndt">${SND_TEST.map(([k, ic, n]) => `<button class="btn ghost" onclick="sndTest('${k}')">${ic} ${n}</button>`).join('')}<button class="btn ghost" onclick="sndTest('raidmus')">⚔ Musica di battaglia</button><button class="btn ghost" onclick="sndTest('stop')">⏹ Ferma</button></div></div>`; }
-function sndTest(k) { const a = ac(); if (a && a.state === 'suspended') a.resume(); if (k === 'stop') { if (TENS.kind) tensionStop(); return; } if (k === 'raidmus') { if (TENS.kind) tensionStop(true); tensionStart('raid'); toast('⚔ Musica di battaglia: tocca «Ferma» per tornare alla musica del villaggio'); return; } if (k === 'step') { for (let i = 0; i < 6; i++) setTimeout(() => sfx('step'), i * 420); return; } sfx(k); }
+function sndTest(k) { const a = ac(); if (a && a.state === 'suspended') a.resume(); if (k === 'stop') { if (TENS.kind) tensionStop(); if (FESTM.node) { FESTM.test = false; festaTrackStop(); if (!(S && S.fest)) musicFesta(false); } return; } if (k.startsWith('festa_')) { const T = trackLoad(k); if (!T || !T.buf) { toast(T && T.bad ? 'Musica non disponibile' : '⏳ La musica si sta caricando, riprova tra un attimo'); return; } if (TENS.kind) tensionStop(true); FESTM.test = true; musicFesta(true); festaTrack(k.slice(6)); if (FESTM.node) FESTM.node.onended = () => { if (FESTM.test) { FESTM.test = false; festaTrackStop(true); if (!(S && S.fest)) musicFesta(false); } }; toast('🎶 ' + (k === 'festa_raccolto' ? 'Festa del Raccolto' : 'Festa Feudale') + ': tocca «Ferma» per tornare alla musica del villaggio'); return; } if (k === 'raidmus') { if (TENS.kind) tensionStop(true); tensionStart('raid'); toast('⚔ Musica di battaglia: tocca «Ferma» per tornare alla musica del villaggio'); return; } if (k === 'step') { for (let i = 0; i < 6; i++) setTimeout(() => sfx('step'), i * 420); return; } sfx(k); }
 function openAudio(back) {
   const re = `openAudio(${back ? `'${back}'` : ''})`;
   openSheet('🔊 Audio', `<div class="aud">${audioHTML(re)}${sndTestHTML()}<div class="acts"><button class="btn" onclick="${back ? back : 'closeSheet()'}">✓ Fatto</button></div></div>`, 'audio');
@@ -1001,19 +1001,32 @@ const TENS = { kind: null, g: null, iv: 0, nextT: 0, step: 0, bus: null };
 const TENS_CH = [[38, [0, 3, 7]], [34, [0, 4, 7]], [31, [0, 3, 7]], [33, [0, 4, 7]]]; // Re- Sib Sol- La (midi radice + accordo)
 const mtof = m => 440 * Math.pow(2, (m - 69) / 12);
 function tensionStart(kind) {
-  const a = ac(); if (!a) return; tensionStop(true);
-  MUS.duck = true; if (MUS.g && MUS.el) { const t = a.currentTime; MUS.g.gain.cancelScheduledValues(t); MUS.g.gain.setValueAtTime(MUS.g.gain.value, t); MUS.g.gain.linearRampToValueAtTime(0, t + 1.2); setTimeout(() => { if (MUS.duck) musicStop(); }, 1300); } else musicStop();
+  const a = ac(); if (!a) return; tensionStop(true); if (typeof festaTrackStop === 'function') festaTrackStop(true);
+  MUS.duck = true; if (MUS.g && MUS.el) { const t = a.currentTime; MUS.g.gain.cancelScheduledValues(t); MUS.g.gain.setValueAtTime(MUS.g.gain.value, t); MUS.g.gain.linearRampToValueAtTime(0, t + 2.5); setTimeout(() => { if (MUS.duck) musicStop(); }, 2600); } else musicStop();
   if (!MUS.on || SET.mute) { TENS.kind = kind; return; }
   TENS.kind = kind; TENS.g = a.createGain(); TENS.g.connect(a.destination);
-  const t0 = a.currentTime; TENS.g.gain.setValueAtTime(0.0001, t0); TENS.g.gain.linearRampToValueAtTime(SET.mvol * 0.9, t0 + 1.5);
+  const t0 = a.currentTime; TENS.g.gain.setValueAtTime(0.0001, t0); TENS.g.gain.linearRampToValueAtTime(SET.mvol * 0.9, t0 + 3.0);
   if (raidTrack(a)) return; // razzie e assedi: colonna sonora "Ombre delle Terre Feudali
   TENS.bus = a.createDynamicsCompressor(); TENS.bus.threshold.value = -18; TENS.bus.ratio.value = 4; TENS.bus.connect(TENS.g);
   TENS.nextT = t0 + 0.15; TENS.step = 0;
   TENS.iv = setInterval(tensionSched, 40);
 }
+// ---- brani mp3 decodificati in WebAudio: si possono sfumare anche su iPhone (dove il volume degli <audio> è bloccato) ----
+const TRACKS = {};
+function trackLoad(name) {
+  const a = ac(); if (!a) return null; if (TRACKS[name]) return TRACKS[name];
+  const T = TRACKS[name] = { buf: null, bad: false };
+  fetch('music/' + name + '.mp3').then(r => { if (!r.ok) throw 0; return r.arrayBuffer(); })
+    .then(ab => new Promise((ok, ko) => a.decodeAudioData(ab, ok, ko))).then(b => { T.buf = b; }).catch(() => { T.bad = true; });
+  return T;
+}
+function trackPlay(name, dest, loop) { const a = AC, T = TRACKS[name]; if (!a || !T || !T.buf) return null; const s = a.createBufferSource(); s.buffer = T.buf; s.loop = !!loop; s.connect(dest); s.start(); return s; }
+function fadeGain(g, to, sec) { const a = AC; if (!a || !g) return; const t = a.currentTime; g.gain.cancelScheduledValues(t); g.gain.setValueAtTime(Math.max(0.0001, g.gain.value), t); g.gain.linearRampToValueAtTime(Math.max(0.0001, to), t + sec); }
+function tracksPreload() { trackLoad('raid'); trackLoad('festa_raccolto'); trackLoad('festa_feudale'); }
 // colonna sonora vera per le razzie (quando ti attaccano); se non si carica, resta la musica generata
-const RAIDM = { el: null, src: null, bad: false };
+const RAIDM = { el: null, src: null, bad: false, node: null };
 function raidTrack(a) {
+  const T = trackLoad('raid'); if (T && T.buf && TENS.g) { RAIDM.node = trackPlay('raid', TENS.g, true); if (RAIDM.node) return true; }
   if (RAIDM.bad) return false;
   try {
     if (!RAIDM.el) { RAIDM.el = new Audio('music/raid.mp3'); RAIDM.el.loop = true; RAIDM.el.preload = 'auto'; RAIDM.el.addEventListener('error', () => { RAIDM.bad = true; if (TENS.kind && !TENS.iv) { TENS.nextT = AC.currentTime + 0.1; TENS.step = 0; TENS.iv = setInterval(tensionSched, 40); } }); }
@@ -1022,10 +1035,11 @@ function raidTrack(a) {
   } catch (e) { RAIDM.bad = true; return false; }
 }
 function tensionStop(now) {
-  if (RAIDM.el && !RAIDM.el.paused) { const el = RAIDM.el; setTimeout(() => { if (!TENS.kind) el.pause(); }, now ? 400 : 2600); }
+  if (RAIDM.node) { const nd = RAIDM.node; RAIDM.node = null; setTimeout(() => { try { nd.stop(); } catch (e) { } }, now ? 400 : 3300); }
+  if (RAIDM.el && !RAIDM.el.paused) { const el = RAIDM.el, v0 = el.volume; if (now) setTimeout(() => { if (!TENS.kind) el.pause(); }, 400); else { let k = 0; const iv = setInterval(() => { k++; try { el.volume = Math.max(0, v0 * (1 - k / 30)); } catch (e) { } if (k >= 30) { clearInterval(iv); if (!TENS.kind) el.pause(); } }, 100); } }
   if (TENS.iv) clearInterval(TENS.iv); TENS.iv = 0; const g = TENS.g, a = AC; TENS.g = null; const wasOn = !!TENS.kind; TENS.kind = null;
-  if (g && a) { const t = a.currentTime; g.gain.cancelScheduledValues(t); g.gain.setValueAtTime(g.gain.value, t); g.gain.linearRampToValueAtTime(0, t + (now ? 0.2 : 2.2)); setTimeout(() => { try { g.disconnect(); } catch (e) { } }, now ? 400 : 2600); }
-  if (wasOn && !now) { MUS.duck = !!MUS.festa; setTimeout(() => { if (TENS.kind || MUS.festa) return; musicStart(); if (MUS.g && AC) { const t = AC.currentTime; MUS.g.gain.cancelScheduledValues(t); MUS.g.gain.setValueAtTime(0, t); MUS.g.gain.linearRampToValueAtTime(SET.mute ? 0 : SET.mvol, t + 2.5); } else musicApply(); }, 1600); }
+  if (g && a) { const t = a.currentTime; g.gain.cancelScheduledValues(t); g.gain.setValueAtTime(g.gain.value, t); g.gain.linearRampToValueAtTime(0, t + (now ? 0.2 : 3.0)); setTimeout(() => { try { g.disconnect(); } catch (e) { } }, now ? 400 : 3400); }
+  if (wasOn && !now) { MUS.duck = !!MUS.festa; setTimeout(() => { if (TENS.kind || MUS.festa) return; musicStart(); if (MUS.g && AC) { const t = AC.currentTime; MUS.g.gain.cancelScheduledValues(t); MUS.g.gain.setValueAtTime(0, t); MUS.g.gain.linearRampToValueAtTime(SET.mute ? 0 : SET.mvol, t + 3.5); } else musicApply(); }, 900); }
   else if (!now) { MUS.duck = false; musicApply(); }
 }
 function tensionSched() {
@@ -1057,7 +1071,7 @@ function tensionStep(a, t, st, s16, raid, late) {
   if (raid && sb === 0 && bar % 2 === 0) { [1, 2.01, 2.76, 4.07].forEach((m, i) => osc('sine', mtof(root + 12) * m, 0.07 / (i + 1), 0.005, 2.6 - i * 0.4)); }
 }
 let AC = null;
-function ac() { if (!AC) { try { AC = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { } } if (AC && AC.state === 'suspended') AC.resume(); return AC; }
+function ac() { if (!AC) { try { AC = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { } if (AC) setTimeout(tracksPreload, 1500); } if (AC && AC.state === 'suspended') AC.resume(); return AC; }
 // ---- musica della festa: un saltarello medievale (flauto, cornamusa con bordone, tamburello) ----
 function festaMusic(a, OUT) {
   const t0 = a.currentTime + 0.05, beat = 0.19; // crome in 6/8, tempo vivace

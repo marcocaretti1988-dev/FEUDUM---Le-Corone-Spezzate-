@@ -108,16 +108,24 @@ let FEST_T = 240, FEST_MT = 0;
 function festTick(dt) {
   if (!S || S.creative || MODE !== 'village' || !SC) return;
   if (S.fest && now() > S.fest.end) { S.fest = null; }
-  musicFesta(!!S.fest);
-  if (S.fest) { FEST_MT = (FEST_MT || 0) - dt; if (FEST_MT <= 0) { FEST_MT = 9.1; sfx('festa'); } }
+  musicFesta(!!S.fest || !!FESTM.test);
+  if (S.fest && !FESTM.node) { FEST_MT = (FEST_MT || 0) - dt; if (FEST_MT <= 0) { FEST_MT = 9.1; if (!festaTrack()) sfx('festa'); } }
+  if (!S.fest && FESTM.node && !FESTM.test) festaTrackStop();
   if (famine()) { if (!S.famineWarned) { S.famineWarned = 1; toast('🍂 Carestia! Il granaio è vuoto: le case si spengono e il popolo è malcontento (-10% produzione)'); sfx('bell'); } } else S.famineWarned = 0;
   FEST_T -= dt; if (FEST_T > 0 || S.fest) return; FEST_T = 420 + Math.random() * 300;
   if (umore() < 70 || !PATHC.plaza || (S.nightIn != null && S.nightIn < 120)) return;
   festStart();
 }
+// le feste si alternano: una volta la Festa del Raccolto, la volta dopo la Festa Feudale (ognuna con la sua musica)
+const FESTE = { raccolto: { n: 'Festa del Raccolto', ic: '🌾', d: 'il popolo balla attorno al falò per il grano nuovo', dur: 49 }, feudale: { n: 'Festa Feudale', ic: '🏰', d: 'stendardi, musici e danze in tondo davanti al Mastio', dur: 52 } };
+const FESTM = { node: null, g: null, test: false };
+function festaTrack(kk) { const k = kk || (S && S.fest && S.fest.k) || 'raccolto'; const a = ac(); if (!a || !MUS.on || SET.mute) return false; const T = trackLoad('festa_' + k); if (!T || !T.buf) return false;
+  festaTrackStop(true); FESTM.g = a.createGain(); FESTM.g.gain.value = 0.0001; FESTM.g.connect(a.destination); FESTM.node = trackPlay('festa_' + k, FESTM.g, false); if (!FESTM.node) return false; fadeGain(FESTM.g, SET.mvol, 1.5); return true; }
+function festaTrackStop(subito) { const nd = FESTM.node, g = FESTM.g; FESTM.node = null; FESTM.g = null; if (!nd) return; fadeGain(g, 0.0001, subito ? 0.2 : 2.5); setTimeout(() => { try { nd.stop(); g.disconnect(); } catch (e) { } }, subito ? 300 : 2700); }
 function festStart() {
-  const [px, py] = PATHC.plaza || [MCX, MCX]; S.fest = { end: now() + 50000, x: px + 1.2, y: py + 1.4 };
-  addRes('favore', 1); toast('🎉 Festa in piazza! Il popolo è felice e balla attorno al falò: +1 👑 Favore'); sfx('festa'); FEST_MT = 9.1; festFX();
+  const [px, py] = PATHC.plaza || [MCX, MCX]; S.festN = (S.festN || 0) + 1; const k = S.festN % 2 ? 'raccolto' : 'feudale', F = FESTE[k];
+  S.fest = { end: now() + F.dur * 1000, x: px + 1.2, y: py + 1.4, k };
+  addRes('favore', 1); toast(`${F.ic} ${F.n}! ${F.d[0].toUpperCase() + F.d.slice(1)}: +1 👑 Favore`); FEST_MT = 9.1; if (!festaTrack()) sfx('festa'); festFX();
   for (const u of SC.U) if (u.ai === workerAI || u.kid) { u.st = 'rest'; u.wt = Math.random() * 2; }
 }
 function festFX() { if (!S.fest || !SC) return; if (SC.FX.some(f => f.k === 'festa')) return; SC.FX.push({ k: 'festa', x: S.fest.x, y: S.fest.y, t: 0, dur: Math.max(1, (S.fest.end - now()) / 1000), draw: drawFesta }); }
