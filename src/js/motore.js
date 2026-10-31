@@ -835,7 +835,7 @@ function paintGroundRegion(g, ctx, x0, y0, x1, y1, T) {
   for (const d of g.decals) if (EATL_OK) { const f = EFR[d.k]; if (d.x > x1 + 1 || d.y > y1 + 1 || d.x + d.w < x0 - 1 || d.y + d.h < y0 - 1) continue; ctx.drawImage(EATL, f[0], f[1], f[2], f[3], d.x * T, d.y * T, d.w * T, d.h * T); }
   ctx.strokeStyle = 'rgba(20,15,5,0.5)'; ctx.lineWidth = Math.max(2, T / 10); ctx.strokeRect(0, 0, NMAP * T, NMAP * T);
 }
-const GCH = 12, GT = 40, GLOW = 12, GMAXCH = 48;
+const GCH = 12, GT = 40, GLOW = NMAP > 128 ? 8 : 12, GMAXCH = 48; // mappa grande: immagine di base più leggera per l'iPhone
 function paintGround(enemy, decals, seed) {
   const g = { enemy, decals: decals || [], seed, chunks: new Map(), tick: 0, stale: !TEX_OK || (!!(decals && decals.length) && !EATL_OK) };
   if (!TEX_OK) return g;
@@ -1200,6 +1200,8 @@ function beyondPat(k) { return BEYONDP[k] || (BEYONDP[k] = (() => {
 const BEYONDP = {};
 function drawBeyond(c, sc) {
   if (!(sc.mode === 'village' || sc.mode === 'raid' || sc.mode === 'visit' || sc.mode === 'attack')) return;
+  // se lo schermo è tutto dentro la mappa non serve disegnare niente (il caso normale): risparmia batteria e fluidità
+  { let dentro = true; for (const [sx, sy] of [[0, 0], [VW, 0], [0, VH], [VW, VH]]) { const [tx, ty] = screenToTile(sx, sy); if (tx < 0.5 || ty < 0.5 || tx > N - 0.5 || ty > N - 0.5) { dentro = false; break; } } if (dentro) return; }
   const k = BEYOND, x0 = cam.x - VW / 2 / cam.z - 20, y0 = cam.y - VH / 2 / cam.z - 20, w = VW / cam.z + 40, h = VH / cam.z + 40;
   const pk = 'p_' + k; if (!BEYONDP[pk]) BEYONDP[pk] = c.createPattern(beyondPat(k), 'repeat'); c.fillStyle = BEYONDP[pk]; c.fillRect(x0, y0, w, h); if (k === 'bosco' && typeof seasonInfo === 'function') { const sk = seasonInfo().s.k; const tint = sk === 'autunno' ? 'rgba(190,100,25,0.32)' : sk === 'inverno' ? 'rgba(235,240,245,0.55)' : sk === 'estate' ? 'rgba(200,170,60,0.12)' : null; if (tint) { c.fillStyle = tint; c.fillRect(x0, y0, w, h); } }
   // fascia vicino al bordo: nebbia che sale dal bosco oppure bruciatura della carta
