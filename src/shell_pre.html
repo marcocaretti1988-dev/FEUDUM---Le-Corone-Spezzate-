@@ -412,6 +412,10 @@ html[data-theme=pietra] .rrow{background:rgba(255,255,255,.05)}
 #memob{position:fixed;right:8px;bottom:calc(var(--sab) + 240px);z-index:15;width:50px;height:50px;border-radius:50%;border:2px solid #6b5338;background:radial-gradient(circle at 35% 30%,#fbf1d6,#d9c39a);box-shadow:0 4px 12px rgba(0,0,0,.45);padding:0;cursor:pointer}
 #memob span{font-size:25px;line-height:46px;display:block}
 #memob b{position:absolute;top:-4px;right:-4px;min-width:20px;height:20px;padding:0 5px;border-radius:10px;background:#7a6a56;color:#fff;font-size:11.5px;line-height:20px;font-family:var(--fb);box-shadow:0 1px 3px rgba(0,0,0,.4)}
+#memob.dot b{display:block!important;min-width:10px;width:10px;height:10px;padding:0;top:2px;right:2px;font-size:0;background:#c99a2e}
+#idleb{position:fixed;right:8px;bottom:calc(var(--sab) + 300px);z-index:15;width:42px;height:42px;border-radius:50%;border:2px solid #6b5338;background:radial-gradient(circle at 35% 30%,#fbf1d6,#d9c39a);box-shadow:0 4px 12px rgba(0,0,0,.45);padding:0;cursor:pointer}
+#idleb span{font-size:20px;line-height:38px;display:block}#idleb b{position:absolute;top:-4px;right:-4px;min-width:18px;height:18px;padding:0 4px;border-radius:9px;background:#7a6a56;color:#fff;font-size:11px;line-height:18px;font-family:var(--fb)}
+#vign{position:fixed;inset:0;z-index:12;pointer-events:none;box-shadow:inset 0 0 70px 18px rgba(180,20,10,.65);animation:vg 1.6s ease-in-out infinite}@keyframes vg{50%{box-shadow:inset 0 0 40px 6px rgba(180,20,10,.25)}}
 #memob.urg b{background:#b3201f;animation:mb 1.2s infinite}@keyframes mb{50%{transform:scale(1.18)}}
 #memob.urg{animation:mw 3s infinite}@keyframes mw{0%,88%,100%{transform:rotate(0)}91%{transform:rotate(-12deg)}94%{transform:rotate(10deg)}97%{transform:rotate(-6deg)}}
 .memo{display:flex;flex-direction:column;gap:7px}
@@ -619,7 +623,7 @@ body.asking #title,body.asking #sheet,body.asking #hud{pointer-events:none}
 <div id="bhud" class="hidden"><div id="btop"></div><div id="bord"></div><div id="bbot"><div id="bcards"></div><button class="rbtn" onclick="retreat()">🏳 Ritirata</button></div></div>
 <div id="sheet" class="hidden"><div class="sh-h"><div id="sheet-t"></div><button class="x" onclick="closeSheet()">✕</button></div><div id="sheet-b"></div></div>
 <div id="wxw" class="hidden" onclick="openWeather()"></div>
-<button id="memob" class="hidden" onclick="sfx('click');openMemo()" title="Promemoria"><span>📜</span><b>0</b></button>
+<button id="memob" class="hidden" onclick="sfx('click');openMemo()" title="Promemoria"><span>📜</span><b>0</b></button><button id="idleb" class="hidden" onclick="idleGo()" title="Mastri d'opera senza lavoro"><span>🔨</span><b>0</b></button><div id="vign" class="hidden"></div>
 <div id="rotbar" class="hidden"><button onclick="rotateView(-1)" title="Ruota (Q)">⟲</button><span id="rotlbl">N</span><button onclick="rotateView(1)" title="Ruota (E)">⟳</button></div>
 <div id="toast"></div>
 <div id="title" class="hidden"><div class="tbox"><i class="rod r1"></i><i class="rod r2"></i><i class="dc d1"></i><i class="dc d2"></i><i class="dc d3"></i><i class="dc d4"></i><div class="seal">F</div>

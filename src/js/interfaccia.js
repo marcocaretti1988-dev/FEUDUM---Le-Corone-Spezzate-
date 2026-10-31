@@ -304,43 +304,41 @@ function tutTick() {
   if (pt && pt[0] > 0 && pt[0] < VW && pt[1] > 0 && pt[1] < VH) { a.style.left = (pt[0] - 18) + 'px'; a.style.top = (pt[1] - 46) + 'px'; a.classList.remove('hidden'); } else a.classList.add('hidden');
 }
 // ================= MEMO: la pergamena delle cose da fare =================
+// tipi di voce: 'urg' = urgenze (numero rosso), 'occ' = occasioni (nella pergamena, senza numero), 'nag' = consigli che compaiono solo dopo tanto che li trascuri
+const NAG_SECS = 20 * 60; // venti minuti di gioco
 function memoItems() {
-  if (!S || S.creative || MODE !== 'village') return []; const it = []; const add = (pri, ic, t, sub, act, lbl) => it.push({ pri, ic, t, sub, act, lbl });
-  // missione pronta
-  const q = QUESTS[S.mq]; if (q && q.c()) add(0, '📜', 'Missione compiuta: riscuoti!', q.t, 'claimQuest();openMemo()', 'Riscuoti');
-  // missione bloccata dai materiali
-  { const qc = questCost(); if (qc && Object.keys(lacking(qc.cost)).length) add(1, '🧱', `Per ${qc.what} manca qualcosa`, needLabel(qc.cost), `questNeed()`, 'Dove trovarlo'); }
-  // razzia in arrivo
-  if (S.raids != null && S.nightIn > 0 && S.nightIn <= 180) add(0, '🔥', `Predoni tra ${fmtT(S.nightIn * 1000)}`, 'Controlla mura, torri ed esercito', "closeSheet();openArmy()", 'Esercito');
-  // raccolto
-  const ready = S.buildings.filter(r => !r.end && resOf(r) && r.stock >= Math.max(1, stockCap(r) * 0.15)); if (ready.length) { const tot = {}; for (const r of ready) { const k = resOf(r); tot[k] = (tot[k] || 0) + Math.floor(r.stock); } add(1, '🧺', `${ready.length} botteghe da raccogliere`, Object.keys(tot).map(k => ICO(k) + ' ' + fmt(tot[k])).join('  '), 'memoCollect()', 'Raccogli tutto'); }
-  // magazzini pieni
-  const c = caps(); const full = RES.filter(r => r !== 'favore' && S.res[r] >= c[r] * 0.97); if (full.length) add(1, '📦', 'Magazzino pieno', full.map(r => ICO(r) + ' ' + RNAME[r]).join(', ') + ': spendi o costruisci un Granaio', "closeSheet();openBuild()", 'Costruisci');
-  // mastri d'opera liberi
-  const free = maxBuilders() - builders(); if (free > 0) { const m = S.buildings.find(b => b.t === 'mastio'); const mc = m && !m.end && !canUp(m) ? upCost(m) : null; if (mc && canPay(mc)) add(1, '🏰', `Puoi alzare il Mastio al livello ${m.lvl + 1}`, 'Sblocca edifici, truppe e la prossima era', `closeSheet();openBuildingInfo(S.buildings.find(b=>b.t==='mastio'))`, 'Vai');
-    else add(2, '🔨', `${free} mastr${free > 1 ? 'i' : 'o'} d'opera senza lavoro`, 'Costruisci o migliora un edificio', "closeSheet();openBuild()", 'Costruisci'); }
-  // edifici migliorabili ora
-  if (free > 0) { const ups = S.buildings.filter(r => r.t !== 'mastio' && !BDEF[r.t].wall && !BDEF[r.t].decor && !r.nat && !canUp(r) && canPay(upCost(r))); if (ups.length) { const r = ups.sort((a, b) => a.lvl - b.lvl)[0]; add(2, '⬆', `${ups.length} edifici migliorabili`, `Per esempio ${BDEF[r.t].n} al livello ${r.lvl + 1}`, `bldNav(${r.id})`, 'Mostra'); } }
-  // persone con punti da spendere
+  if (!S || S.creative || MODE !== 'village') return []; const it = []; const add = (pri, ic, t, sub, act, lbl, key, kind) => it.push({ pri, ic, t, sub, act, lbl, key: key || t, kind: kind || 'occ' });
+  // ---- URGENZE
+  if (S.raids != null && S.nightIn > 0 && S.nightIn <= 180) add(0, '🔥', `Predoni tra ${fmtT(S.nightIn * 1000)}`, 'Controlla mura, torri ed esercito', "closeSheet();openArmy()", 'Esercito', 'razzia', 'urg');
+  const rotti = S.buildings.filter(b => b.rotto); if (rotti.length) add(0, '🔧', `Breccia nelle difese: ${rotti.length} ${rotti.length > 1 ? 'pezzi rotti' : 'pezzo rotto'}`, 'Da lì bestie e predoni entrano: ripara', `closeSheet();bldGo0(${rotti[0].id})`, 'Ripara', 'rotti', 'urg');
+  const c = caps(); const full = RES.filter(r => r !== 'favore' && S.res[r] >= c[r] * 0.97); if (full.length) add(1, '📦', 'Magazzino pieno', full.map(r => ICO(r) + ' ' + RNAME[r]).join(', ') + ': stai sprecando risorse, spendi o costruisci un Granaio', "closeSheet();openBuild()", 'Costruisci', 'pieno:' + full.join(','), 'urg');
+  { const v = umore(); if (v < 35) add(1, '😠', 'Il popolo è scontento', `Umore ${Math.round(v)}: la produzione cala`, "closeSheet();openMood()", 'Perché', 'umore', 'urg'); }
+  const reqs = typeof feudi === 'function' ? feudi().filter(f => f.req) : []; if (reqs.length) add(1, '🤝', `${reqs.length} ${reqs.length > 1 ? 'signori aspettano' : 'signore aspetta'} una risposta`, reqs.map(f => `${fBase(f).lord} (scade ${fmtT(f.req.left * 1000)})`).join(', '), "closeSheet();openDiplo()", 'Diplomazia', 'diplo:' + reqs.length, 'urg');
+  // ---- OCCASIONI (senza numero rosso)
+  const q = QUESTS[S.mq]; if (q && q.c()) add(0, '📜', 'Missione compiuta: riscuoti!', q.t, 'claimQuest();openMemo()', 'Riscuoti', 'quest');
+  { const qc = questCost(); if (qc && Object.keys(lacking(qc.cost)).length) add(1, '🧱', `Per ${qc.what} manca qualcosa`, needLabel(qc.cost), `questNeed()`, 'Dove trovarlo', 'questneed'); }
+  const ready = S.buildings.filter(r => !r.end && resOf(r) && r.stock >= Math.max(1, stockCap(r) * 0.15)); if (ready.length) { const tot = {}; for (const r of ready) { const k = resOf(r); tot[k] = (tot[k] || 0) + Math.floor(r.stock); } add(1, '🧺', `${ready.length} botteghe da raccogliere`, Object.keys(tot).map(k => ICO(k) + ' ' + fmt(tot[k])).join('  '), 'memoCollect()', 'Raccogli tutto', 'raccolto'); }
+  const free = maxBuilders() - builders(); if (free > 0) { const m = S.buildings.find(b => b.t === 'mastio'); const mc = m && !m.end && !canUp(m) ? upCost(m) : null; if (mc && canPay(mc)) add(1, '🏰', `Puoi alzare il Mastio al livello ${m.lvl + 1}`, 'Sblocca edifici, truppe e la prossima era', `closeSheet();openBuildingInfo(S.buildings.find(b=>b.t==='mastio'))`, 'Vai', 'mastio'); }
+  if (free > 0) { const ups = S.buildings.filter(r => r.t !== 'mastio' && !BDEF[r.t].wall && !BDEF[r.t].decor && !r.nat && !canUp(r) && canPay(upCost(r))); if (ups.length) { const r = ups.sort((a, b) => a.lvl - b.lvl)[0]; add(2, '⬆', `${ups.length} edifici migliorabili`, `Per esempio ${BDEF[r.t].n} al livello ${r.lvl + 1}`, `bldNav(${r.id})`, 'Mostra', 'ups'); } }
   const pts = []; for (const k in (S.vets || {})) for (const r of S.vets[k]) if (r.pts) pts.push(r); for (const k in (S.wrk || {})) if (S.wrk[k].pts) pts.push(S.wrk[k]); for (const k in (S.hrec || {})) if (S.hrec[k].pts) pts.push(S.hrec[k]);
-  if (pts.length) add(1, '⭐', `${pts.length} ${pts.length > 1 ? 'persone hanno' : 'persona ha'} punti da spendere`, pts.slice(0, 3).map(r => r.nm).join(', ') + (pts.length > 3 ? '…' : ''), `memoFolk(${pts[0].id})`, 'Mostra');
-  // persone da addestrare
+  if (pts.length) add(1, '⭐', `${pts.length} ${pts.length > 1 ? 'persone hanno' : 'persona ha'} punti da spendere`, pts.slice(0, 3).map(r => r.nm).join(', ') + (pts.length > 3 ? '…' : ''), `memoFolk(${pts[0].id})`, 'Mostra', 'punti');
+  const si = seasonInfo(); if (si.left < 30 * 60000) { const n = SEASONS[(si.i + 1) % 4]; add(2, n.ic, `${n.n} tra ${fmtT(si.left)}`, n.fx + (n.k === 'inverno' ? ' · fai scorte di cibo' : n.k === 'autunno' ? ' · ottimo per vendere il grano dopo' : ''), "closeSheet();openWeather()", 'Meteo', 'stagione:' + n.k); }
+  // ---- CONSIGLI: compaiono solo se li trascuri per tanto tempo
+  const nag = (cond, key, ...a) => { const T = S.nagT || (S.nagT = {}); if (!cond) { delete T[key]; return; } if ((T[key] || 0) >= NAG_SECS) add(3, ...a, key, 'nag'); };
   const busyT = new Set((S.works || []).filter(w => w.kind === 'train').map(w => w.rid)); const all = []; for (const k in (S.wrk || {})) all.push(S.wrk[k]); for (const k in (S.vets || {})) for (const r of S.vets[k]) all.push(r);
   const tr = all.filter(r => !busyT.has(r.id) && r.lvl < FOLK_MAX() && canPay(trainCost(r))).sort((a, b) => a.lvl - b.lvl);
-  if (tr.length && !busyT.size) add(3, '🎯', 'Nessuno si sta addestrando', `${tr[0].nm} può salire di livello`, `memoFolk(${tr[0].id})`, 'Addestra');
-  // esercito
-  if (!S.queue.length && armyUsed() < armyCap()) add(3, '⚔', 'La caserma è ferma', `Posti liberi nell'esercito: ${armyCap() - armyUsed()}`, "closeSheet();openArmy()", 'Addestra');
-  // diplomazia
-  const reqs = typeof feudi === 'function' ? feudi().filter(f => f.req) : []; if (reqs.length) add(1, '🤝', `${reqs.length} ${reqs.length > 1 ? 'signori aspettano' : 'signore aspetta'} una risposta`, reqs.map(f => `${fBase(f).lord} (scade ${fmtT(f.req.left * 1000)})`).join(', '), "closeSheet();openDiplo()", 'Diplomazia');
-  if (typeof feudi === 'function') { const g = feudi().find(f => f.st !== 'guerra' && now() >= (f.gift || 0) && f.rel < 60 && canPay(giftCost(f))); if (g && S.mq >= 10) add(3, '🎁', `Puoi mandare un dono a ${fBase(g).lord}`, `Rapporto: ${relWord(g.rel)}`, "closeSheet();openDiplo()", 'Diplomazia'); }
-  // stagione in arrivo
-  const si = seasonInfo(); if (si.left < 30 * 60000) { const n = SEASONS[(si.i + 1) % 4]; add(2, n.ic, `${n.n} tra ${fmtT(si.left)}`, n.fx + (n.k === 'inverno' ? ' · fai scorte di cibo' : n.k === 'autunno' ? ' · ottimo per vendere il grano dopo' : ''), "closeSheet();openWeather()", 'Meteo'); }
-  if (!S.arms && S.mq >= 1) add(3, '🛡️', 'Scegli lo stemma della casata', 'Colori e figura per stendardi e bandiere', 'openArms()', 'Stemma');
-  if (prestige() < 6 && S.mastio >= 2) add(4, '🌷', 'Abbellisci il borgo', 'Le decorazioni danno Prestigio: più produzione e un popolo felice', "closeSheet();openBuild('d')", 'Decorazioni');
-  // caccia
-  if ((S.hunted || 0) < 3 && S.fauna && S.fauna.some(a => !FAUNA[a.k].need)) add(4, '🏹', 'Animali da cacciare nei boschi', 'Tocca un cervo, una capra o una lepre sulla mappa', null, '');
+  nag(tr.length && !busyT.size, 'addestra', '🎯', 'Da tanto nessuno si addestra', tr.length ? `${tr[0].nm} può salire di livello` : '', tr.length ? `memoFolk(${tr[0].id})` : null, 'Addestra');
+  nag(!S.queue.length && armyUsed() < armyCap(), 'caserma', '⚔', 'La caserma è ferma da tempo', `Posti liberi nell'esercito: ${armyCap() - armyUsed()}`, "closeSheet();openArmy()", 'Addestra');
+  if (typeof feudi === 'function') { const g = feudi().find(f => f.st !== 'guerra' && now() >= (f.gift || 0) && f.rel < 60 && canPay(giftCost(f))); nag(g && S.mq >= 10, 'dono', '🎁', g ? `Da tempo non mandi doni a ${fBase(g).lord}` : '', g ? `Rapporto: ${relWord(g.rel)}` : '', "closeSheet();openDiplo()", 'Diplomazia'); }
+  nag(!S.arms && S.mq >= 1, 'stemma', '🛡️', 'La casata non ha ancora uno stemma', 'Colori e figura per stendardi e bandiere', 'openArms()', 'Stemma');
+  nag(prestige() < 6 && S.mastio >= 2, 'borgo', '🌷', 'Il borgo è spoglio', 'Le decorazioni danno Prestigio: più produzione e un popolo felice', "closeSheet();openBuild('d')", 'Decorazioni');
+  nag((S.hunted || 0) < 3 && S.fauna && S.fauna.some(a => !FAUNA[a.k].need), 'caccia', '🏹', 'Nessuno va a caccia', 'Tocca un cervo, una capra o una lepre sulla mappa', null, '');
   return it.sort((a, b) => a.pri - b.pri);
 }
+// i consigli contano il tempo di gioco in cui la cosa resta da fare
+function nagTick(dt) { if (!S || !S.nagT || MODE !== 'village') return; for (const k in S.nagT) S.nagT[k] += dt; }
+function nagSeed() { if (!S) return; const T = S.nagT || (S.nagT = {}); for (const k of ['addestra', 'caserma', 'dono', 'stemma', 'borgo', 'caccia']) if (T[k] == null) T[k] = 0; }
+function bldGo0(id) { const r = S.buildings.find(b => b.id === id); if (!r) return; const [x, y] = W(r.x + 0.5, r.y + 0.5); cam.x = x; cam.y = y + 40; openBuildingInfo(r); }
 function memoCollect() { let n = 0; for (const r of S.buildings) if (!r.end && resOf(r) && r.stock >= 1) { if (collect(r)) n++; } if (SC) for (const b of SC.B) b.bubble = null; toast(`🧺 Raccolto da ${n} botteghe`); save(); openMemo(); }
 // scorri tra le persone con punti da spendere (aperto dal Promemoria)
 let FOLK_NAV = null;
@@ -365,11 +363,26 @@ function spendRec(rec, sold) { const keys = sold ? ['str', 'vit', 'def'] : ['abi
 function folkSpendAll() { if (!FOLK_NAV) return; let pp = 0, ppl = 0; for (const id of FOLK_NAV) { const u = folkUnit(id); if (!u) continue; const rec = folkOf(u); if (!rec || !rec.pts) continue; const sold = !!UDEF[u.k] || !!(u.hero && HDEF[u.k]); const n = spendRec(rec, sold); if (n) { pp += n; ppl++; if (!sold && u.d && !u.fake && rec.spd) u.d.spd = 0.7 * (1 + 0.1 * rec.spd); } }
   if (!pp) { toast('Nessun punto da spendere'); return; } sfx('coin'); save(); toast(`⭐ ${pp} punt${pp > 1 ? 'i' : 'o'} spes${pp > 1 ? 'i' : 'o'} su ${ppl} ${ppl > 1 ? 'persone' : 'persona'}`); if (SC && SC.folkU) openFolk(SC.folkU); }
 function openMemo() {
-  const it = memoItems();
+  const it = memoItems(); S.memoSeen = it.map(x => x.key);
   openSheet('📜 Promemoria del Siniscalco', it.length ? `<p class="desc"><i>«Mio signore, ecco cosa attende la vostra attenzione.»</i></p><div class="memo">${it.map(x => `<div class="mi p${x.pri}"><span class="mic">${x.ic}</span><div class="mt"><b>${x.t}</b><small>${x.sub}</small></div>${x.act ? `<button class="btn ${x.pri <= 1 ? '' : 'ghost'}" onclick="${x.act}">${x.lbl}</button>` : ''}</div>`).join('')}</div>` : `<div class="memo0"><div>🕯️</div><p><i>«Tutto è in ordine, mio signore. Il feudo lavora per voi.»</i></p></div>`, 'memo');
 }
 let MEMO_T = 0;
-function memoTick(dt) { MEMO_T -= dt; if (MEMO_T > 0) return; MEMO_T = 1; const el = $('#memob'); if (!el) return; if (!S || S.creative || MODE !== 'village') { el.classList.add('hidden'); return; } el.classList.remove('hidden'); const it = memoItems(); const urgent = it.filter(x => x.pri <= 1).length; const b = el.querySelector('b'); b.textContent = it.length; b.style.display = it.length ? '' : 'none'; el.classList.toggle('urg', urgent > 0); if ($('#sheet').dataset.p === 'memo' && (el.dataset.n !== String(it.length))) openMemo(); el.dataset.n = it.length; }
+function memoTick(dt) { nagTick(dt); idleTick(); MEMO_T -= dt; if (MEMO_T > 0) return; MEMO_T = 1; const el = $('#memob'); if (!el) return; if (!S || S.creative || MODE !== 'village') { el.classList.add('hidden'); return; } el.classList.remove('hidden'); nagSeed();
+  const it = memoItems(), seen = new Set(S.memoSeen || []); S.memoSeen = (S.memoSeen || []).filter(k => it.some(x => x.key === k)); // una voce sparita può tornare la prossima volta
+  const urg = it.filter(x => x.kind === 'urg' && !seen.has(x.key)).length, nuove = it.filter(x => x.kind !== 'urg' && !seen.has(x.key)).length;
+  const b = el.querySelector('b'); b.textContent = urg; b.style.display = urg ? '' : 'none'; el.classList.toggle('urg', urg > 0); el.classList.toggle('dot', !urg && nuove > 0);
+  if ($('#sheet').dataset.p === 'memo' && (el.dataset.n !== String(it.length))) openMemo(); el.dataset.n = it.length; alertTick(); }
+// avvisi in stile Age of Empires: corno e bordo rosso quando arrivano i predoni
+let ALERT = { raid: 0 };
+function alertTick() { const v = $('#vign'); if (!v) return; const near = !!(S && MODE === 'village' && S.raids != null && S.nightIn > 0 && S.nightIn <= 60);
+  v.classList.toggle('hidden', !near); if (near && !ALERT.raid) { ALERT.raid = 1; sfx('horn'); toast('🔥 I predoni stanno arrivando!'); } if (!near) ALERT.raid = 0; }
+// tasto dei mastri d'opera senza lavoro (come il "contadino inattivo" di Age of Empires)
+function idleTick() { const el = $('#idleb'); if (!el) return; const free = S && !S.creative && MODE === 'village' ? maxBuilders() - builders() : 0; el.classList.toggle('hidden', free <= 0); if (free > 0) el.querySelector('b').textContent = free; }
+function idleGo() { sfx('click'); const m = S.buildings.find(b => b.t === 'mastio'); const mc = m && !m.end && !canUp(m) ? upCost(m) : null;
+  if (mc && canPay(mc)) { bldGo0(m.id); toast('🏰 I mastri possono alzare il Mastio'); return; }
+  const ups = S.buildings.filter(r => r.t !== 'mastio' && !BDEF[r.t].wall && !BDEF[r.t].decor && !r.nat && !canUp(r) && canPay(upCost(r))).sort((a, b) => a.lvl - b.lvl);
+  if (ups.length) { bldNav(ups[0].id); toast(`🔨 ${ups.length} edifici si possono migliorare`); return; }
+  closeSheet(); openBuild(); toast('🔨 I mastri aspettano: costruisci qualcosa'); }
 
 // ================= RISORSE MANCANTI: la pergamena dice dove produrle =================
 const RSRC = { cibo: ['fattoria', 'taverna'], legno: ['capanna'], oro: ['casa', 'municipio', 'mercato', 'mastio'], pietra: ['cava', 'miniera'], ferro: ['fucina', 'miniera'], pelli: [], favore: ['monastero'] };

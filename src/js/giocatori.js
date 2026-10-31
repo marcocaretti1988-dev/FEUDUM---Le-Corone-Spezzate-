@@ -443,7 +443,7 @@ function economy(dt) {
     if (r.end && t >= r.end) {
       r.end = 0; r.lvl = r.toLvl || r.lvl; r.toLvl = 0; changed = true;
       if (r.t === 'mastio') { S.mastio = r.lvl; prefetchEra(); if (ERAI(r.lvl) !== ERAI(r.lvl - 1)) setTimeout(() => { faunaFill(true); toast(ERAI(r.lvl) === 2 ? '🐖 I maiali bradi spariscono dai boschi' : ERAI(r.lvl) === 3 ? '🦌 Cervi e orsi scendono nella Marca' : '🐺 Nuove bestie popolano la Marca'); }, 2500); toast(`🏰 Mastio livello ${r.lvl}! ${r.lvl === 5 ? 'Inizia l\'Età Feudale!' : ''}`); sfx('bell'); refreshTargets(true); }
-      else if (!BDEF[r.t].wall && !BDEF[r.t].decor) { toast(`🔨 ${BDEF[r.t].n} completato (liv. ${r.lvl})`); sfx('build'); } else if (Math.random() < 0.3) sfx('tock');
+      else if (!BDEF[r.t].wall && !BDEF[r.t].decor) { toast(`🔨 ${BDEF[r.t].n} completato (liv. ${r.lvl})`); sfx('bell'); } else if (Math.random() < 0.3) sfx('tock');
     }
     if (!r.end && resOf(r)) { r.stock = Math.min(stockCap(r), (r.stock || 0) + rateOf(r) * dt / 60); }
   }
