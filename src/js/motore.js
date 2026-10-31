@@ -1145,6 +1145,8 @@ function sceneIndex(sc) {
   for (const b of sc.B) if (BDEF[b.t].wall) {
     const at = (x, y) => { if (!inMap(x, y)) return false; const i = sc.grid[y * N + x]; if (i < 0) return false; const o = sc.B[i], d = BDEF[o.t]; return d.wall || (!d.decor && !d.moat && !(o.ref && o.ref.nat)); };
     b.mask = (at(b.x + 1, b.y) ? 1 : 0) | (at(b.x - 1, b.y) ? 2 : 0) | (at(b.x, b.y + 1) ? 4 : 0) | (at(b.x, b.y - 1) ? 8 : 0);
+    const aw = (x, y) => { if (!inMap(x, y)) return false; const i = sc.grid[y * N + x]; return i >= 0 && !!BDEF[sc.B[i].t].wall; }; // solo palizzata/mura: per le torri d'angolo
+    b.maskW = (aw(b.x + 1, b.y) ? 1 : 0) | (aw(b.x - 1, b.y) ? 2 : 0) | (aw(b.x, b.y + 1) ? 4 : 0) | (aw(b.x, b.y - 1) ? 8 : 0);
   }
 }
 function bAt(sc, x, y) { if (!inMap(x, y)) return null; const i = sc.grid[y * N + x]; if (i < 0) return null; const b = sc.B[i]; return b.dead ? null : b; }
@@ -1393,7 +1395,7 @@ function drawBuilding(c, sc, b) {
         if ((m & 12) === 12) segs.push(['_wv', 3 * Math.PI / 4, 1.1]); else segs.push(['_hv', 3 * Math.PI / 4, 0.62, 0, m & 4 ? 0.24 : -0.24]); }
       else { if ((m & 3) || !m) segs.push(['_wu', Math.PI / 4, 1.1]); if (m & 12) segs.push(['_wv', 3 * Math.PI / 4, 1.1]); }
       for (const [kk, yw, ft, ox, oy] of segs) { if (!b[kk]) b[kk] = { x: b.x + (ox || 0), y: b.y + (oy || 0), w: 1, h: 1 }; g3draw(c, b[kk], wk, ft, yw); }
-      if (wk === 'mura' && (m & 3) && (m & 12) && (m & 3) !== 3 && (m & 12) !== 12) { if (!G3.models.torrepietra) need3d('torrepietra'); if (G3.models.torrepietra && G3.models.torrepietra.ready) { if (!b._tw) b._tw = { x: b.x, y: b.y, w: 1, h: 1 }; g3draw(c, b._tw, 'torrepietra', 1.15, 0); } } }
+      const mw = b.maskW == null ? m : b.maskW; if (wk === 'mura' && (mw & 3) && (mw & 12) && (mw & 3) !== 3 && (mw & 12) !== 12) { if (!G3.models.torrepietra) need3d('torrepietra'); if (G3.models.torrepietra && G3.models.torrepietra.ready) { if (!b._tw) b._tw = { x: b.x, y: b.y, w: 1, h: 1 }; g3draw(c, b._tw, 'torrepietra', 1.15, 0); } } }
     else if (BDEF[b.t].wall || BDEF[b.t].moat) c.drawImage(e.cv, wx - e.ox, wy - e.oy, e.w, e.h);
     else { const q = ((ANG / (Math.PI / 2)) % 4 + 4) % 4, i = Math.floor(q), sm0 = Math.min(1, Math.max(0, (q - i - 0.38) / 0.24)), t = sm0 * sm0 * (3 - 2 * sm0); const ga = c.globalAlpha; const [cx] = W(b.x + b.w / 2, b.y + b.h / 2); const ox = cx - wx;
       for (const [fl, al] of [[i % 2, 1 - t], [(i + 1) % 2, t]]) { if (al < 0.01) continue; c.globalAlpha = ga * (al > 0.99 ? 1 : al); if (fl) { c.save(); c.translate(wx + ox, 0); c.scale(-1, 1); c.translate(-ox, 0); c.drawImage(e.cv, -e.ox, wy - e.oy, e.w, e.h); c.restore(); } else c.drawImage(e.cv, wx - e.ox, wy - e.oy, e.w, e.h); }

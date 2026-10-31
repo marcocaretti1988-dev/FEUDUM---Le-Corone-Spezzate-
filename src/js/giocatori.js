@@ -737,7 +737,19 @@ function drawWorks(c, sc) {
   }
 }
 // ---------- fauna: animali selvatici e caccia ----------
-function wildOk(x, y) { const ix = x | 0, iy = y | 0; if (ix < 2 || iy < 2 || ix >= N - 2 || iy >= N - 2) return false; if (villageWater()[iy * N + ix]) return false; if (Math.hypot(x - MCX, y - MCX) < 13) return false; return !S.buildings.some(b => !BDEF[b.t].decor && ix >= b.x && ix < b.x + BDEF[b.t].w && iy >= b.y && iy < b.y + BDEF[b.t].h); }
+// dove possono stare gli animali selvatici: fuori dal villaggio (oltre la palizzata, se c'è), lontano un passo da edifici e acqua
+let WILDZ = null;
+function wildZone() { const key = S.buildings.length + ':' + S.nextId + ':' + (S.buildings.find(b => b.t === 'mastio') || {}).x; if (WILDZ && WILDZ.key === key) return WILDZ.z;
+  const z = new Uint8Array(N * N), wv = villageWater(); for (let i = 0; i < N * N; i++) if (wv[i]) z[i] = 1;
+  for (const b of S.buildings) { const d = BDEF[b.t]; if (d.decor) continue; for (let y = b.y - 1; y <= b.y + d.h; y++) for (let x = b.x - 1; x <= b.x + d.w; x++) if (inMap(x, y)) z[y * N + x] = 1; }
+  const ws = S.buildings.filter(b => b.t === 'muro');
+  if (ws.length >= 16) { const X0 = Math.min(...ws.map(r => r.x)) - 1, X1 = Math.max(...ws.map(r => r.x)) + 1, Y0 = Math.min(...ws.map(r => r.y)) - 1, Y1 = Math.max(...ws.map(r => r.y)) + 1; for (let y = Y0; y <= Y1; y++) for (let x = X0; x <= X1; x++) if (inMap(x, y)) z[y * N + x] = 1; }
+  else { let rad = 13; for (const b of S.buildings) { const d = BDEF[b.t]; if (d.decor || b.nat) continue; rad = Math.max(rad, Math.hypot(b.x + d.w / 2 - MCX, b.y + d.h / 2 - MCX) + 3); } for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) if (Math.hypot(x + 0.5 - MCX, y + 0.5 - MCX) < rad) z[y * N + x] = 1; }
+  WILDZ = { key, z }; return z; }
+function wildOk(x, y) { const ix = x | 0, iy = y | 0; if (ix < 2 || iy < 2 || ix >= N - 2 || iy >= N - 2) return false; return !wildZone()[iy * N + ix]; }
+// un animale rimasto chiuso (per esempio una palizzata costruita dove stava) torna fuori nel punto libero più vicino, verso l'esterno
+function wildFree(a) { if (wildOk(a.x, a.y)) return; const dx = a.x - MCX, dy = a.y - MCX, l = Math.hypot(dx, dy) || 1;
+  for (let r = 1; r < 60; r++) { for (let k = -3; k <= 3; k++) { const an = Math.atan2(dy, dx) + k * 0.25, x = MCX + Math.cos(an) * (l + r), y = MCX + Math.sin(an) * (l + r); if (wildOk(x, y)) { a.x = x; a.y = y; a.tx = x; a.ty = y; return; } } } a.dying = 9; }
 function spawnFauna(k) {
   if (k === 'lupo') { for (let t = 0; t < 60; t++) { const a = Math.random() * 6.283, r = 16 + Math.random() * (N / 2 - 20); const x = MCX + Math.cos(a) * r, y = MCX + Math.sin(a) * r; if (!wildOk(x, y)) continue;
       const n = Math.random() < 0.5 ? 1 : 2 + (Math.random() < 0.4 ? 1 : 0); const lid = S.nextId; let made = 0;
@@ -776,6 +788,7 @@ function faunaTick(dt) {
   }
   for (const a of S.fauna) {
     if (a.dying != null) { a.dying += dt; continue; }
+    if (!a.huntBy && !a.infight) wildFree(a);
     a.gph = (a.gph || Math.random() * 10) + dt * 1.6; if (a.atk > 0) a.atk -= dt; if (a.fcd > 0) a.fcd -= dt;
     if (a.infight) { a.mv = false; if (!(a.atk > 0)) a.atk = 0.8; const op = STRONG[a.k] ? byId[(a.fight && a.fight.wolves[0])] : byId[a.infight]; if (op) { const sv = rotV(op.x - a.x, op.y - a.y); a.fl = (sv[0] - sv[1]) < 0; } continue; }
     const chg = a.charge; a.charge = 0;
