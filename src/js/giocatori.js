@@ -279,10 +279,11 @@ function occupiedBy(x, y, w, h, ignore, skipMuro) {
 }
 function canPlace(t, x, y, ignore) { const d = BDEF[t]; if (x < 3 || y < 3 || x + d.w > N - 3 || y + d.h > N - 3) return false; const wv = villageWater(); for (let yy = y; yy < y + d.h; yy++) for (let xx = x; xx < x + d.w; xx++) if (wv[yy * N + xx]) return false; return !occupiedBy(x, y, d.w, d.h, ignore, !!d.gate); }
 function buildVillage() {
+  ensureVarchi();
   const sc = newScene('village'); villageSetup(sc);
   for (const r of S.buildings) { const b = mkBuilding(r.t, r.x, r.y, r.lvl, 'D', r); if (r.rotto) { b.dead = true; b.deadT = 99; } sc.B.push(b); }
   sceneIndex(sc);
-  computePaths(sc);
+  computePaths(sc); varchiSetup(sc, 'village');
   // workers
   const jobs = [];
   for (const b of sc.B) {
@@ -501,11 +502,34 @@ function ringSquare() {
   const ax1 = Math.min(N - 4, ax0 + side), ay1 = Math.min(N - 4, ay0 + side);
   const ring = []; for (let x = ax0; x <= ax1; x++) ring.push([x, ay0], [x, ay1]); for (let y = ay0 + 1; y < ay1; y++) ring.push([ax0, y], [ax1, y]);
   return ring; }
+// ---- varchi nella palizzata: un'uscita per lato, con due guardie fisse che non fanno entrare bestie ed estranei
+function ensureVarchi() {
+  S.varchi = (S.varchi || []).filter(v => !S.buildings.some(r => { const d = BDEF[r.t]; return v.x >= r.x && v.x < r.x + d.w && v.y >= r.y && v.y < r.y + d.h; }));
+  const ws = S.buildings.filter(r => r.t === 'muro'); if (ws.length < 16) return;
+  const X0 = Math.min(...ws.map(r => r.x)), X1 = Math.max(...ws.map(r => r.x)), Y0 = Math.min(...ws.map(r => r.y)), Y1 = Math.max(...ws.map(r => r.y));
+  for (const [ax, val, inn] of [['y', Y0, 1], ['y', Y1, -1], ['x', X0, 1], ['x', X1, -1]]) {
+    const on = r => ax === 'y' ? r.y === val : r.x === val; const line = ws.filter(on); if (line.length < 5 || S.varchi.some(on)) continue;
+    // un cancello su questo lato fa già da uscita
+    if (S.buildings.some(r => r.t === 'cancello' && (ax === 'y' ? val >= r.y - 1 && val <= r.y + 3 : val >= r.x - 1 && val <= r.x + 3))) continue;
+    const mid = ax === 'y' ? (X0 + X1) / 2 : (Y0 + Y1) / 2, pos = r => ax === 'y' ? r.x : r.y;
+    line.sort((a, b) => Math.abs(pos(a) - mid) - Math.abs(pos(b) - mid)); const p = line.find(r => !r.rotto && !r.end); if (!p) continue;
+    S.buildings = S.buildings.filter(r => r !== p); S.varchi.push({ x: p.x, y: p.y, ix: ax === 'x' ? inn : 0, iy: ax === 'y' ? inn : 0 });
+  }
+}
+function varchiSetup(sc, modo) {
+  sc.varchiK = {}; for (const v of S.varchi || []) {
+    const ax = v.ix ? 0 : 1, ay = v.ix ? 1 : 0; const rec = { v, g: [] }; sc.varchiK[v.y * N + v.x] = rec;
+    for (const s of [-1, 1]) { const x = v.x + 0.5 + ax * s * 0.95 + v.ix * 0.75, y = v.y + 0.5 + ay * s * 0.95 + v.iy * 0.75; if (isWater(sc, x | 0, y | 0)) continue;
+      const u = mkUnit(S.mastio >= 4 ? 'uomoarme' : 'picchiere', modo === 'raid' ? 'D' : 'V', x, y); u.guardia = 1; u.post = { x, y }; u.face = 'F'; u.flip = false;
+      if (modo === 'raid') { u.ally = true; u.guardR = 2.8; u.leash = 3; u.maxhp = u.hp = u.hp * 1.6; } else u.ai = soldierAI;
+      sc.U.push(u); rec.g.push(u); } }
+}
 function wallRing() {
   const ring = ringSquare(), key = (x, y) => x + ',' + y, onRing = new Set(ring.map(([x, y]) => key(x, y))), wv = villageWater();
   const at = (x, y) => S.buildings.filter(r => { const d = BDEF[r.t]; return x >= r.x && x < r.x + d.w && y >= r.y && y < r.y + d.h; });
   const nuovi = [], nat = [], tenuti = new Set();
-  for (const [x, y] of ring) { if (wv[y * N + x]) continue; const os = at(x, y); if (os.some(r => r.t === 'muro')) { tenuti.add(key(x, y)); continue; } if (os.some(r => !r.nat)) continue; for (const r of os) nat.push(r); nuovi.push([x, y]); }
+  const vk = new Set((S.varchi || []).map(v => key(v.x, v.y)));
+  for (const [x, y] of ring) { if (wv[y * N + x] || vk.has(key(x, y))) continue; const os = at(x, y); if (os.some(r => r.t === 'muro')) { tenuti.add(key(x, y)); continue; } if (os.some(r => !r.nat)) continue; for (const r of os) nat.push(r); nuovi.push([x, y]); }
   const vecchi = S.buildings.filter(r => r.t === 'muro' && !onRing.has(key(r.x, r.y)));
   return { nuovi, nat, vecchi, tenuti: tenuti.size }; }
 function closeRing() {
@@ -624,7 +648,7 @@ function trainCost(rec) { const l = rec.lvl; if (HDEF[rec.k]) return { cibo: 40 
 // selezione sulla mappa
 function pickFolk(sx, sy, tx, ty) {
   if (!SC || MODE !== 'village') return null; const wx = (sx - VW / 2) / cam.z + cam.x, wy = (sy - VH / 2) / cam.z + cam.y; let best = null, bd = 1e9;
-  for (const u of SC.U) { if (u.dead || u.side !== 'V' || u.k === 'carro' || u.kid || u.vis || u.hunter) continue; const [bx, by] = W(u.x, u.y); const tall = u.d && u.d.model ? 34 : 26; const dx = wx - bx, dy = wy - (by - (tall === 34 ? 28 : 20)); if (Math.abs(dx) < 16 && Math.abs(dy) < tall) { const d = dx * dx + dy * dy; if (d < bd) { bd = d; best = u; } } }
+  for (const u of SC.U) { if (u.dead || u.side !== 'V' || u.k === 'carro' || u.kid || u.vis || u.hunter || u.guardia) continue; const [bx, by] = W(u.x, u.y); const tall = u.d && u.d.model ? 34 : 26; const dx = wx - bx, dy = wy - (by - (tall === 34 ? 28 : 20)); if (Math.abs(dx) < 16 && Math.abs(dy) < tall) { const d = dx * dx + dy * dy; if (d < bd) { bd = d; best = u; } } }
   return best;
 }
 function folkOf(u) {

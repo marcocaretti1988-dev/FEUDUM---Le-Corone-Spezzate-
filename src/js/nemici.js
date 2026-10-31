@@ -57,12 +57,17 @@ function pickBuilding(sc, u) {
   }
   return best;
 }
+// varco della palizzata: chiuso a bestie e predoni finché almeno una delle sue due guardie è in piedi
+function varcoChiuso(sc, x, y) { const v = sc.varchiK && sc.varchiK[y * N + x]; return !!(v && v.g.some(g => !g.dead)); }
+// chi finisce in acqua (per esempio comparso sulla riva) torna sulla terra più vicina
+function dryOut(sc, u) { const tx = Math.floor(u.x), ty = Math.floor(u.y); if (!isWater(sc, tx, ty)) return; for (let r = 1; r < 8; r++) for (let dy = -r; dy <= r; dy++) for (let dx = -r; dx <= r; dx++) { if (Math.max(Math.abs(dx), Math.abs(dy)) !== r) continue; const x = tx + dx, y = ty + dy; if (inMap(x, y) && !isWater(sc, x, y) && !bAt(sc, x, y)) { u.x = x + 0.5; u.y = y + 0.5; u.path = null; return; } } }
 function costFnFor(sc, u, tgt) {
   return (x, y) => {
     if (sc.water[y * N + x]) return Infinity;
+    if (u.side === 'A' && varcoChiuso(sc, x, y)) return Infinity;
     const b = bAt(sc, x, y); if (!b) return 1;
     if (b === tgt) return 1;
-    if (BDEF[b.t].wall || BDEF[b.t].gate) return u.side === b.side ? 1.5 : (BDEF[b.t].gate ? 14 : 7);
+    if (BDEF[b.t].wall || BDEF[b.t].gate) return u.side === b.side ? (BDEF[b.t].gate ? 1.5 : Infinity) : (BDEF[b.t].gate ? 14 : 7);
     if (BDEF[b.t].moat) return u.side === b.side ? 1.3 : 6;
     if (BDEF[b.t].decor) return 2;
     return Infinity;
@@ -90,7 +95,7 @@ function moveTo(sc, u, tx, ty, dt) {
   u.moving = true; setFace(u, dx, dy);
   return d <= sp;
 }
-function blockedFor(sc, u, x, y) { if (isWater(sc, Math.floor(x), Math.floor(y))) return true; const b = bAt(sc, Math.floor(x), Math.floor(y)); if (!b) return false; if (b === u.tgt && !b.isB) return false; if (BDEF[b.t].decor) return false; if ((BDEF[b.t].wall || BDEF[b.t].gate) && b.side === u.side) return false; return true; }
+function blockedFor(sc, u, x, y) { if (isWater(sc, Math.floor(x), Math.floor(y))) return true; if (u.side === 'A' && varcoChiuso(sc, Math.floor(x), Math.floor(y))) return true; const b = bAt(sc, Math.floor(x), Math.floor(y)); if (!b) return false; if (b === u.tgt && !b.isB) return false; if (BDEF[b.t].decor) return false; if (BDEF[b.t].gate && b.side === u.side) return false; return true; }
 function stepTo(sc, u, nx, ny) {
   if (!blockedFor(sc, u, nx, ny)) { u.x = nx; u.y = ny; }
   else if (!blockedFor(sc, u, nx, u.y)) u.x = nx; else if (!blockedFor(sc, u, u.x, ny)) u.y = ny;
@@ -148,6 +153,7 @@ function updateScene(sc, dt) {
     u.cd -= dt; u.atkT -= dt; u.rt -= dt; u.slow -= dt; u.inv -= dt; u.hitT -= dt; u.prt -= dt; u.moving = false;
     if (u.ai) { u.ai(sc, u, dt); continue; }
     if (u.tgt && u.tgt.dead) { u.tgt = null; u.path = null; }
+    dryOut(sc, u);
     if (u.wall && u.wall.dead) { u.wall = null; u.path = null; }
     const foe = enemiesOf(u.side);
     if (u.side === 'A') {
@@ -382,13 +388,14 @@ function startRaid() {
   const m = sc.B.find(b => b.t === 'mastio'); const cas = sc.B.filter(b => b.t === 'caserma' || b.t === 'mastio');
   let i = 0;
   for (const k of UNIT_ORDER) for (let n = 0; n < (S.army[k] || 0); n++) { if (i > 45) break; const home = cas[i % cas.length]; const [fx, fy] = frontTile(sc, home); const u = mkUnit(k, 'D', fx + 0.5 + (Math.random() - .5) * 1.5, fy + 0.5 + (Math.random() - .5) * 1.5); if (bAt(sc, Math.floor(u.x), Math.floor(u.y))) { u.x = fx + 0.5; u.y = fy + 0.5; } u.post = { x: u.x, y: u.y }; u.guardR = 7; u.leash = 13; u.pl = true; u.home0 = { ...u.post }; unitBonus(u); recApply(u, vets(k)[n]); sc.U.push(u); i++; }
+  varchiSetup(sc, 'raid');
   { const al = allyReinforcements(); const m0 = sc.B.find(b => b.t === 'mastio'); if (al.length && m0) { let j = 0; for (const k of al) { const [fx, fy] = frontTile(sc, m0); const u = mkUnit(k, 'D', fx + 0.5 + (Math.random() - .5) * 3, fy + 0.5 + (Math.random() - .5) * 3); if (bAt(sc, Math.floor(u.x), Math.floor(u.y))) { u.x = fx + 0.5; u.y = fy + 0.5; } u.post = { x: u.x, y: u.y }; u.guardR = 8; u.leash = 14; u.ally = true; sc.U.push(u); j++; } setTimeout(() => toast(`🤝 Gli alleati mandano ${j} uomini in tuo aiuto`), 1500); } }
   const lv = S.mastio; const pool = ['miliziano', 'arccorto', 'miliziano']; if (lv >= 2) pool.push('scudata'); if (lv >= 3) pool.push('picchiere', 'arccorto'); if (lv >= 4) pool.push('balestriere'); if (lv >= 5) pool.push('berserker', 'scudata'); if (lv >= 6) pool.push('uomoarme');
   const pack = S.raids >= 2 && Math.random() < 0.3; if (pack) { pool.length = 0; pool.push('lupo', 'lupo', 'lupo'); if (lv >= 2) pool.push('orso'); } else { pool.push('lupo'); if (lv >= 3) pool.push('orso'); }
   const count = Math.min(50, Math.max(2, Math.round((4 + lv * 2 + Math.min(10, S.raids)) * DF().raid)));
   const side = (Math.random() * 4) | 0;
   BT = { raid: true, timer: 150, heroes: heroList().map(k => ({ k, u: null })), avail: {}, used: {}, raiders: count, killed: 0, ended: false, spawnLeft: count, spawnT: 1.5, side, pool, pack, beasts: { lupo: 0, orso: 0 } };
-  SC = sc; SC.deploySel = null; SC.arms = armsMult(); BT.vrad = Math.max(0, ...sc.B.map(b => Math.hypot(b.x + b.w / 2 - MCX, b.y + b.h / 2 - MCX) + Math.max(b.w, b.h) / 2));
+  SC = sc; SC.deploySel = null; SC.arms = armsMult(); BT.vrad = Math.min(45, Math.max(0, ...sc.B.filter(b => !(b.ref || b.raidRef || {}).nat && !b.nat && !BDEF[b.t].decor).map(b => Math.hypot(b.x + b.w / 2 - MCX, b.y + b.h / 2 - MCX) + Math.max(b.w, b.h) / 2)));
   SC.onUDead = u => { if (u.side === 'A') { BT.killed++; if (u.d.beast) BT.beasts[u.k]++; } };
   SC.onBDead = b => { const d = BDEF[b.t]; if (b.raidRef && (d.wall || d.gate)) { b.raidRef.rotto = 1; BT.rotti = (BT.rotti || 0) + 1; } };
   centerCam(MCX, MCX); cam.z = VW < 600 ? 0.75 : Math.max(0.6, Math.min(1.0, VW / 1250));
