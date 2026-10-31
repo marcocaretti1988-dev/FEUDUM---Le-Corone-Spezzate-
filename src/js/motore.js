@@ -932,7 +932,7 @@ function sprDraw(c, key, x, y, sc, flip, alpha) {
 
 // ---------- building sprites ----------
 const BATL = new Image(); let BATL_OK = false; BATL.onload = () => BATL_OK = true;
-const BSCALE = { castello: 1.2, casa: 1.0, taverna: 1.1, falegnameria: 1.14, fucina: 1.06, armeria: 1.06, infermeria: 1.04, municipio: 1.0, mercato: 1.22, chiesa: 1.1, accademia: 1.12, cancello: 1.35, stalla: 1.15, fattoria: 1.35, miniera: 1.28, torre: 1.35, funghi: 0.6, cespuglio: 1.05, masso: 1.0, tronco: 1.0 };
+const BSCALE = { castello: 1.2, casa: 1.0, taverna: 1.1, falegnameria: 1.14, fucina: 1.06, armeria: 1.06, infermeria: 1.04, municipio: 1.0, mercato: 1.22, chiesa: 1.1, accademia: 1.12, cancello: 1.35, stalla: 0.95, fattoria: 1.35, miniera: 1.28, torre: 1.35, funghi: 0.6, cespuglio: 1.05, masso: 1.0, tronco: 1.0 };
 function bSprite(b) { if (b.t === 'mastio') return b.lvl >= 5 ? 'castello' : null; return BDEF[b.t].spr || null; }
 function bSpriteView(b) { const k = bSprite(b); const kv = k + '_' + rstep(); return BFR[kv] ? kv : k; } // facades: casa_1, casa_2, casa_3 when provided
 function bSpriteBase(b) { const k = bSprite(b); const f = BFR[k]; if (!f) return null;
@@ -1147,6 +1147,8 @@ function sceneIndex(sc) {
     b.mask = (at(b.x + 1, b.y) ? 1 : 0) | (at(b.x - 1, b.y) ? 2 : 0) | (at(b.x, b.y + 1) ? 4 : 0) | (at(b.x, b.y - 1) ? 8 : 0);
     const aw = (x, y) => { if (!inMap(x, y)) return false; const i = sc.grid[y * N + x]; return i >= 0 && !!BDEF[sc.B[i].t].wall; }; // solo palizzata/mura: per le torri d'angolo
     b.maskW = (aw(b.x + 1, b.y) ? 1 : 0) | (aw(b.x - 1, b.y) ? 2 : 0) | (aw(b.x, b.y + 1) ? 4 : 0) | (aw(b.x, b.y - 1) ? 8 : 0);
+    // se a due passi c'è già una torre vera, niente torretta d'angolo (eviterebbe la "torre doppia")
+    b.nearTower = sc.B.some(o => !o.dead && (o.t === 'torre' || o.t === 'torrepietra' || o.t === 'balista' || o.t === 'cancello') && b.x >= o.x - 2 && b.x < o.x + o.w + 2 && b.y >= o.y - 2 && b.y < o.y + o.h + 2);
   }
 }
 function bAt(sc, x, y) { if (!inMap(x, y)) return null; const i = sc.grid[y * N + x]; if (i < 0) return null; const b = sc.B[i]; return b.dead ? null : b; }
@@ -1356,6 +1358,7 @@ function plotCache(w, h) { return cached(`plot${w}x${h}${TEX_OK ? "t" : ""}`, w,
   const o0 = isoP(-m, -m), ex = isoP(1, 0), ey = isoP(0, 1), oz = isoP(0, 0);
   c.save(); c.transform((ex[0] - oz[0]) / T, (ex[1] - oz[1]) / T, (ey[0] - oz[0]) / T, (ey[1] - oz[1]) / T, o0[0], o0[1]); c.drawImage(tv, 0, 0); c.restore();
 }); }
+const VOLK = { chiesa: 1.45, municipio: 1.15, monastero: 1.1, accademia: 1.05, casa: 0.9, granaio: 0.9, scuderia: 0.7, fattoria: 0.85, fucina: 0.9 }; // ritocchi: edifici importanti un filo più grandi
 const H3FREE = { cripta: 1, torrepietra: 1, torre: 1, mura: 1, palizzata: 1, cancello: 1, balista: 1 };
 function drawBuilding(c, sc, b) {
   const vr0 = vRect(b); const [wx, wy] = WR(vr0[0], vr0[1]);
@@ -1372,7 +1375,11 @@ function drawBuilding(c, sc, b) {
     const dfit = DFIT[b.t] && G3.models[k3] && G3.models[k3].m; if (dfit) { const mm = G3.models[k3].m, hz = Math.max(mm.size[0], mm.size[2]); fitm = DFIT[b.t].h ? DFIT[b.t].h * hz / Math.max(1e-6, mm.size[1]) / (b.w * 1.3) : DFIT[b.t].w / (b.w * 1.3); yaw = (((b.ref || b.raidRef) && (b.ref || b.raidRef).rot) || 0) * Math.PI / 2 + (DYAW_RND[b.t] ? ((b.id * 2654435761) >>> 0) % 628 / 100 : 0); }
     let fit3 = fitm * b.w * 1.3 * (b.t === 'mastio' ? (b.lvl <= 8 ? 1.25 + 0.03 * b.lvl : 1.49 + 0.014 * (b.lvl - 8)) : b.t === 'caserma' ? 0.82 : b.t === 'falo' ? 0.8 : b.t === 'tronco' ? 0.55 : 1);
     // nessun edificio deve superare in altezza il Mastio: tetto all'altezza in base all'impronta
-    if (b.t !== 'mastio' && !H3FREE[b.t] && b.w >= 2) { const mm = G3.models[k3].m, hNow = mm.size[1] * fit3 / Math.max(mm.size[0], mm.size[2]), hMax = 0.75 * b.w + 0.3; if (hNow > hMax) fit3 *= hMax / hNow; }
+    // grandezze uniformi: ogni edificio occupa lo stesso "volume" per la sua impronta (le chiese alte e strette crescono, i mercati larghi e bassi calano),
+    // senza uscire troppo dal suo terreno e senza superare il Mastio in altezza
+    if (b.t !== 'mastio' && !H3FREE[b.t] && b.w >= 2 && !BDEF[b.t].decor) { const mm = G3.models[k3].m, hz = Math.max(mm.size[0], mm.size[2]); const sx = mm.size[0] * fit3 / hz, sz = mm.size[2] * fit3 / hz, sh = mm.size[1] * fit3 / hz;
+      const Vt = Math.pow(b.w * 1.1, 2) * (b.w >= 3 ? 2.4 : 1.8) * (VOLK[b.t] || 1); let s = Math.cbrt(Vt / Math.max(1e-3, sx * sz * sh));
+      s = Math.min(s, b.w * 1.2 / Math.max(sx, sz), ((b.t === 'chiesa' ? 1.45 : 1.1) * b.w + 0.5) / sh); fit3 *= s; }
     const dark = (b.t === 'casa' || b.t === 'taverna') && sc.mode === 'village' && famine(); if (dark) c.filter = 'brightness(0.6) saturate(0.5)';
     g3draw(c, b, k3, fit3, yaw); c.globalAlpha = ga; if (dark) c.filter = 'none';
     if (CHIM3[b.t] && b.r3d && !b.dead && !b.ghost && sc.mode !== 'title' && !(dark)) { b.chimT = (b.chimT || 0) - 1 / 60; if (b.chimT <= 0) { b.chimT = 0.45 + Math.random() * 0.6; const [cxp, cyp] = CHIM3[b.t]; const r = b.r3d; sc.FX.push({ k: 'chim', x0: r[0] + r[2] * cxp, y0: r[1] + r[3] * cyp, t: 0, dur: 2.8, r: 3 + Math.random() * 2.5, dx: 5 + Math.random() * 7 }); } }
@@ -1395,7 +1402,7 @@ function drawBuilding(c, sc, b) {
         if ((m & 12) === 12) segs.push(['_wv', 3 * Math.PI / 4, 1.1]); else segs.push(['_hv', 3 * Math.PI / 4, 0.62, 0, m & 4 ? 0.24 : -0.24]); }
       else { if ((m & 3) || !m) segs.push(['_wu', Math.PI / 4, 1.1]); if (m & 12) segs.push(['_wv', 3 * Math.PI / 4, 1.1]); }
       for (const [kk, yw, ft, ox, oy] of segs) { if (!b[kk]) b[kk] = { x: b.x + (ox || 0), y: b.y + (oy || 0), w: 1, h: 1 }; g3draw(c, b[kk], wk, ft, yw); }
-      const mw = b.maskW == null ? m : b.maskW; if (wk === 'mura' && (mw & 3) && (mw & 12) && (mw & 3) !== 3 && (mw & 12) !== 12) { if (!G3.models.torrepietra) need3d('torrepietra'); if (G3.models.torrepietra && G3.models.torrepietra.ready) { if (!b._tw) b._tw = { x: b.x, y: b.y, w: 1, h: 1 }; g3draw(c, b._tw, 'torrepietra', 1.15, 0); } } }
+      const mw = b.maskW == null ? m : b.maskW; if (wk === 'mura' && !b.nearTower && (mw & 3) && (mw & 12) && (mw & 3) !== 3 && (mw & 12) !== 12) { if (!G3.models.torrepietra) need3d('torrepietra'); if (G3.models.torrepietra && G3.models.torrepietra.ready) { if (!b._tw) b._tw = { x: b.x, y: b.y, w: 1, h: 1 }; g3draw(c, b._tw, 'torrepietra', 1.15, 0); } } }
     else if (BDEF[b.t].wall || BDEF[b.t].moat) c.drawImage(e.cv, wx - e.ox, wy - e.oy, e.w, e.h);
     else { const q = ((ANG / (Math.PI / 2)) % 4 + 4) % 4, i = Math.floor(q), sm0 = Math.min(1, Math.max(0, (q - i - 0.38) / 0.24)), t = sm0 * sm0 * (3 - 2 * sm0); const ga = c.globalAlpha; const [cx] = W(b.x + b.w / 2, b.y + b.h / 2); const ox = cx - wx;
       for (const [fl, al] of [[i % 2, 1 - t], [(i + 1) % 2, t]]) { if (al < 0.01) continue; c.globalAlpha = ga * (al > 0.99 ? 1 : al); if (fl) { c.save(); c.translate(wx + ox, 0); c.scale(-1, 1); c.translate(-ox, 0); c.drawImage(e.cv, -e.ox, wy - e.oy, e.w, e.h); c.restore(); } else c.drawImage(e.cv, wx - e.ox, wy - e.oy, e.w, e.h); }
